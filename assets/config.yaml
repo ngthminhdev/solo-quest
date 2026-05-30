@@ -1,0 +1,4 @@
+apiHost: "https://api.example.com"
+appVersion: "1.0.0"
+env: "local"
+isWriteLogToServer: false
