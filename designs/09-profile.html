@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Hồ Sơ & Cài Đặt</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .profile-header {
+    padding: 24px 20px 20px;
+    text-align: center;
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(135deg, var(--cyan-dim), var(--violet-dim));
+    pointer-events: none;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--glow-cyan);
+  }
+
+  .profile-avatar__inner {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--bg-raised);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--fg);
+  }
+
+  .profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-rank {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--violet);
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-joined {
+    font-size: 12px;
+    color: var(--fg-muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    margin-top: 16px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .profile-stat {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    background: var(--bg-raised);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .profile-stat__val {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+
+  .profile-stat__label {
+    font-size: 9px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .section-block {
+    padding: 16px 20px 0;
+  }
+
+  .section-block__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  /* Info card */
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .info-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .info-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .info-card__edit {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+
+  .info-card__edit:active {
+    background: var(--cyan-dim);
+  }
+
+  /* Info grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .info-grid__item {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .info-grid__label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-grid__value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Schedule card */
+  .schedule-card {
+    background: var(--surface);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .schedule-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .schedule-row:last-child {
+    border-bottom: none;
+  }
+
+  .schedule-row__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .schedule-row__label {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .schedule-row__value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--fg);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Reminder card */
+  .reminder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .reminder-item:last-child {
+    border-bottom: none;
+  }
+
+  .reminder-item__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .reminder-item__label {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reminder-item__value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--fg);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Reward tags */
+  .reward-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .reward-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--fg);
+    background: var(--surface-hover);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+  }
+
+  .reward-tag__icon {
+    font-size: 16px;
+  }
+
+  /* AI settings */
+  .ai-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .ai-row:last-child {
+    border-bottom: none;
+  }
+
+  .ai-row__left {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .ai-row__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ai-row__desc {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Segmented control */
+  .segmented {
+    display: flex;
+    background: var(--bg);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .segmented__btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .segmented__btn.active {
+    background: var(--surface);
+    color: var(--cyan);
+  }
+
+  /* Toggle */
+  .toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--fg-muted);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on {
+    background: var(--cyan);
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after {
+    transform: translateX(18px);
+  }
+
+  /* Settings group */
+  .settings-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .settings-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    min-height: 48px;
+    overflow: hidden;
+  }
+
+  .settings-item:last-child {
+    border-bottom: none;
+  }
+
+  .settings-item:active {
+    background: var(--surface-hover);
+  }
+
+  .settings-item__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .settings-item__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .settings-item__icon.cyan { background: var(--cyan-dim); color: var(--cyan); }
+  .settings-item__icon.violet { background: var(--violet-dim); color: var(--violet); }
+  .settings-item__icon.gold { background: var(--exp-gold-dim); color: var(--exp-gold); }
+  .settings-item__icon.green { background: var(--success-dim); color: var(--success); }
+  .settings-item__icon.red { background: var(--danger-dim); color: var(--danger); }
+  .settings-item__icon.grey { background: var(--surface-hover); color: var(--fg-secondary); }
+
+  .settings-item__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .settings-item__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .settings-item__desc {
+    font-size: 12px;
+    color: var(--fg-secondary);
+  }
+
+  .settings-item__action {
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  .settings-item__action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .danger-zone {
+    padding: 16px 20px;
+  }
+
+  .btn--danger {
+    width: 100%;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn--danger:active {
+    background: var(--danger-dim);
+  }
+
+  .app-version {
+    text-align: center;
+    padding: 12px 20px 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <div class="profile-avatar__inner">M</div>
+        </div>
+        <div class="profile-name">Minh</div>
+        <div class="profile-rank">Cấp 3 · Thành viên</div>
+        <div class="profile-joined">Tham gia 15/05/2026</div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat__val">142</div>
+            <div class="profile-stat__label">Nhiệm Vụ</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat__val">7</div>
+            <div class="profile-stat__label">Chuỗi</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat__val">8.4k</div>
+            <div class="profile-stat__label">EXP</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat__val">94h</div>
+            <div class="profile-stat__label">Thời Gian</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. Thông tin cá nhân -->
+      <div class="section-block">
+        <div class="section-block__title">Thông Tin Cá Nhân</div>
+        <div class="info-card">
+          <div class="info-card__header">
+            <div class="info-card__title">Thông Tin Cá Nhân</div>
+            <button class="info-card__edit">Chỉnh sửa</button>
+          </div>
+          <div class="info-grid">
+            <div class="info-grid__item">
+              <div class="info-grid__label">Tên hiển thị</div>
+              <div class="info-grid__value">Minh</div>
+            </div>
+            <div class="info-grid__item">
+              <div class="info-grid__label">Tuổi</div>
+              <div class="info-grid__value">24</div>
+            </div>
+            <div class="info-grid__item">
+              <div class="info-grid__label">Chiều cao</div>
+              <div class="info-grid__value">1m72</div>
+            </div>
+            <div class="info-grid__item">
+              <div class="info-grid__label">Cân nặng</div>
+              <div class="info-grid__value">68 kg</div>
+            </div>
+            <div class="info-grid__item">
+              <div class="info-grid__label">Công việc</div>
+              <div class="info-grid__value">Lập trình viên</div>
+            </div>
+            <div class="info-grid__item">
+              <div class="info-grid__label">Mục tiêu chính</div>
+              <div class="info-grid__value">Sống khỏe hơn</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Lịch cá nhân -->
+      <div class="section-block">
+        <div class="section-block__title">Lịch Cá Nhân</div>
+        <div class="schedule-card">
+          <div class="info-card__header">
+            <div class="info-card__title">Lịch làm việc / học</div>
+            <button class="info-card__edit" onclick="location.href='12-schedule-editor.html'">Chỉnh lịch</button>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-row__icon" style="background:var(--cyan-dim);color:var(--cyan)">📅</div>
+            <div class="schedule-row__label">Thứ 2 — Thứ 6</div>
+            <div class="schedule-row__value">08:30–12:00 · 13:30–17:30</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-row__icon" style="background:var(--violet-dim);color:var(--violet)">☕</div>
+            <div class="schedule-row__label">Nghỉ trưa</div>
+            <div class="schedule-row__value">12:00–13:30</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-row__icon" style="background:var(--success-dim);color:var(--success)">🎮</div>
+            <div class="schedule-row__label">Thời gian rảnh</div>
+            <div class="schedule-row__value">20:00–22:00</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-row__icon" style="background:var(--info-dim);color:var(--info)">🛏</div>
+            <div class="schedule-row__label">Giờ ngủ mục tiêu</div>
+            <div class="schedule-row__value">23:00</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-row__icon" style="background:var(--warn-dim);color:var(--warn)">⏰</div>
+            <div class="schedule-row__label">Giờ thức dậy</div>
+            <div class="schedule-row__value">07:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Cài đặt nhắc nhở -->
+      <div class="section-block">
+        <div class="section-block__title">Cài Đặt Nhắc Nhở</div>
+        <div class="info-card">
+          <div class="info-card__header">
+            <div class="info-card__title">Tần suất & thời gian</div>
+            <button class="info-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh nhắc nhở</button>
+          </div>
+          <div class="reminder-item">
+            <div class="reminder-item__dot" style="background:#60A5FA"></div>
+            <div class="reminder-item__label">Break Quest</div>
+            <div class="reminder-item__value">Mỗi 90 phút</div>
+          </div>
+          <div class="reminder-item">
+            <div class="reminder-item__dot" style="background:#C084FC"></div>
+            <div class="reminder-item__label">Thời gian nghỉ</div>
+            <div class="reminder-item__value">5 phút</div>
+          </div>
+          <div class="reminder-item">
+            <div class="reminder-item__dot" style="background:#60A5FA"></div>
+            <div class="reminder-item__label">Water Quest</div>
+            <div class="reminder-item__value">Random 60–120 phút</div>
+          </div>
+          <div class="reminder-item">
+            <div class="reminder-item__dot" style="background:#818CF8"></div>
+            <div class="reminder-item__label">Không nhắc sau</div>
+            <div class="reminder-item__value">22:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Phần thưởng yêu thích -->
+      <div class="section-block">
+        <div class="section-block__title">Phần Thưởng Yêu Thích</div>
+        <div class="info-card">
+          <div class="info-card__header">
+            <div class="info-card__title">Khi hoàn thành mục tiêu</div>
+            <button class="info-card__edit">Chỉnh phần thưởng</button>
+          </div>
+          <div class="reward-tags">
+            <span class="reward-tag"><span class="reward-tag__icon">🎮</span> Chơi game</span>
+            <span class="reward-tag"><span class="reward-tag__icon">🎬</span> Xem phim</span>
+            <span class="reward-tag"><span class="reward-tag__icon">😴</span> Nghỉ ngơi</span>
+            <span class="reward-tag"><span class="reward-tag__icon">🍜</span> Ăn món yêu thích</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Mục tiêu cá nhân -->
+      <div class="section-block">
+        <div class="section-block__title">Mục Tiêu Cá Nhân</div>
+        <div class="info-card" style="border-color: var(--border-glow-violet); box-shadow: var(--glow-violet);">
+          <div class="info-card__header">
+            <div class="info-card__title">Mục tiêu học tập</div>
+            <button class="info-card__edit" onclick="location.href='13-learning-goals.html'">Xem</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div style="width:36px; height:36px; border-radius:var(--radius-sm); background:var(--warn-dim); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14px; font-weight:600; color:var(--fg);">Docker cơ bản</div>
+              <div style="font-size:12px; color:var(--fg-secondary);">Bài 3 / 12 · 20 phút mỗi tối</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span style="font-size:11px; color:var(--success);">Đang đồng bộ nhiệm vụ</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn--secondary btn--small" style="flex:1;" onclick="location.href='14-learning-roadmap.html'">Xem lộ trình</button>
+            <button class="btn btn--ghost btn--small" style="flex:1;" onclick="location.href='13-learning-goals.html'">Chỉnh sửa</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Cá nhân hóa AI -->
+      <div class="section-block">
+        <div class="section-block__title">Cá Nhân Hóa AI</div>
+        <div class="info-card">
+          <div class="ai-row">
+            <div class="ai-row__left">
+              <div class="ai-row__label">Tone thông báo</div>
+              <div class="ai-row__desc">Kiểu giọng nói của hệ thống</div>
+            </div>
+            <div class="segmented">
+              <button class="segmented__btn active">Hệ thống</button>
+              <button class="segmented__btn">Dịu</button>
+              <button class="segmented__btn">Nghiêm</button>
+              <button class="segmented__btn">Hài hước</button>
+            </div>
+          </div>
+          <div class="ai-row">
+            <div class="ai-row__left">
+              <div class="ai-row__label">Độ khó mặc định</div>
+              <div class="ai-row__desc">Mức độ thử thách hàng ngày</div>
+            </div>
+            <div class="segmented">
+              <button class="segmented__btn">Dễ</button>
+              <button class="segmented__btn active">Bình thường</button>
+              <button class="segmented__btn">Thử thách</button>
+            </div>
+          </div>
+          <div class="ai-row">
+            <div class="ai-row__left">
+              <div class="ai-row__label">Recovery mode</div>
+              <div class="ai-row__desc">Giảm độ khó khi năng lượng thấp</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App settings -->
+      <div class="section-block">
+        <div class="section-block__title">Ứng Dụng</div>
+        <div class="settings-group">
+          <div class="settings-item">
+            <div class="settings-item__icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="settings-item__info">
+              <div class="settings-item__label">Thông Báo</div>
+              <div class="settings-item__desc">Nhắc nhiệm vụ, cảnh báo chuỗi</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item__icon grey">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </div>
+            <div class="settings-item__info">
+              <div class="settings-item__label">Giao Diện</div>
+              <div class="settings-item__desc">Chế độ tối (hệ thống)</div>
+            </div>
+            <div class="settings-item__action">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="settings-item" onclick="location.href='16-quest-rules.html'">
+            <div class="settings-item__icon violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div class="settings-item__info">
+              <div class="settings-item__label">Luật Điều Chỉnh Quest</div>
+              <div class="settings-item__desc">Xem cách SoloQuest tự điều chỉnh nhiệm vụ</div>
+            </div>
+            <div class="settings-item__action">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item__icon grey">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="settings-item__info">
+              <div class="settings-item__label">Phản Hồi AI</div>
+              <div class="settings-item__desc">Giúp cải thiện tạo nhiệm vụ</div>
+            </div>
+            <div class="settings-item__action">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item__icon grey">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="settings-item__info">
+              <div class="settings-item__label">Trợ Giúp & Hỗ Trợ</div>
+              <div class="settings-item__desc">FAQ, liên hệ, phản hồi</div>
+            </div>
+            <div class="settings-item__action">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-zone">
+        <button class="btn--danger">Đăng Xuất</button>
+      </div>
+
+      <div class="app-version">SoloQuest v1.0.0 · Hệ Thống Trực Tuyến</div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Trang Chủ
+      </a>
+      <a href="05-logs.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Nhật Ký
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        Tiến Trình
+      </a>
+      <a href="07-rewards.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Thưởng
+      </a>
+      <a href="09-profile.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hồ Sơ
+      </a>
+    </nav>
+  </div>
+</body>
+</html>

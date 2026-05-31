@@ -1,5 +1,3 @@
-import '../config/app_config.dart';
-
 void log(
   String message, {
   String? name,

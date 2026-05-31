@@ -5,10 +5,10 @@ import 'base_page.dart';
 import 'base_page_model.dart';
 import 'base_page_state.dart';
 
-abstract class BasePageConsumerState<T extends BasePageModel<S>, S extends BasePageState>
-    extends ConsumerState<BasePage<T, S>> with AutomaticKeepAliveClientMixin {
+abstract class BasePageConsumerState<P extends BasePage<T, S>, T extends BasePageModel<S>, S extends BasePageState>
+    extends ConsumerState<P> with AutomaticKeepAliveClientMixin {
   T get pageModel => ref.read(widget.provider.notifier);
-  S get read => ref.read(widget.provider);
+  S get read => ref.watch(widget.provider);
 
   void listen(void Function(S? previous, S next) listener) {
     ref.listen(widget.provider, listener);

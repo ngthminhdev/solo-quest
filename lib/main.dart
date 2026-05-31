@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/app_config.dart';
 import 'config/app_session.dart';
+import 'config/app_theme_registry.dart';
+import 'generated/l10n/app_localizations.dart';
 import 'routes/router.dart';
 import 'routes/routes_config.dart';
-import 'services/http_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await AppConfig.load(configFile: 'assets/config.yaml');
-
-  await HttpService.warmUp(apiHost: AppConfig.instance.apiHost);
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -27,10 +27,16 @@ class MyApp extends StatelessWidget {
       navigatorKey: AppSession.navigatorKey,
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: RoutesConfig.splash,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6C5CE7)),
-        useMaterial3: true,
-      ),
+      theme: AppThemeRegistry.darkTheme,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('vi'),
     );
   }
 }

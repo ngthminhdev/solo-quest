@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Bắt Đầu Thiết Lập</title>
+<link rel="stylesheet" href="../soloquest-tokens.css">
+<link rel="stylesheet" href="../onboarding-steps.css">
+<style>
+  .intro-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-screen::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse-glow 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .intro-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--glow-cyan), var(--glow-violet);
+  }
+
+  .intro-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--bg-deep);
+  }
+
+  .intro-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .intro-desc {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.6;
+  }
+
+  .intro-steps {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .intro-step-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .intro-step-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cyan);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--cyan-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .intro-step-text {
+    font-size: 13px;
+    color: var(--fg);
+  }
+
+  .system-hint-intro {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-align: center;
+    line-height: 1.5;
+    padding: 4px 0;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="onboard-container">
+        <div class="onboard-header">
+          <div class="onboard-step">Bước 1 / 9 — Giới Thiệu</div>
+        </div>
+
+        <div class="step-progress">
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+        </div>
+
+        <div class="intro-screen">
+          <div class="intro-content">
+            <div class="intro-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+
+            <h1 class="intro-title">Thiết Lập Hành Trình</h1>
+            <p class="intro-desc">SoloQuest sẽ tạo nhiệm vụ cá nhân hóa dựa trên thông tin của bạn. Quy trình gồm 8 bước:</p>
+
+            <div class="intro-steps">
+              <div class="intro-step-item">
+                <span class="intro-step-num">1</span>
+                <span class="intro-step-text">Thông tin cá nhân</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">2</span>
+                <span class="intro-step-text">Công việc & lịch trình</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">3</span>
+                <span class="intro-step-text">Sức khỏe & thể chất</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">4</span>
+                <span class="intro-step-text">Mục tiêu cá nhân</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">5</span>
+                <span class="intro-step-text">Lịch trình hàng ngày</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">6</span>
+                <span class="intro-step-text">Nhắc nhở</span>
+              </div>
+              <div class="intro-step-item">
+                <span class="intro-step-num">7</span>
+                <span class="intro-step-text">Phần thưởng</span>
+              </div>
+            </div>
+
+            <p class="system-hint-intro">Mất khoảng 2 phút. Bạn có thể chỉnh lại sau.</p>
+          </div>
+        </div>
+
+        <div class="onboard-actions">
+          <a href="../01-welcome.html" class="btn btn--secondary">← Quay lại</a>
+          <a href="step-02-basic.html" class="btn btn--primary">Bắt đầu thiết lập →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Nhật Ký Cá Nhân</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .logs-header {
+    padding: 16px 20px 0;
+    background: var(--bg-raised);
+  }
+
+  .logs-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .logs-desc {
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 6px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .summary-card__val {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .summary-card__val.cyan { color: var(--cyan); }
+  .summary-card__val.green { color: var(--success); }
+  .summary-card__val.gold { color: var(--exp-gold); }
+  .summary-card__val.violet { color: var(--violet); }
+
+  .summary-card__label {
+    font-size: 10px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .quick-log-section {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .quick-log-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .quick-log-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .quick-log-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .quick-log-btn:active {
+    transform: scale(0.95);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .quick-log-btn.logged {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .insight-card {
+    margin: 12px 20px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(0,240,255,0.06), rgba(168,85,247,0.06));
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-lg);
+  }
+
+  .insight-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .insight-card__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--cyan-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .insight-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+
+  .insight-card__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .insight-card__item {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .insight-card__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cyan);
+    opacity: 0.6;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-bar::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--fg-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .filter-chip.active {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .filter-chip__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .timeline {
+    padding: 12px 20px 100px;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 32px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline-dot.water { background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow); }
+  .timeline-dot.break { background: #F97316; box-shadow: 0 0 6px rgba(249,115,22,0.3); }
+  .timeline-dot.movement { background: var(--success); box-shadow: 0 0 6px rgba(34,197,94,0.3); }
+  .timeline-dot.learning { background: var(--violet); box-shadow: 0 0 6px rgba(168,85,247,0.3); }
+  .timeline-dot.mood { background: var(--exp-gold); box-shadow: 0 0 6px rgba(234,179,8,0.3); }
+  .timeline-dot.sleep { background: #818CF8; box-shadow: 0 0 6px rgba(129,140,248,0.3); }
+  .timeline-dot.checkin { background: var(--info); box-shadow: 0 0 6px rgba(59,130,246,0.3); }
+  .timeline-dot.review { background: var(--violet); box-shadow: 0 0 6px rgba(168,85,247,0.3); }
+  .timeline-dot.note { background: var(--fg-muted); }
+  .timeline-dot.pending { background: var(--fg-muted); opacity: 0.3; }
+
+  .timeline-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timeline-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-bottom: 4px;
+  }
+
+  .timeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    overflow: hidden;
+  }
+
+  .timeline-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+
+  .timeline-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .timeline-card-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .timeline-card-badge.water { background: rgba(0,240,255,0.1); color: var(--cyan); }
+  .timeline-card-badge.break { background: rgba(249,115,22,0.1); color: #F97316; }
+  .timeline-card-badge.movement { background: rgba(34,197,94,0.1); color: var(--success); }
+  .timeline-card-badge.learning { background: rgba(168,85,247,0.1); color: var(--violet); }
+  .timeline-card-badge.mood { background: rgba(234,179,8,0.1); color: var(--exp-gold); }
+  .timeline-card-badge.sleep { background: rgba(129,140,248,0.1); color: #818CF8; }
+  .timeline-card-badge.checkin { background: rgba(59,130,246,0.1); color: var(--info); }
+  .timeline-card-badge.review { background: rgba(168,85,247,0.1); color: var(--violet); }
+  .timeline-card-badge.note { background: rgba(255,255,255,0.05); color: var(--fg-muted); }
+
+  .timeline-card-detail {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .timeline-card-note {
+    font-size: 11px;
+    color: var(--fg-muted);
+    padding: 6px 8px;
+    background: var(--bg);
+    border-radius: 6px;
+    margin-top: 6px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  .timeline-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .timeline-card-meta span {
+    font-size: 10px;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .timeline-card-meta .exp {
+    color: var(--exp-gold);
+    font-weight: 700;
+  }
+
+  .timeline-card-meta .source {
+    color: var(--cyan);
+    opacity: 0.7;
+  }
+
+  .timeline-card-meta .impact-positive { color: var(--success); }
+  .timeline-card-meta .impact-neutral { color: var(--fg-muted); }
+  .timeline-card-meta .impact-negative { color: var(--warn); }
+
+  .timeline-card-rating {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .timeline-card-rating span {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+  }
+
+  .timeline-card-rating span.active {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .timeline-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 0 6px;
+    margin-left: 44px;
+  }
+
+  .weekly-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 20px 12px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--violet);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .weekly-link:active {
+    transform: scale(0.98);
+    border-color: var(--violet);
+  }
+
+  /* Add Log Tab */
+  .add-log-section {
+    padding: 16px 20px 100px;
+  }
+
+  .log-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .log-form-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .chip-option:active,
+  .chip-option.selected {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .chip-option.impact-good.selected { background: var(--success-dim); border-color: var(--success); color: var(--success); }
+  .chip-option.impact-neutral.selected { background: rgba(255,255,255,0.06); border-color: var(--fg-muted); color: var(--fg-secondary); }
+  .chip-option.impact-bad.selected { background: var(--warn-dim); border-color: var(--warn); color: var(--warn); }
+
+  .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--fg);
+    font-size: 13px;
+    font-family: var(--font-body);
+    resize: none;
+    min-height: 60px;
+    box-sizing: border-box;
+  }
+
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 2px var(--cyan-glow);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+
+  .toggle-row__text {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+    flex: 1;
+    padding-right: 12px;
+  }
+
+  .toggle-switch {
+    width: 44px;
+    height: 24px;
+    background: var(--fg-muted);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.on {
+    background: var(--cyan);
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: var(--surface);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+  }
+
+  .toggle-switch.on::after {
+    transform: translateX(20px);
+  }
+
+  .form-submit {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--cyan), var(--violet));
+    border: none;
+    border-radius: var(--radius-md);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .form-submit:active { transform: scale(0.98); }
+
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--success);
+    color: var(--bg-deep);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Header -->
+      <div class="logs-header">
+        <h1 class="logs-title">◆ Nhật Ký Cá Nhân</h1>
+        <p class="logs-desc">Lưu lại trạng thái, nhiệm vụ, thói quen và ghi chú hằng ngày để SoloQuest hiểu bạn tốt hơn theo thời gian.</p>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('timeline')">Timeline</button>
+          <button class="tab-btn" onclick="switchTab('addlog')">Thêm log</button>
+        </div>
+      </div>
+
+      <!-- Tab: Timeline -->
+      <div class="tab-content active" id="tab-timeline">
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card__val cyan">6/9</div>
+            <div class="summary-card__label">Quest xong</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__val gold">+180</div>
+            <div class="summary-card__label">EXP</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__val green">5</div>
+            <div class="summary-card__label">Streak</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__val violet">12</div>
+            <div class="summary-card__label">Log hôm nay</div>
+          </div>
+        </div>
+
+        <div class="quick-log-section">
+          <div class="quick-log-title">Log nhanh</div>
+          <div class="quick-log-grid">
+            <button class="quick-log-btn" onclick="quickLog(this)">😓 Hôm nay mệt</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">📖 Học tốt buổi tối</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">🔔 Bị nhắc quá nhiều</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">😴 Ngủ ít</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">😰 Stress cao</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">💪 Quest quá dễ</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">🏋 Quest quá khó</button>
+            <button class="quick-log-btn" onclick="quickLog(this)">🌿 Cần ngày mai nhẹ hơn</button>
+          </div>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-card__header">
+            <div class="insight-card__icon">🧠</div>
+            <div class="insight-card__title">SoloQuest nhận thấy</div>
+          </div>
+          <ul class="insight-card__list">
+            <li class="insight-card__item">Bạn thường hoàn thành Learning Quest tốt hơn sau 20:00.</li>
+            <li class="insight-card__item">Break Quest bị hoãn nhiều nhất vào buổi sáng.</li>
+            <li class="insight-card__item">Khi năng lượng dưới 3/5, bạn dễ bỏ qua Movement Quest.</li>
+            <li class="insight-card__item">Water Quest đang ổn định 5 ngày liên tiếp.</li>
+          </ul>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-chip active" data-filter="all">Tất cả</div>
+          <div class="filter-chip" data-filter="checkin"><span class="filter-chip__dot" style="background:var(--info)"></span>Check-in</div>
+          <div class="filter-chip" data-filter="water"><span class="filter-chip__dot" style="background:var(--cyan)"></span>Nước</div>
+          <div class="filter-chip" data-filter="break"><span class="filter-chip__dot" style="background:#F97316"></span>Nghỉ mắt</div>
+          <div class="filter-chip" data-filter="learning"><span class="filter-chip__dot" style="background:var(--violet)"></span>Học tập</div>
+          <div class="filter-chip" data-filter="movement"><span class="filter-chip__dot" style="background:var(--success)"></span>Vận động</div>
+          <div class="filter-chip" data-filter="review"><span class="filter-chip__dot" style="background:var(--violet)"></span>Review</div>
+          <div class="filter-chip" data-filter="skipped"><span class="filter-chip__dot" style="background:var(--fg-muted)"></span>Bỏ qua</div>
+          <div class="filter-chip" data-filter="snoozed"><span class="filter-chip__dot" style="background:var(--warn)"></span>Hoãn</div>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <!-- Hôm nay -->
+          <div class="timeline-section-label">Hôm nay — 29/05</div>
+
+          <div class="timeline-item" data-type="checkin">
+            <div class="timeline-dot checkin"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">07:30</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Morning Check-in</div>
+                  <span class="timeline-card-badge checkin">Check-in</span>
+                </div>
+                <div class="timeline-card-detail">Năng lượng 3/5, Stress 2/5, thời gian rảnh 60 phút</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Morning Check-in</span>
+                  <span class="impact-neutral">Trung tính</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="water">
+            <div class="timeline-dot water"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">09:30</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Uống nước</div>
+                  <span class="timeline-card-badge water">Nước</span>
+                </div>
+                <div class="timeline-card-detail">250ml — Uống ngay sau khi thức dậy</div>
+                <div class="timeline-card-meta">
+                  <span class="exp">+5 EXP</span>
+                  <span>5 phút</span>
+                  <span>✓ 09:32</span>
+                  <span class="source">Nguồn: Water Quest</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="break">
+            <div class="timeline-dot break"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">10:00</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Nghỉ mắt</div>
+                  <span class="timeline-card-badge break">Nghỉ mắt</span>
+                </div>
+                <div class="timeline-card-detail">5 phút — Rời khỏi màn hình, nhìn ra xa</div>
+                <div class="timeline-card-meta">
+                  <span class="exp">+10 EXP</span>
+                  <span>5 phút</span>
+                  <span>✓ 10:04</span>
+                  <span class="source">Nguồn: Break Quest</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+                <div class="timeline-card-note">Phản hồi: Đỡ mỏi mắt hơn</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="snoozed">
+            <div class="timeline-dot pending"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">10:30</div>
+              <div class="timeline-card" style="border-color: rgba(245,158,11,0.2);">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Break Quest — đã hoãn</div>
+                  <span class="timeline-card-badge" style="background:var(--warn-dim); color:var(--warn);">Đã hoãn</span>
+                </div>
+                <div class="timeline-card-detail">Hoãn đến 10:45 — đang họp</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Người dùng hoãn</span>
+                  <span class="impact-neutral">Cần điều chỉnh</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="learning">
+            <div class="timeline-dot learning"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">09:00</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Học Docker cơ bản</div>
+                  <span class="timeline-card-badge learning">Học tập</span>
+                </div>
+                <div class="timeline-card-detail">15 phút — Image là template, container là instance</div>
+                <div class="timeline-card-meta">
+                  <span class="exp">+35 EXP</span>
+                  <span>15 phút</span>
+                  <span>✓ 09:14</span>
+                  <span class="source">Nguồn: Learning Quest</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+                <div class="timeline-card-rating">
+                  <span>1</span>
+                  <span>2</span>
+                  <span class="active">3</span>
+                  <span>4</span>
+                  <span>5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="movement">
+            <div class="timeline-dot movement"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">18:30</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Vận động</div>
+                  <span class="timeline-card-badge movement">Vận động</span>
+                </div>
+                <div class="timeline-card-detail">Đi bộ 15 phút — ngoài trời</div>
+                <div class="timeline-card-meta">
+                  <span class="exp">+30 EXP</span>
+                  <span>15 phút</span>
+                  <span>✓ 18:44</span>
+                  <span class="source">Nguồn: Movement Quest</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+                <div class="timeline-card-rating">
+                  <span>Dễ</span>
+                  <span class="active">Vừa sức</span>
+                  <span>Khó</span>
+                  <span>Quá mệt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="skipped">
+            <div class="timeline-dot pending" style="opacity:0.5;"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">14:00</div>
+              <div class="timeline-card" style="opacity:0.6;">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Movement Quest — bỏ qua</div>
+                  <span class="timeline-card-badge" style="background:rgba(255,255,255,0.05); color:var(--fg-muted);">Bỏ qua</span>
+                </div>
+                <div class="timeline-card-detail">Lý do: Bận họp đột xuất</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Người dùng bỏ qua</span>
+                  <span class="impact-negative">Cần điều chỉnh</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="review">
+            <div class="timeline-dot review"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">21:30</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Daily Review</div>
+                  <span class="timeline-card-badge review">Review</span>
+                </div>
+                <div class="timeline-card-detail">Hơi mệt, muốn ngày mai nhẹ hơn. Học tốt buổi tối.</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Daily Review</span>
+                  <span class="impact-neutral">Trung tính</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hôm qua -->
+          <div class="timeline-section-label">Hôm qua — 28/05</div>
+
+          <div class="timeline-item" data-type="checkin">
+            <div class="timeline-dot checkin"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">08:00</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Morning Check-in</div>
+                  <span class="timeline-card-badge checkin">Check-in</span>
+                </div>
+                <div class="timeline-card-detail">Năng lượng 4/5, Stress 1/5, thời gian rảnh 90 phút</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Morning Check-in</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="learning">
+            <div class="timeline-dot learning"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">09:30</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Học React hooks</div>
+                  <span class="timeline-card-badge learning">Học tập</span>
+                </div>
+                <div class="timeline-card-detail">20 phút — useEffect cleanup, dependency array</div>
+                <div class="timeline-card-meta">
+                  <span class="exp">+35 EXP</span>
+                  <span>20 phút</span>
+                  <span>✓ 09:48</span>
+                  <span class="source">Nguồn: Learning Quest</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="skipped">
+            <div class="timeline-dot pending" style="opacity:0.5;"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">09:30</div>
+              <div class="timeline-card" style="opacity:0.6;">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Movement Quest — bỏ qua</div>
+                  <span class="timeline-card-badge" style="background:rgba(255,255,255,0.05); color:var(--fg-muted);">Bỏ qua</span>
+                </div>
+                <div class="timeline-card-detail">Lý do: Không có thời gian</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Người dùng bỏ qua</span>
+                  <span class="impact-negative">Cần điều chỉnh</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item" data-type="review">
+            <div class="timeline-dot review"></div>
+            <div class="timeline-content">
+              <div class="timeline-time">22:00</div>
+              <div class="timeline-card">
+                <div class="timeline-card-header">
+                  <div class="timeline-card-title">Daily Review</div>
+                  <span class="timeline-card-badge review">Review</span>
+                </div>
+                <div class="timeline-card-detail">Năng lượng ổn, muốn thử thách hơn. Học tốt hơn sau 20:00.</div>
+                <div class="timeline-card-meta">
+                  <span class="source">Nguồn: Daily Review</span>
+                  <span class="impact-positive">Tốt</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="11-weekly-summary.html" class="weekly-link">
+          📊 Xem báo cáo tuần
+        </a>
+      </div>
+
+      <!-- Tab: Thêm log -->
+      <div class="tab-content" id="tab-addlog">
+        <div class="add-log-section">
+          <div class="log-form-card">
+            <div class="log-form-card__title">📝 Ghi log mới</div>
+
+            <div class="form-group">
+              <label class="form-label">Loại log</label>
+              <div class="chip-group" id="logTypeChips">
+                <div class="chip-option selected" onclick="selectChip(this, 'logTypeChips')">Ghi chú nhanh</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Tâm trạng</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Năng lượng</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Sức khỏe</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Học tập</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Công việc</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Thói quen</div>
+                <div class="chip-option" onclick="selectChip(this, 'logTypeChips')">Sự kiện bất thường</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tác động</label>
+              <div class="chip-group" id="impactChips">
+                <div class="chip-option impact-good selected" onclick="selectChip(this, 'impactChips')">Tốt hơn</div>
+                <div class="chip-option impact-neutral" onclick="selectChip(this, 'impactChips')">Bình thường</div>
+                <div class="chip-option impact-bad" onclick="selectChip(this, 'impactChips')">Tệ hơn</div>
+                <div class="chip-option impact-neutral" onclick="selectChip(this, 'impactChips')">Không rõ</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Thời điểm</label>
+              <div class="chip-group" id="timeChips">
+                <div class="chip-option selected" onclick="selectChip(this, 'timeChips')">Bây giờ</div>
+                <div class="chip-option" onclick="selectChip(this, 'timeChips')">Sáng</div>
+                <div class="chip-option" onclick="selectChip(this, 'timeChips')">Chiều</div>
+                <div class="chip-option" onclick="selectChip(this, 'timeChips')">Tối</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nội dung ghi chú</label>
+              <textarea class="form-textarea" placeholder="Ví dụ: hôm nay học buổi tối tập trung hơn, nhưng bị nhắc uống nước quá nhiều…"></textarea>
+            </div>
+
+            <div class="form-group">
+              <div class="toggle-row">
+                <div class="toggle-row__text">Dùng dữ liệu này để điều chỉnh quest sau này</div>
+                <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+              </div>
+            </div>
+
+            <button class="form-submit" onclick="submitNewLog()">Lưu log</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Đã lưu log</div>
+
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Trang Chủ
+      </a>
+      <a href="05-logs.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Nhật Ký
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        Tiến Trình
+      </a>
+      <a href="07-rewards.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Thưởng
+      </a>
+      <a href="09-profile.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hồ Sơ
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function selectChip(el, groupId) {
+      const group = document.getElementById(groupId);
+      group.querySelectorAll('.chip-option').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function quickLog(btn) {
+      btn.classList.toggle('logged');
+      if (btn.classList.contains('logged')) {
+        showToast('Đã lưu: ' + btn.textContent.trim());
+      }
+    }
+
+    function submitNewLog() {
+      showToast('Đã lưu log mới');
+      setTimeout(() => switchTab('timeline'), 600);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.timeline-item').forEach(item => {
+          if (filter === 'all' || item.dataset.type === filter) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

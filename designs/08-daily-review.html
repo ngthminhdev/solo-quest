@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Đánh Giá Cuối Ngày</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .review-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  /* ── Header ── */
+  .review-header {
+    padding: 24px 20px 20px;
+    text-align: center;
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .review-header::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, var(--violet-dim) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .review-date {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .review-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .review-subtitle {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    position: relative;
+    z-index: 1;
+    line-height: 1.4;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* ── Stats row ── */
+  .review-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .review-stat {
+    text-align: center;
+    padding: 10px 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .review-stat__val {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .review-stat__val.cyan { color: var(--cyan); }
+  .review-stat__val.gold { color: var(--exp-gold); }
+  .review-stat__val.green { color: var(--success); }
+  .review-stat__val.warn { color: var(--warn); }
+  .review-stat__val.danger { color: var(--danger); }
+
+  .review-stat__label {
+    font-size: 10px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Section wrapper ── */
+  .review-section {
+    padding: 16px 16px;
+  }
+
+  .review-section + .review-section {
+    border-top: 1px solid var(--border);
+  }
+
+  .review-section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  /* ── Choice cards (radio-like) ── */
+  .choice-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .choice-card {
+    flex: 1;
+    padding: 12px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .choice-card:active { transform: scale(0.97); }
+
+  .choice-card.selected {
+    border-color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+
+  .choice-card__icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .choice-card__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    line-height: 1.3;
+  }
+
+  .choice-card.selected .choice-card__label {
+    color: var(--cyan);
+  }
+
+  /* ── Chip select (multi) ── */
+  .chip-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip-sel {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .chip-sel:active { transform: scale(0.95); }
+
+  .chip-sel.selected {
+    border-color: var(--violet);
+    color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .chip-sel__emoji { font-size: 14px; }
+
+  /* ── Energy / mood scale ── */
+  .scale-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .scale-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .scale-dot:active { transform: scale(0.9); }
+
+  .scale-dot.selected {
+    border-color: var(--cyan);
+    background: var(--cyan-dim);
+    color: var(--cyan);
+  }
+
+  .scale-label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Mood faces ── */
+  .mood-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mood-face {
+    flex: 1;
+    padding: 10px 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mood-face:active { transform: scale(0.95); }
+
+  .mood-face.selected {
+    border-color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .mood-face__emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+
+  .mood-face__label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    line-height: 1.2;
+  }
+
+  .mood-face.selected .mood-face__label { color: var(--violet); }
+
+  /* ── Satisfaction scale ── */
+  .satis-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .satis-dot {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .satis-dot:active { transform: scale(0.95); }
+
+  .satis-dot.selected {
+    border-color: var(--exp-gold);
+    background: var(--exp-gold-dim);
+    color: var(--exp-gold);
+  }
+
+  /* ── Textarea ── */
+  .review-textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 13px;
+    color: var(--fg);
+    font-family: var(--font-body);
+    resize: none;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .review-textarea::placeholder {
+    color: var(--fg-muted);
+  }
+
+  .review-textarea:focus {
+    outline: none;
+    border-color: var(--cyan);
+  }
+
+  /* ── Adjustment preview card ── */
+  .adjust-preview {
+    margin: 0 16px 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(0,240,255,0.06), rgba(168,85,247,0.04));
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-lg);
+  }
+
+  .adjust-preview__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .adjust-preview__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cyan-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan);
+    flex-shrink: 0;
+  }
+
+  .adjust-preview__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .adjust-preview__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .adjust-preview__list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .adjust-preview__list li {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .adjust-preview__list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--cyan);
+    font-weight: 700;
+  }
+
+  /* ── Log note ── */
+  .log-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin: 0 16px 12px;
+    font-size: 11px;
+    color: var(--fg-muted);
+    background: var(--bg-raised);
+    border-radius: var(--radius-md);
+  }
+
+  .log-note svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--fg-muted);
+  }
+
+  .log-note a {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+
+  .log-note a:hover { text-decoration: underline; }
+
+  /* ── Actions ── */
+  .review-actions {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .review-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Satisfaction label ── */
+  .field-label {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-bottom: 8px;
+  }
+
+  /* ── Section divider ── */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">21:30</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="review-screen">
+
+        <!-- ═══ HEADER ═══ -->
+        <div class="review-header">
+          <div class="review-date">Thứ Sáu, 30/05/2026</div>
+          <h1 class="review-title">Đánh Giá Cuối Ngày</h1>
+          <p class="review-subtitle">Phản hồi nhanh về hôm nay để SoloQuest điều chỉnh lịch và độ khó cho ngày mai.</p>
+        </div>
+
+        <!-- ═══ STATS ═══ -->
+        <div class="review-stats">
+          <div class="review-stat">
+            <div class="review-stat__val cyan">6/9</div>
+            <div class="review-stat__label">Hoàn thành</div>
+          </div>
+          <div class="review-stat">
+            <div class="review-stat__val gold">+180</div>
+            <div class="review-stat__label">EXP</div>
+          </div>
+          <div class="review-stat">
+            <div class="review-stat__val green">5</div>
+            <div class="review-stat__label">Chuỗi</div>
+          </div>
+          <div class="review-stat">
+            <div class="review-stat__val warn">2</div>
+            <div class="review-stat__label">Hoãn</div>
+          </div>
+        </div>
+
+        <!-- ═══ 1. QUEST LIST ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Tổng kết nhiệm vụ</div>
+
+          <div class="review-quest cleared" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">💧</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Uống Nước</div>
+              <div style="font-size:11px;color:var(--fg-muted);">06:30 · 250ml</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+5</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">💪</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Vận Động Sáng</div>
+              <div style="font-size:11px;color:var(--fg-muted);">07:00 · 10 chống đẩy + squat</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+25</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">💧</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Uống Nước</div>
+              <div style="font-size:11px;color:var(--fg-muted);">09:30 · 250ml</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+5</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">🧘</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Nghỉ Mắt</div>
+              <div style="font-size:11px;color:var(--fg-muted);">10:00 · Rời màn hình 5 phút</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+10</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">📚</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Học Docker</div>
+              <div style="font-size:11px;color:var(--fg-muted);">14:00 · 15 phút · Bài 3/12</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+35</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius-md);margin-bottom:6px;">
+            <span style="font-size:15px;">🚶</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Đi Bộ</div>
+              <div style="font-size:11px;color:var(--fg-muted);">18:30 · 15 phút quanh nhà</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--exp-gold);">+30</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--fg-muted);border-radius:var(--radius-md);margin-bottom:6px;opacity:0.6;">
+            <span style="font-size:15px;">🧘</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;">Nghỉ Mắt</div>
+              <div style="font-size:11px;color:var(--fg-muted);">15:30 · Đã bỏ qua</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--fg-muted);">+0</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid rgba(245,158,11,0.15);border-radius:var(--radius-md);margin-bottom:6px;opacity:0.6;">
+            <span style="font-size:15px;">💧</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:var(--fg-secondary);">Uống Nước</div>
+              <div style="font-size:11px;color:var(--fg-muted);">Đã hoãn đến 22:00</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--warn);">Hoãn</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid rgba(245,158,11,0.15);border-radius:var(--radius-md);opacity:0.6;">
+            <span style="font-size:15px;">😴</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:var(--fg-secondary);">Chuẩn Bị Ngủ</div>
+              <div style="font-size:11px;color:var(--fg-muted);">Đã hoãn · nhắc lại sau</div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--warn);">Hoãn</span>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ═══ 2. DIFFICULTY QUESTION ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Độ khó hôm nay</div>
+          <div class="choice-row" id="difficultyRow">
+            <div class="choice-card" data-val="light" onclick="selectChoice('difficultyRow',this)">
+              <span class="choice-card__icon">🍃</span>
+              <span class="choice-card__label">Quá nhẹ</span>
+            </div>
+            <div class="choice-card selected" data-val="fit" onclick="selectChoice('difficultyRow',this)">
+              <span class="choice-card__icon">✅</span>
+              <span class="choice-card__label">Vừa sức</span>
+            </div>
+            <div class="choice-card" data-val="heavy" onclick="selectChoice('difficultyRow',this)">
+              <span class="choice-card__icon">🏋️</span>
+              <span class="choice-card__label">Quá nặng</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ 3. MOST HELPFUL QUEST ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Nhiệm vụ hữu ích nhất hôm nay</div>
+          <div class="chip-select" id="helpfulChips">
+            <div class="chip-sel selected" onclick="toggleChip(this)"><span class="chip-sel__emoji">📚</span> Learning</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">💧</span> Water</div>
+            <div class="chip-sel selected" onclick="toggleChip(this)"><span class="chip-sel__emoji">🧘</span> Break</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🚶</span> Movement</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">😴</span> Sleep</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🪞</span> Reflection</div>
+          </div>
+        </div>
+
+        <!-- ═══ 4. MOST ANNOYING QUEST ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Nhiệm vụ gây khó chịu hoặc dễ bị bỏ qua</div>
+          <div class="chip-select" id="annoyingChips">
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">📚</span> Learning</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">💧</span> Water</div>
+            <div class="chip-sel selected" onclick="toggleChip(this)"><span class="chip-sel__emoji">🧘</span> Break</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🚶</span> Movement</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">😴</span> Sleep</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🔔</span> Nhắc quá nhiều</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">⏰</span> Thời điểm chưa phù hợp</div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ═══ 5. MOOD / ENERGY ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Tâm trạng & năng lượng cuối ngày</div>
+
+          <div class="field-label">Tâm trạng cuối ngày</div>
+          <div class="mood-row" id="moodRow">
+            <div class="mood-face" data-val="great" onclick="selectMood(this)">
+              <span class="mood-face__emoji">😊</span>
+              <span class="mood-face__label">Tốt</span>
+            </div>
+            <div class="mood-face selected" data-val="ok" onclick="selectMood(this)">
+              <span class="mood-face__emoji">😐</span>
+              <span class="mood-face__label">Bình thường</span>
+            </div>
+            <div class="mood-face" data-val="tired" onclick="selectMood(this)">
+              <span class="mood-face__emoji">😓</span>
+              <span class="mood-face__label">Mệt</span>
+            </div>
+            <div class="mood-face" data-val="stress" onclick="selectMood(this)">
+              <span class="mood-face__emoji">😫</span>
+              <span class="mood-face__label">Stress</span>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <div class="field-label">Năng lượng còn lại</div>
+            <div class="scale-row" id="energyScale">
+              <div class="scale-dot" data-val="1" onclick="selectScale('energyScale',this)">1</div>
+              <div class="scale-dot selected" data-val="2" onclick="selectScale('energyScale',this)">2</div>
+              <div class="scale-dot" data-val="3" onclick="selectScale('energyScale',this)">3</div>
+              <div class="scale-dot" data-val="4" onclick="selectScale('energyScale',this)">4</div>
+              <div class="scale-dot" data-val="5" onclick="selectScale('energyScale',this)">5</div>
+            </div>
+            <div class="scale-label"><span>Gần hết</span><span>Dồi dào</span></div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <div class="field-label">Hài lòng với hôm nay</div>
+            <div class="satis-row" id="satisScale">
+              <div class="satis-dot" data-val="1" onclick="selectScale('satisScale',this)">1</div>
+              <div class="satis-dot" data-val="2" onclick="selectScale('satisScale',this)">2</div>
+              <div class="satis-dot" data-val="3" onclick="selectScale('satisScale',this)">3</div>
+              <div class="satis-dot selected" data-val="4" onclick="selectScale('satisScale',this)">4</div>
+              <div class="satis-dot" data-val="5" onclick="selectScale('satisScale',this)">5</div>
+            </div>
+            <div class="scale-label"><span>Kém</span><span>Tuyệt vời</span></div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ═══ 6. TOMORROW ADJUSTMENT ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Ngày mai bạn muốn điều chỉnh thế nào?</div>
+          <div class="chip-select" id="tomorrowChips">
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🍃</span> Nhẹ hơn hôm nay</div>
+            <div class="chip-sel selected" onclick="toggleChip(this)"><span class="chip-sel__emoji">✅</span> Giữ như hôm nay</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🔥</span> Thử thách hơn</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">📚</span> Tập trung học tập</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">💪</span> Tập trung sức khỏe</div>
+            <div class="chip-sel" onclick="toggleChip(this)"><span class="chip-sel__emoji">🛌</span> Tập trung nghỉ ngơi</div>
+          </div>
+        </div>
+
+        <!-- ═══ 7. FREE NOTES ═══ -->
+        <div class="review-section">
+          <div class="review-section-title">Ghi chú thêm</div>
+          <textarea class="review-textarea" placeholder="Ví dụ: ngủ ít, bận đột xuất, học tốt hơn buổi tối, bị nhắc quá nhiều…"></textarea>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ═══ 8. SYSTEM ADJUSTMENT PREVIEW ═══ -->
+        <div class="review-section" style="padding-bottom:8px;">
+          <div class="adjust-preview">
+            <div class="adjust-preview__header">
+              <div class="adjust-preview__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.4-1.2 4.5-3 5.7V17a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-2.3C6.2 13.5 5 11.4 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
+              </div>
+              <span class="adjust-preview__label">SoloQuest sẽ điều chỉnh ngày mai</span>
+            </div>
+            <ul class="adjust-preview__list">
+              <li>Giữ Learning Quest 15 phút — bạn hoàn thành tốt</li>
+              <li>Break Quest mỗi 90 phút trong giờ học/làm</li>
+              <li>Dời Water Quest buổi tối sớm hơn 30 phút</li>
+              <li>Ưu tiên nhiệm vụ nhẹ vào buổi sáng</li>
+            </ul>
+            <a href="16-quest-rules.html" style="display:inline-block;margin-top:10px;font-size:11px;color:var(--cyan);text-decoration:none;font-weight:600;">Vì sao có đề xuất này? →</a>
+          </div>
+        </div>
+
+        <!-- ═══ 9. LOG NOTE ═══ -->
+        <div class="log-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Đánh giá sẽ lưu vào <a href="05-logs.html">Nhật ký</a> để cải thiện đề xuất sau này.</span>
+        </div>
+
+        <!-- ═══ 10. ACTIONS ═══ -->
+        <div class="review-actions">
+          <a href="03-home.html" class="btn btn--primary" style="text-decoration:none;">Lưu Đánh Giá Hôm Nay</a>
+          <a href="11-weekly-summary.html" class="btn btn--secondary" style="text-decoration:none;">Xem Báo Cáo Tuần</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectChoice(rowId, el) {
+      const row = document.getElementById(rowId);
+      row.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function toggleChip(el) {
+      el.classList.toggle('selected');
+    }
+
+    function selectMood(el) {
+      const row = el.parentElement;
+      row.querySelectorAll('.mood-face').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function selectScale(rowId, el) {
+      const row = document.getElementById(rowId);
+      row.querySelectorAll('.scale-dot, .satis-dot').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+  </script>
+</body>
+</html>

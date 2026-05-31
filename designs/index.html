@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoloQuest — Thư Viện Màn Hình</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  body {
+    background: var(--bg-deep);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .gallery-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .gallery-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: var(--glow-cyan), var(--glow-violet);
+  }
+
+  .gallery-logo svg {
+    width: 28px;
+    height: 28px;
+    color: var(--bg-deep);
+  }
+
+  .gallery-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    background: var(--level-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .gallery-subtitle {
+    font-size: 14px;
+    color: var(--fg-secondary);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .screen-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: var(--fg);
+    display: block;
+  }
+
+  .screen-card:hover {
+    border-color: var(--border-glow-cyan);
+    transform: translateY(-2px);
+  }
+
+  .screen-card__preview {
+    height: 200px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen-card__preview::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .screen-card__phone {
+    width: 140px;
+    height: 280px;
+    background: var(--bg);
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    transform: scale(0.7);
+  }
+
+  .screen-card__label {
+    padding: 16px;
+  }
+
+  .screen-card__num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .screen-card__name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .screen-card__desc {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+  }
+
+  .screen-card__file {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 8px;
+  }
+
+  .flow-section {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .flow-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .flow-steps::-webkit-scrollbar { display: none; }
+
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .flow-step__dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--cyan-dim);
+    border: 2px solid var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+
+  .flow-step__label {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    white-space: nowrap;
+  }
+
+  .flow-arrow {
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+
+  .flow-arrow svg {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="gallery-header">
+    <div class="gallery-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <h1 class="gallery-title">SoloQuest</h1>
+    <p class="gallery-subtitle">Hệ thống nhiệm vụ hàng ngày cá nhân hóa — Giao diện dark premium cho Android</p>
+  </div>
+
+  <div class="gallery-grid">
+    <a href="01-welcome.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 01</div>
+        <div class="screen-card__name">Chào Mừng</div>
+        <div class="screen-card__desc">Màn hình splash với hiệu ứng khởi động hệ thống</div>
+        <div class="screen-card__file">01-welcome.html</div>
+      </div>
+    </a>
+
+    <a href="10-morning-checkin.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 10</div>
+        <div class="screen-card__name">Check-in Buổi Sáng</div>
+        <div class="screen-card__desc">Scan trạng thái: giấc ngủ, năng lượng, tâm trạng, stress, lịch trình trước khi tạo nhiệm vụ</div>
+        <div class="screen-card__file">10-morning-checkin.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-01-welcome.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 1/9</div>
+        <div class="screen-card__name">Bắt Đầu</div>
+        <div class="screen-card__desc">Splash screen — hệ thống khởi động</div>
+        <div class="screen-card__file">onboarding/step-01-welcome.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-02-basic.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 2/9</div>
+        <div class="screen-card__name">Thông Tin Cơ Bản</div>
+        <div class="screen-card__desc">Tên, tuổi, giới tính, chiều cao, cân nặng</div>
+        <div class="screen-card__file">onboarding/step-02-basic.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-03-work.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 3/9</div>
+        <div class="screen-card__name">Công Việc & Học Tập</div>
+        <div class="screen-card__desc">Nghề nghiệp, lịch làm việc, thời gian rảnh</div>
+        <div class="screen-card__file">onboarding/step-03-work.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-04-health.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 4/9</div>
+        <div class="screen-card__name">Sức Khỏe & Vận Động</div>
+        <div class="screen-card__desc">Mức vận động, lần tập gần nhất, giới hạn sức khỏe</div>
+        <div class="screen-card__file">onboarding/step-04-health.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-05-goals.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--exp-gold)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 5/9</div>
+        <div class="screen-card__name">Đặt Mục Tiêu</div>
+        <div class="screen-card__desc">Chọn lĩnh vực muốn cải thiện: nước, vận động, học, ngủ...</div>
+        <div class="screen-card__file">onboarding/step-05-goals.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-06-schedule.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 6/9</div>
+        <div class="screen-card__name">Lịch Sinh Hoạt</div>
+        <div class="screen-card__desc">Giờ thức, giờ ngủ, thời gian rảnh, khung giờ muốn học/vận động</div>
+        <div class="screen-card__file">onboarding/step-06-schedule.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-07-reminders.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 7/9</div>
+        <div class="screen-card__name">Cài Đặt Nhắc Nhở</div>
+        <div class="screen-card__desc">Tần suất break, water quest, giờ không nhắc</div>
+        <div class="screen-card__file">onboarding/step-07-reminders.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-08-rewards.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--exp-gold)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 8/9</div>
+        <div class="screen-card__name">Phần Thưởng</div>
+        <div class="screen-card__desc">Chọn phần thưởng: game, phim, nghỉ ngơi, MXH, ăn uống</div>
+        <div class="screen-card__file">onboarding/step-08-rewards.html</div>
+      </div>
+    </a>
+
+    <a href="onboarding/step-09-complete.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Onboarding 9/9</div>
+        <div class="screen-card__name">Hoàn Tất</div>
+        <div class="screen-card__desc">Tóm tắt hồ sơ + xem trước lịch nhiệm vụ mẫu</div>
+        <div class="screen-card__file">onboarding/step-09-complete.html</div>
+      </div>
+    </a>
+
+    <a href="03-home.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 03</div>
+        <div class="screen-card__name">Trang Chủ / Nhiệm Vụ Hàng Ngày</div>
+        <div class="screen-card__desc">Màn hình chính — thẻ nhiệm vụ với thời gian, hành động, thời lượng, EXP, Hoàn thành/Hoãn/Bỏ qua</div>
+        <div class="screen-card__file">03-home.html</div>
+      </div>
+    </a>
+
+    <a href="04-quest-detail.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 04</div>
+        <div class="screen-card__name">Chi Tiết Nhiệm Vụ</div>
+        <div class="screen-card__desc">Xem đầy đủ nhiệm vụ với thông số, hướng dẫn, và lịch sử</div>
+        <div class="screen-card__file">04-quest-detail.html</div>
+      </div>
+    </a>
+
+    <a href="05-logs.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 05</div>
+        <div class="screen-card__name">Dòng Thời Gian Nhật Ký</div>
+        <div class="screen-card__desc">Dòng thời gian hoạt động với tab ngày và trạng thái nhiệm vụ</div>
+        <div class="screen-card__file">05-logs.html</div>
+      </div>
+    </a>
+
+    <a href="06-progress.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.5"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 06</div>
+        <div class="screen-card__name">Tiến Trình / Cấp Độ</div>
+        <div class="screen-card__desc">Cấp độ, hạng, thống kê, biểu đồ tuần, thành tựu</div>
+        <div class="screen-card__file">06-progress.html</div>
+      </div>
+    </a>
+
+    <a href="07-rewards.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--exp-gold)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 07</div>
+        <div class="screen-card__name">Phần Thưởng</div>
+        <div class="screen-card__desc">Cửa hàng: chủ đề, tăng lực, vật phẩm trang trí</div>
+        <div class="screen-card__file">07-rewards.html</div>
+      </div>
+    </a>
+
+    <a href="08-daily-review.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 08</div>
+        <div class="screen-card__name">Đánh Giá Hàng Ngày</div>
+        <div class="screen-card__desc">Phân tích hiệu suất cuối ngày với insight AI</div>
+        <div class="screen-card__file">08-daily-review.html</div>
+      </div>
+    </a>
+
+    <a href="09-profile.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--fg-secondary)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 09</div>
+        <div class="screen-card__name">Hồ Sơ / Cài Đặt</div>
+        <div class="screen-card__desc">Hồ sơ người dùng, thông báo, cài đặt ứng dụng</div>
+        <div class="screen-card__file">09-profile.html</div>
+      </div>
+    </a>
+
+    <a href="12-schedule-editor.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 12</div>
+        <div class="screen-card__name">Chỉnh Lịch</div>
+        <div class="screen-card__desc">Chỉnh sửa lịch cá nhân theo ngày: giờ làm, nghỉ trưa, rảnh, giờ ngủ</div>
+        <div class="screen-card__file">12-schedule-editor.html</div>
+      </div>
+    </a>
+
+    <a href="11-weekly-summary.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 11</div>
+        <div class="screen-card__name">Tổng Kết Tuần</div>
+        <div class="screen-card__desc">Báo cáo tuần: tỷ lệ hoàn thành, biểu đồ, insight AI, đề xuất tuần sau</div>
+        <div class="screen-card__file">11-weekly-summary.html</div>
+      </div>
+    </a>
+
+    <a href="13-learning-goals.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 13</div>
+        <div class="screen-card__name">Mục Tiêu Học Tập</div>
+        <div class="screen-card__desc">Chọn kỹ năng muốn cải thiện, AI gợi ý, tạo lộ trình học cá nhân hóa</div>
+        <div class="screen-card__file">13-learning-goals.html</div>
+      </div>
+    </a>
+
+    <a href="14-learning-roadmap.html" class="screen-card">
+      <div class="screen-card__preview">
+        <div class="screen-card__phone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+      <div class="screen-card__label">
+        <div class="screen-card__num">Màn Hình 14</div>
+        <div class="screen-card__name">Lộ Trình Học</div>
+        <div class="screen-card__desc">Xem chi tiết lộ trình học theo tuần, module, bài học với tiến độ</div>
+        <div class="screen-card__file">14-learning-roadmap.html</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">Luồng Onboarding (9 bước)</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step__dot">1</div>
+        <span class="flow-step__label">Chào Mừng</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">2</div>
+        <span class="flow-step__label">Thông Tin</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">3</div>
+        <span class="flow-step__label">Công Việc</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">4</div>
+        <span class="flow-step__label">Sức Khỏe</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">5</div>
+        <span class="flow-step__label">Mục Tiêu</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">6</div>
+        <span class="flow-step__label">Lịch</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">7</div>
+        <span class="flow-step__label">Nhắc Nhở</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">8</div>
+        <span class="flow-step__label">Thưởng</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">9</div>
+        <span class="flow-step__label">Hoàn Tất</span>
+      </div>
+    </div>
+
+    <div class="flow-title" style="margin-top:24px">Luồng App Chính</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step__dot">1</div>
+        <span class="flow-step__label">Check-in Sáng</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">2</div>
+        <span class="flow-step__label">Trang Chủ</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">3</div>
+        <span class="flow-step__label">Chi Tiết Quest</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">4</div>
+        <span class="flow-step__label">Nhật Ký</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">5</div>
+        <span class="flow-step__label">Tiến Trình</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">6</div>
+        <span class="flow-step__label">Thưởng</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">7</div>
+        <span class="flow-step__label">Đánh Giá</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">8</div>
+        <span class="flow-step__label">Hồ Sơ</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">9</div>
+        <span class="flow-step__label">Tổng Kết Tuần</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">10</div>
+        <span class="flow-step__label">Mục Tiêu Học</span>
+      </div>
+      <div class="flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="flow-step">
+        <div class="flow-step__dot">11</div>
+        <span class="flow-step__label">Lộ Trình Học</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

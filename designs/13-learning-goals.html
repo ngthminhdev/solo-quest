@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mục Tiêu Học Tập — SoloQuest</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .page-header {
+    padding: 16px 20px 4px;
+  }
+
+  .page-header__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--warn-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .page-header__icon svg {
+    width: 22px;
+    height: 22px;
+    color: var(--warn);
+  }
+
+  .page-header__title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 6px;
+  }
+
+  .page-header__subtitle {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+  }
+
+  .section-label {
+    padding: 20px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label__icon {
+    font-size: 14px;
+  }
+
+  .section-label__text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-secondary);
+  }
+
+  /* AI banner */
+  .ai-banner {
+    margin: 0 16px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  .ai-banner__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .ai-banner__badge {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-banner__badge svg {
+    width: 18px;
+    height: 18px;
+    color: var(--bg-deep);
+  }
+
+  .ai-banner__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .ai-banner__desc {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .ai-banner .btn {
+    width: 100%;
+  }
+
+  /* Skill cards */
+  .skill-card {
+    margin: 0 16px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .skill-card:active {
+    border-color: var(--border-glow-cyan);
+  }
+
+  .skill-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .skill-card__name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+
+  .skill-card__difficulty {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .skill-card__difficulty--easy {
+    background: var(--success-dim);
+    color: var(--success);
+  }
+
+  .skill-card__difficulty--medium {
+    background: var(--warn-dim);
+    color: var(--warn);
+  }
+
+  .skill-card__difficulty--hard {
+    background: var(--danger-dim);
+    color: var(--danger);
+  }
+
+  .skill-card__reason {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .skill-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .skill-card__duration {
+    font-size: 11px;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .skill-card__duration svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .skill-card .btn--small {
+    flex-shrink: 0;
+  }
+
+  .skill-card--selected {
+    border-color: var(--border-glow-cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .skill-card--selected .btn--small {
+    background: var(--success);
+    color: var(--bg-deep);
+    border-color: var(--success);
+  }
+
+  /* Custom form */
+  .custom-form {
+    margin: 0 16px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  .custom-form__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .custom-form__input {
+    width: 100%;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--fg);
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+
+  .custom-form__input::placeholder {
+    color: var(--fg-muted);
+  }
+
+  .custom-form__input:focus {
+    border-color: var(--cyan);
+  }
+
+  .custom-form__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .option-chip {
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .option-chip:active {
+    transform: scale(0.95);
+  }
+
+  .option-chip.selected {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .custom-form .btn {
+    width: 100%;
+  }
+
+  /* Active goals */
+  .active-goal {
+    margin: 0 16px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    overflow: hidden;
+    box-shadow: var(--glow-violet);
+  }
+
+  .active-goal__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .active-goal__name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .active-goal__status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--violet-dim);
+    color: var(--violet);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .active-goal__meta {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .active-goal__meta svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--fg-muted);
+  }
+
+  .active-goal__progress {
+    margin-bottom: 12px;
+  }
+
+  .active-goal__progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .active-goal__progress-label {
+    font-size: 11px;
+    color: var(--fg-muted);
+  }
+
+  .active-goal__progress-value {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--violet);
+  }
+
+  .active-goal__sync {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--success);
+    margin-bottom: 10px;
+  }
+
+  .active-goal__sync svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .active-goal__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .active-goal__actions .btn {
+    flex: 1;
+  }
+
+  /* Skills list */
+  .skills-list {
+    display: none;
+  }
+
+  .skills-list.visible {
+    display: block;
+  }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    right: 20px;
+    background: var(--surface-active);
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 30;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .toast__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: var(--success-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .toast__icon svg {
+    width: 16px;
+    height: 16px;
+    color: var(--success);
+  }
+
+  .toast__text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  /* ── Sync bottom sheet ── */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,14,26,0.6);
+    z-index: 15;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .sheet-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .bottom-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-raised);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 20px 16px 24px;
+    z-index: 20;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    max-height: 80%;
+    overflow-y: auto;
+  }
+
+  .bottom-sheet.active {
+    transform: translateY(0);
+  }
+
+  .bottom-sheet__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .bottom-sheet__sub {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .sheet-section {
+    margin-bottom: 16px;
+  }
+
+  .sheet-section__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    margin-bottom: 8px;
+  }
+
+  .sheet-section__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sheet-chip {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .sheet-chip.selected {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+
+  .sheet-chip:active { transform: scale(0.95); }
+
+  .sheet-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .sheet-toggle-row__label {
+    font-size: 13px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .sheet-toggle-row__desc {
+    font-size: 11px;
+    color: var(--fg-secondary);
+  }
+
+  .toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--fg-muted);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on {
+    background: var(--cyan);
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after {
+    transform: translateX(18px);
+  }
+
+  .sheet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .sheet-actions .btn {
+    width: 100%;
+  }
+
+  /* Back link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-decoration: none;
+    padding: 4px 0;
+    margin-bottom: 4px;
+  }
+
+  .back-link:active { color: var(--fg-secondary); }
+
+  .back-link svg {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-bar__time">09:15</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--fg)" stroke="none"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+      <!-- Header -->
+      <div class="page-header">
+        <a href="09-profile.html" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Hồ sơ
+        </a>
+        <div class="page-header__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <h1 class="page-header__title">Mục tiêu học tập</h1>
+        <p class="page-header__subtitle">Chọn kỹ năng bạn muốn cải thiện. Hệ thống sẽ tạo nhiệm vụ học tập nhỏ mỗi ngày từ mục tiêu này.</p>
+      </div>
+
+      <!-- AI Suggestion -->
+      <div class="section-label">
+        <span class="section-label__icon">✦</span>
+        <span class="section-label__text">Gợi ý từ AI</span>
+      </div>
+
+      <div class="ai-banner" id="aiBanner">
+        <div class="ai-banner__head">
+          <div class="ai-banner__badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <path d="M12 8h.01"/>
+            </svg>
+          </div>
+          <span class="ai-banner__title">Chưa biết nên học gì?</span>
+        </div>
+        <p class="ai-banner__desc">Dựa trên hồ sơ, công việc và mục tiêu của bạn, hệ thống có thể đề xuất kỹ năng phù hợp.</p>
+        <button class="btn btn--secondary" id="btnSuggest" onclick="showSuggestions()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Gợi ý dựa trên hồ sơ
+        </button>
+      </div>
+
+      <!-- Skill suggestions (hidden until button clicked) -->
+      <div class="skills-list" id="skillsList">
+        <div class="skill-card" id="skill-docker">
+          <div class="skill-card__top">
+            <span class="skill-card__name">Docker cơ bản</span>
+            <span class="skill-card__difficulty skill-card__difficulty--easy">Dễ</span>
+          </div>
+          <p class="skill-card__reason">Phù hợp nếu bạn muốn học backend, deployment và làm việc với môi trường dev thực tế.</p>
+          <div class="skill-card__footer">
+            <span class="skill-card__duration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              15–20 phút/ngày
+            </span>
+            <button class="btn btn--small btn--secondary" onclick="selectSkill(this, 'docker')">Chọn mục tiêu</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-postgres">
+          <div class="skill-card__top">
+            <span class="skill-card__name">PostgreSQL</span>
+            <span class="skill-card__difficulty skill-card__difficulty--medium">Vừa</span>
+          </div>
+          <p class="skill-card__reason">Giúp cải thiện kỹ năng database cho backend, hiểu rõ cách truy vấn và tối ưu dữ liệu.</p>
+          <div class="skill-card__footer">
+            <span class="skill-card__duration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              20 phút/ngày
+            </span>
+            <button class="btn btn--small btn--secondary" onclick="selectSkill(this, 'postgres')">Chọn mục tiêu</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-system-design">
+          <div class="skill-card__top">
+            <span class="skill-card__name">System Design nhập môn</span>
+            <span class="skill-card__difficulty skill-card__difficulty--medium">Vừa</span>
+          </div>
+          <p class="skill-card__reason">Phù hợp nếu bạn muốn nâng cấp tư duy thiết kế hệ thống, chuẩn bị cho phỏng vấn kỹ thuật.</p>
+          <div class="skill-card__footer">
+            <span class="skill-card__duration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              20–30 phút/ngày
+            </span>
+            <button class="btn btn--small btn--secondary" onclick="selectSkill(this, 'system-design')">Chọn mục tiêu</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-english">
+          <div class="skill-card__top">
+            <span class="skill-card__name">Tiếng Anh giao tiếp</span>
+            <span class="skill-card__difficulty skill-card__difficulty--easy">Dễ</span>
+          </div>
+          <p class="skill-card__reason">Cải thiện kỹ năng nghe nói, phục vụ công việc và phỏng vấn tại công ty quốc tế.</p>
+          <div class="skill-card__footer">
+            <span class="skill-card__duration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              15 phút/ngày
+            </span>
+            <button class="btn btn--small btn--secondary" onclick="selectSkill(this, 'english')">Chọn mục tiêu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom goal form -->
+      <div class="section-label">
+        <span class="section-label__icon">✎</span>
+        <span class="section-label__text">Tự nhập mục tiêu</span>
+      </div>
+
+      <div class="custom-form">
+        <label class="custom-form__label">Tôi muốn học</label>
+        <input class="custom-form__input" type="text" id="customSkill" placeholder="Ví dụ: Kotlin, React Native, Docker, tiếng Anh giao tiếp, thuật toán...">
+
+        <label class="custom-form__label">Thời lượng mỗi ngày</label>
+        <div class="custom-form__options" id="durationOptions">
+          <span class="option-chip" onclick="selectChip(this, 'durationOptions')">10 phút</span>
+          <span class="option-chip selected" onclick="selectChip(this, 'durationOptions')">15 phút</span>
+          <span class="option-chip" onclick="selectChip(this, 'durationOptions')">20 phút</span>
+          <span class="option-chip" onclick="selectChip(this, 'durationOptions')">30 phút</span>
+        </div>
+
+        <label class="custom-form__label">Khung giờ học</label>
+        <div class="custom-form__options" id="timeOptions">
+          <span class="option-chip" onclick="selectChip(this, 'timeOptions')">Sáng</span>
+          <span class="option-chip" onclick="selectChip(this, 'timeOptions')">Trưa</span>
+          <span class="option-chip selected" onclick="selectChip(this, 'timeOptions')">Tối</span>
+          <span class="option-chip" onclick="selectChip(this, 'timeOptions')">Tự chọn giờ</span>
+        </div>
+
+        <button class="btn btn--primary" onclick="createCustomGoal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tạo lộ trình học
+        </button>
+      </div>
+
+      <!-- Active goals -->
+      <div class="section-label" id="activeSection">
+        <span class="section-label__icon">◉</span>
+        <span class="section-label__text">Mục tiêu đang theo</span>
+      </div>
+
+      <div class="active-goal">
+        <div class="active-goal__top">
+          <span class="active-goal__name">Docker cơ bản</span>
+          <span class="active-goal__status">Tuần 1</span>
+        </div>
+        <div class="active-goal__meta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          20 phút mỗi tối · Bài 2 / 12
+        </div>
+        <div class="active-goal__sync">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Đang đồng bộ vào Nhiệm vụ hôm nay
+        </div>
+        <div class="active-goal__progress">
+          <div class="active-goal__progress-top">
+            <span class="active-goal__progress-label">Tiến độ tuần này</span>
+            <span class="active-goal__progress-value">2 / 5 bài</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill" style="width: 40%; background: linear-gradient(90deg, var(--violet), var(--cyan));"></div>
+          </div>
+        </div>
+        <div class="active-goal__actions">
+          <button class="btn btn--secondary btn--small" onclick="viewRoadmap()">Xem lộ trình</button>
+          <button class="btn btn--secondary btn--small" onclick="openSyncSheet()">Đồng bộ</button>
+          <button class="btn btn--ghost btn--small" onclick="pauseGoal(this)">Tạm dừng</button>
+        </div>
+      </div>
+
+      <div class="active-goal">
+        <div class="active-goal__top">
+          <span class="active-goal__name">Tiếng Anh giao tiếp</span>
+          <span class="active-goal__status">Tuần 3</span>
+        </div>
+        <div class="active-goal__meta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          15 phút mỗi sáng · Bài 8 / 20
+        </div>
+        <div class="active-goal__sync">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Đang đồng bộ vào Nhiệm vụ hôm nay
+        </div>
+        <div class="active-goal__progress">
+          <div class="active-goal__progress-top">
+            <span class="active-goal__progress-label">Tiến độ tuần này</span>
+            <span class="active-goal__progress-value">4 / 5 bài</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill" style="width: 80%; background: linear-gradient(90deg, var(--violet), var(--cyan));"></div>
+          </div>
+        </div>
+        <div class="active-goal__actions">
+          <button class="btn btn--secondary btn--small" onclick="viewRoadmap()">Xem lộ trình</button>
+          <button class="btn btn--secondary btn--small" onclick="openSyncSheet()">Đồng bộ</button>
+          <button class="btn btn--ghost btn--small" onclick="pauseGoal(this)">Tạm dừng</button>
+        </div>
+      </div>
+
+      <div style="height: 16px;"></div>
+    </div>
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Trang chủ</span>
+      </a>
+      <a href="05-logs.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Nhật ký</span>
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        <span>Tiến trình</span>
+      </a>
+      <a href="07-rewards.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Phần thưởng</span>
+      </a>
+      <a href="09-profile.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Hồ sơ</span>
+      </a>
+    </nav>
+
+    <!-- Sync bottom sheet -->
+    <div class="sheet-backdrop" id="syncBackdrop"></div>
+    <div class="bottom-sheet" id="syncSheet">
+      <div class="bottom-sheet__title">Đồng bộ vào nhiệm vụ hằng ngày?</div>
+      <div class="bottom-sheet__sub">Hệ thống sẽ tự động lấy bài học tiếp theo trong lộ trình để tạo Learning Quest mỗi ngày.</div>
+
+      <div class="sheet-section">
+        <div class="sheet-section__label">Tần suất</div>
+        <div class="sheet-section__chips">
+          <div class="sheet-chip selected" onclick="selectSheetChip(this, 'freq')">Mỗi ngày</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'freq')">T2, 4, 6</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'freq')">Cuối tuần</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'freq')">Tự chọn</div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-section__label">Thời lượng</div>
+        <div class="sheet-section__chips">
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'dur')">10 phút</div>
+          <div class="sheet-chip selected" onclick="selectSheetChip(this, 'dur')">15 phút</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'dur')">20 phút</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'dur')">30 phút</div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-section__label">Khung giờ</div>
+        <div class="sheet-section__chips">
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'time')">Sáng</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'time')">Trưa</div>
+          <div class="sheet-chip selected" onclick="selectSheetChip(this, 'time')">Tối</div>
+          <div class="sheet-chip" onclick="selectSheetChip(this, 'time')">Tự chọn</div>
+        </div>
+      </div>
+
+      <div class="sheet-toggle-row">
+        <div>
+          <div class="sheet-toggle-row__label">Tự động thêm vào Nhiệm vụ hôm nay</div>
+          <div class="sheet-toggle-row__desc">Learning Quest sẽ xuất hiện mỗi ngày</div>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <div class="sheet-actions">
+        <button class="btn btn--primary" onclick="confirmSync()">Đồng bộ vào nhiệm vụ hằng ngày</button>
+        <button class="btn btn--ghost" onclick="closeSyncSheet()">Để sau</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <div class="toast__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span class="toast__text" id="toastText">Đã thêm mục tiêu</span>
+    </div>
+  </div>
+
+  <script>
+    function showSuggestions() {
+      const banner = document.getElementById('aiBanner');
+      const list = document.getElementById('skillsList');
+      banner.querySelector('.btn').textContent = 'Đang phân tích hồ sơ...';
+      banner.querySelector('.btn').disabled = true;
+
+      setTimeout(() => {
+        banner.style.display = 'none';
+        list.classList.add('visible');
+      }, 800);
+    }
+
+    function selectSkill(btn, skillId) {
+      const card = btn.closest('.skill-card');
+      if (card.classList.contains('skill-card--selected')) {
+        card.classList.remove('skill-card--selected');
+        btn.textContent = 'Chọn mục tiêu';
+        btn.classList.remove('btn--primary');
+        btn.classList.add('btn--secondary');
+      } else {
+        card.classList.add('skill-card--selected');
+        btn.textContent = '✓ Đã chọn';
+        btn.classList.remove('btn--secondary');
+        btn.classList.add('btn--primary');
+        showToast('Đã thêm "' + card.querySelector('.skill-card__name').textContent + '" vào mục tiêu');
+      }
+    }
+
+    function selectChip(chip, groupId) {
+      const group = document.getElementById(groupId);
+      group.querySelectorAll('.option-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    }
+
+    function createCustomGoal() {
+      const input = document.getElementById('customSkill');
+      const skill = input.value.trim();
+      if (!skill) {
+        input.style.borderColor = 'var(--danger)';
+        setTimeout(() => { input.style.borderColor = ''; }, 1500);
+        return;
+      }
+
+      showToast('Đã tạo lộ trình học "' + skill + '"');
+      input.value = '';
+    }
+
+    function viewRoadmap() {
+      window.location.href = '14-learning-roadmap.html';
+    }
+
+    function pauseGoal(btn) {
+      const goal = btn.closest('.active-goal');
+      if (btn.textContent.trim() === 'Tạm dừng') {
+        btn.textContent = 'Tiếp tục';
+        btn.style.color = 'var(--cyan)';
+        goal.style.opacity = '0.6';
+        showToast('Đã tạm dừng mục tiêu');
+      } else {
+        btn.textContent = 'Tạm dừng';
+        btn.style.color = '';
+        goal.style.opacity = '';
+        showToast('Đã tiếp tục mục tiêu');
+      }
+    }
+
+    function selectSheetChip(chip, group) {
+      const parent = chip.parentElement;
+      parent.querySelectorAll('.sheet-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    }
+
+    function openSyncSheet() {
+      document.getElementById('syncSheet').classList.add('active');
+      document.getElementById('syncBackdrop').classList.add('active');
+    }
+
+    function closeSyncSheet() {
+      document.getElementById('syncSheet').classList.remove('active');
+      document.getElementById('syncBackdrop').classList.remove('active');
+    }
+
+    function confirmSync() {
+      closeSyncSheet();
+      showToast('Đã đồng bộ vào Nhiệm vụ hôm nay');
+    }
+
+    document.getElementById('syncBackdrop').addEventListener('click', closeSyncSheet);
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').textContent = text;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2000);
+    }
+  </script>
+</body>
+</html>

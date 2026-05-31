@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Luật Điều Chỉnh Quest</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .page-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .page-header__back {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .page-header__info { flex: 1; min-width: 0; }
+  .page-header__title { font-size: 18px; font-weight: 700; color: var(--fg); }
+  .page-header__desc { font-size: 12px; color: var(--fg-secondary); line-height: 1.4; }
+
+  .qr-section { padding: 0 20px 20px; }
+  .qr-section__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .qr-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .qr-card--cyan { border-color: var(--border-glow-cyan); box-shadow: var(--glow-cyan); }
+  .qr-card--violet { border-color: var(--border-glow-violet); box-shadow: var(--glow-violet); }
+
+  .qr-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .qr-card__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .qr-card__icon.cyan { background: var(--cyan-dim); color: var(--cyan); }
+  .qr-card__icon.violet { background: var(--violet-dim); color: var(--violet); }
+  .qr-card__icon.gold { background: var(--warn-dim); color: var(--warn); }
+  .qr-card__icon.green { background: var(--success-dim); color: var(--success); }
+  .qr-card__icon.blue { background: var(--info-dim); color: var(--info); }
+  .qr-card__icon.indigo { background: rgba(99,102,241,0.15); color: #818CF8; }
+  .qr-card__icon.red { background: var(--danger-dim); color: var(--danger); }
+
+  .qr-card__title { font-size: 14px; font-weight: 600; color: var(--fg); }
+  .qr-card__subtitle { font-size: 11px; color: var(--fg-muted); margin-top: 1px; }
+
+  /* Rule card */
+  .rule-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .rule-card:last-child { margin-bottom: 0; }
+
+  .rule-condition {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rule-condition .arrow { color: var(--fg-muted); font-weight: 400; }
+
+  .rule-result {
+    font-size: 13px;
+    color: var(--fg);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .rule-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rule-example {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .rule-example::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--fg-muted);
+    font-weight: 700;
+  }
+
+  /* Data source list */
+  .data-source {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-source:last-child { border-bottom: none; padding-bottom: 0; }
+  .data-source:first-child { padding-top: 0; }
+
+  .data-source__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .data-source__name { font-size: 13px; font-weight: 600; color: var(--fg); }
+  .data-source__desc { font-size: 11px; color: var(--fg-muted); margin-top: 1px; }
+
+  /* Timeline illustration */
+  .timeline-demo { margin-top: 8px; }
+  .timeline-item {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    position: relative;
+  }
+  .timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    bottom: -2px;
+    width: 1px;
+    background: var(--border);
+  }
+  .timeline-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .timeline-content { flex: 1; min-width: 0; }
+  .timeline-time { font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted); margin-bottom: 2px; }
+  .timeline-text { font-size: 13px; color: var(--fg-secondary); line-height: 1.4; }
+  .timeline-result { font-size: 11px; color: var(--cyan); margin-top: 4px; font-weight: 600; }
+
+  /* Control card */
+  .control-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .control-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+  }
+  .control-item__check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--success-dim);
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+  }
+
+  /* Actions */
+  .qr-actions {
+    padding: 16px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .qr-actions .btn { width: 100%; justify-content: center; }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <!-- Header -->
+      <div class="page-header">
+        <button class="page-header__back" onclick="history.back()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="page-header__info">
+          <div class="page-header__title">Luật Điều Chỉnh Quest</div>
+          <div class="page-header__desc">SoloQuest dùng các luật này để điều chỉnh nhiệm vụ theo năng lượng, lịch sinh hoạt, logs và phản hồi hằng ngày của bạn.</div>
+        </div>
+      </div>
+
+      <!-- 1. Dữ liệu được dùng -->
+      <div class="qr-section">
+        <div class="qr-section__title">Dữ liệu được dùng để điều chỉnh quest</div>
+        <div class="qr-card">
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--cyan-dim);color:var(--cyan);">☀️</div>
+            <div>
+              <div class="data-source__name">Morning Check-in</div>
+              <div class="data-source__desc">Dùng để chọn độ khó quest trong ngày</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--success-dim);color:var(--success);">✅</div>
+            <div>
+              <div class="data-source__name">Quest hoàn thành</div>
+              <div class="data-source__desc">Dùng để phát hiện thói quen tốt và tăng thử thách</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--warn-dim);color:var(--warn);">⏳</div>
+            <div>
+              <div class="data-source__name">Quest bị hoãn</div>
+              <div class="data-source__desc">Dùng để đổi thời điểm nhắc và giảm tần suất</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--danger-dim);color:var(--danger);">⏭️</div>
+            <div>
+              <div class="data-source__name">Quest bị bỏ qua</div>
+              <div class="data-source__desc">Dùng để phát hiện quest quá khó hoặc sai thời điểm</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--violet-dim);color:var(--violet);">📝</div>
+            <div>
+              <div class="data-source__name">Logs thủ công</div>
+              <div class="data-source__desc">Dùng để bổ sung context mà hệ thống không tự biết</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:rgba(99,102,241,0.15);color:#818CF8;">📋</div>
+            <div>
+              <div class="data-source__name">Daily Review</div>
+              <div class="data-source__desc">Dùng để điều chỉnh kế hoạch ngày mai</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--info-dim);color:var(--info);">📊</div>
+            <div>
+              <div class="data-source__name">Weekly Summary</div>
+              <div class="data-source__desc">Dùng để điều chỉnh tần suất trong tuần sau</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--surface-hover);color:var(--fg-secondary);">📅</div>
+            <div>
+              <div class="data-source__name">Lịch học/làm</div>
+              <div class="data-source__desc">Dùng để chọn khung giờ nhắc phù hợp</div>
+            </div>
+          </div>
+          <div class="data-source">
+            <div class="data-source__icon" style="background:var(--surface-hover);color:var(--fg-secondary);">🔔</div>
+            <div>
+              <div class="data-source__name">Cài đặt nhắc nhở</div>
+              <div class="data-source__desc">Dùng để giới hạn số lần và thời điểm nhắc</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Luật theo năng lượng -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo năng lượng</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon cyan">⚡</div>
+            <div>
+              <div class="qr-card__title">Năng lượng thấp</div>
+              <div class="qr-card__subtitle">Khi năng lượng ≤ 2/5</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Năng lượng ≤ 2/5 <span class="arrow">→</span> Giảm độ khó quest trong ngày</div>
+            <div class="rule-examples">
+              <div class="rule-example">Learning Quest giảm từ 25 phút xuống 10–15 phút</div>
+              <div class="rule-example">Movement Quest chuyển thành vận động nhẹ 3 phút</div>
+              <div class="rule-example">Ưu tiên Break Quest và Sleep Quest</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Năng lượng ≥ 4/5 <span class="arrow">→</span> Có thể tăng nhẹ thử thách</div>
+            <div class="rule-examples">
+              <div class="rule-example">Learning Quest tăng thêm 5–10 phút</div>
+              <div class="rule-example">Thêm 1 Focus Quest nếu lịch còn trống</div>
+              <div class="rule-example">Không tăng quá 1 mức/ngày</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Luật theo stress -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo stress</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon red">😤</div>
+            <div>
+              <div class="qr-card__title">Stress cao</div>
+              <div class="qr-card__subtitle">Khi stress ≥ 4/5</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Stress ≥ 4/5 <span class="arrow">→</span> Giảm quest gây áp lực</div>
+            <div class="rule-examples">
+              <div class="rule-example">Không tạo nhiều Learning Quest</div>
+              <div class="rule-example">Tăng Break Quest nhẹ</div>
+              <div class="rule-example">Gợi ý Reflection Quest ngắn</div>
+              <div class="rule-example">Giảm số notification trong ngày</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Stress thấp + hoàn thành cao <span class="arrow">→</span> Giữ hoặc tăng nhẹ độ khó</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Luật theo hành vi hoàn thành -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo hành vi hoàn thành</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon green">📈</div>
+            <div>
+              <div class="qr-card__title">Xu hướng hoàn thành</div>
+              <div class="qr-card__subtitle">Dựa trên tỷ lệ quest trong 3 ngày</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Hoàn thành ≥ 80% trong 3 ngày <span class="arrow">→</span> Tăng nhẹ thử thách</div>
+            <div class="rule-examples">
+              <div class="rule-example">Tăng Learning Quest thêm 5 phút</div>
+              <div class="rule-example">Thêm 1 quest nâng cao mỗi tuần</div>
+              <div class="rule-example">Tăng EXP reward nhẹ</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Hoàn thành < 50% trong 2 ngày <span class="arrow">→</span> Giảm số lượng quest</div>
+            <div class="rule-examples">
+              <div class="rule-example">Giảm số quest hôm sau</div>
+              <div class="rule-example">Ưu tiên quest nhỏ, dễ hoàn thành</div>
+              <div class="rule-example">Đề xuất "ngày nhẹ"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Luật theo quest bị hoãn -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo quest bị hoãn</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon gold">⏳</div>
+            <div>
+              <div class="qr-card__title">Hoãn nhiều lần</div>
+              <div class="qr-card__subtitle">Khi quest bị snooze liên tục</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Bị hoãn nhiều lần trong ngày <span class="arrow">→</span> Đổi thời điểm nhắc</div>
+            <div class="rule-examples">
+              <div class="rule-example">Water Quest bị hoãn 3 lần buổi sáng → chuyển sang nhắc sau bữa trưa hoặc buổi chiều</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Bị hoãn nhiều lần trong tuần <span class="arrow">→</span> Đề xuất giảm tần suất</div>
+            <div class="rule-examples">
+              <div class="rule-example">Break Quest bị hoãn 5 lần/tuần → đổi từ mỗi 90 phút sang mỗi 120 phút</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Luật theo quest bị bỏ qua -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo quest bị bỏ qua</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon red">⏭️</div>
+            <div>
+              <div class="qr-card__title">Bỏ qua nhiều lần</div>
+              <div class="qr-card__subtitle">Khi user skip cùng một loại quest</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Bỏ qua cùng loại 3 lần/tuần <span class="arrow">→</span> Hỏi người dùng có muốn giảm/tắt</div>
+            <div class="rule-examples">
+              <div class="rule-example">"Bạn thường bỏ qua Movement Quest. Bạn muốn giảm còn 2 lần/tuần không?"</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Bỏ qua Learning Quest 3 lần/tuần <span class="arrow">→</span> Giảm thời lượng hoặc đổi giờ</div>
+            <div class="rule-examples">
+              <div class="rule-example">Từ 25 phút xuống 15 phút</div>
+              <div class="rule-example">Chuyển từ buổi sáng sang 20:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Luật theo lịch cá nhân -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo lịch cá nhân</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon indigo">📅</div>
+            <div>
+              <div class="qr-card__title">Lịch sinh hoạt</div>
+              <div class="qr-card__subtitle">Dựa trên lịch học/làm và giờ ngủ</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Giờ ngủ <span class="arrow">→</span> Không nhắc trong giờ ngủ</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Deep work <span class="arrow">→</span> Không nhắc nếu bật chế độ này</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Rảnh < 30 phút <span class="arrow">→</span> Chỉ tạo micro quest</div>
+            <div class="rule-examples">
+              <div class="rule-example">Uống nước · Nghỉ mắt · Ghi chú 1 dòng · Học 5 phút</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Rảnh > 60 phút <span class="arrow">→</span> Có thể tạo Learning/Focus Quest</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Luật theo Daily Review -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật theo Daily Review</div>
+        <div class="qr-card">
+          <div class="qr-card__header">
+            <div class="qr-card__icon violet">📋</div>
+            <div>
+              <div class="qr-card__title">Phản hồi cuối ngày</div>
+              <div class="qr-card__subtitle">Dựa trên lựa chọn trong Daily Review</div>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Chọn "Ngày mai nhẹ hơn" <span class="arrow">→</span> Giảm số quest và thời lượng learning</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Chọn "Giữ như hôm nay" <span class="arrow">→</span> Giữ cấu hình hiện tại</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Chọn "Thử thách hơn" <span class="arrow">→</span> Chỉ tăng nhẹ, không tăng đột ngột</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-condition">Ghi chú "bị nhắc quá nhiều" <span class="arrow">→</span> Giảm notification ngày hôm sau</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. Luật bảo vệ người dùng -->
+      <div class="qr-section">
+        <div class="qr-section__title">Luật bảo vệ người dùng</div>
+        <div class="qr-card qr-card--cyan">
+          <div class="qr-card__header">
+            <div class="qr-card__icon cyan">🛡️</div>
+            <div>
+              <div class="qr-card__title">An toàn & quyền kiểm soát</div>
+              <div class="qr-card__subtitle">App không ép người dùng quá mức</div>
+            </div>
+          </div>
+          <div class="control-list">
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Không tăng độ khó nếu người dùng đang stress cao</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Không tạo quá nhiều notification trong một giờ</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Không phạt nặng khi bỏ qua quest</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Không làm mất streak nếu người dùng chọn "ngày nghỉ"</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Cho phép tạm dừng một loại quest</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Cho phép người dùng override đề xuất của hệ thống</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Minh họa một ngày hoạt động -->
+      <div class="qr-section">
+        <div class="qr-section__title">Minh họa một ngày hoạt động</div>
+        <div class="qr-card">
+          <div class="timeline-demo">
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--cyan-dim);color:var(--cyan);">☀️</div>
+              <div class="timeline-content">
+                <div class="timeline-time">07:30</div>
+                <div class="timeline-text">Morning Check-in: năng lượng 2/5, stress 4/5</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--violet-dim);color:var(--violet);">⚙️</div>
+              <div class="timeline-content">
+                <div class="timeline-time">07:31</div>
+                <div class="timeline-text">Hệ thống áp dụng rules</div>
+                <div class="timeline-result">Giảm Learning Quest xuống 10 phút · Tăng Break Quest nhẹ · Giảm notification</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--warn-dim);color:var(--warn);">💧</div>
+              <div class="timeline-content">
+                <div class="timeline-time">10:00</div>
+                <div class="timeline-text">Người dùng hoãn Water Quest 2 lần</div>
+                <div class="timeline-result">Hệ thống chuyển lần nhắc tiếp theo sang 14:00</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:rgba(99,102,241,0.15);color:#818CF8;">📋</div>
+              <div class="timeline-content">
+                <div class="timeline-time">21:30</div>
+                <div class="timeline-text">Daily Review: người dùng chọn "Ngày mai nhẹ hơn"</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--success-dim);color:var(--success);">🌅</div>
+              <div class="timeline-content">
+                <div class="timeline-time">Ngày mai</div>
+                <div class="timeline-text">Hệ thống đề xuất: ít quest hơn, ưu tiên sức khỏe và nghỉ ngơi</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. Người dùng có quyền kiểm soát -->
+      <div class="qr-section">
+        <div class="qr-section__title">Quyền kiểm soát của bạn</div>
+        <div class="qr-card qr-card--violet">
+          <div class="qr-card__header">
+            <div class="qr-card__icon violet">🎮</div>
+            <div>
+              <div class="qr-card__title">Bạn luôn có quyền quyết định</div>
+              <div class="qr-card__subtitle">SoloQuest hỗ trợ, không ép buộc</div>
+            </div>
+          </div>
+          <div class="control-list">
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Bật/tắt từng loại rule</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Tắt một loại quest bất kỳ</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Chỉnh reminder theo ý muốn</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Chọn ngày nghỉ</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Không cho một log ảnh hưởng tới quest</span>
+            </div>
+            <div class="control-item">
+              <div class="control-item__check">✓</div>
+              <span>Áp dụng hoặc từ chối đề xuất tuần sau</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="qr-actions">
+        <a href="15-reminder-settings.html" class="btn btn--primary" style="text-decoration:none;">Chỉnh cài đặt nhắc nhở</a>
+        <a href="05-logs.html" class="btn btn--secondary" style="text-decoration:none;">Xem Nhật ký dữ liệu</a>
+        <a href="09-profile.html" class="btn btn--secondary" style="text-decoration:none;">Quay về Hồ sơ</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

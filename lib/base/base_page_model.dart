@@ -6,4 +6,12 @@ abstract class BasePageModel<S extends BasePageState> extends StateNotifier<S> {
   BasePageModel(super.state);
 
   S get readState => state;
+
+  void setLoading() {
+    state = state.updateState() as S;
+  }
+
+  void setError() {
+    state = state.updateState() as S;
+  }
 }

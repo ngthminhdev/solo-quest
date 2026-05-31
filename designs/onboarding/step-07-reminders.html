@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Nhắc Nhở</title>
+<link rel="stylesheet" href="../soloquest-tokens.css">
+<link rel="stylesheet" href="../onboarding-steps.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="onboard-container">
+        <div class="onboard-header">
+          <div class="onboard-step">Bước 7 / 9 — Nhắc Nhở</div>
+          <h1 class="onboard-title">Cài Đặt Nhắc Nhở</h1>
+          <p class="onboard-desc">Tùy chỉnh tần suất nhắc nhở để hệ thống hoạt động phù hợp với bạn</p>
+        </div>
+
+        <div class="step-progress">
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label class="form-label">Break Quest — Nghỉ Giải Lao</label>
+            <p class="option-desc" style="margin-bottom:8px">Nhắc rời khỏi màn hình sau mỗi khoảng thời gian</p>
+            <div class="chip-select">
+              <div class="chip-option" onclick="selectChipSingle(this)">Mỗi 60 phút</div>
+              <div class="chip-option selected" onclick="selectChipSingle(this)">Mỗi 90 phút</div>
+              <div class="chip-option" onclick="selectChipSingle(this)">Mỗi 120 phút</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Thời Gian Nghỉ</label>
+            <div class="chip-select">
+              <div class="chip-option" onclick="selectChipSingle(this)">3 phút</div>
+              <div class="chip-option selected" onclick="selectChipSingle(this)">5 phút</div>
+              <div class="chip-option" onclick="selectChipSingle(this)">10 phút</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Water Quest — Uống Nước</label>
+            <p class="option-desc" style="margin-bottom:8px">Kiểu nhắc uống nước trong ngày</p>
+            <div class="toggle-group">
+              <div class="toggle-btn" onclick="selectToggle(this, 'water-mode')">Cố định</div>
+              <div class="toggle-btn selected" onclick="selectToggle(this, 'water-mode')">Ngẫu nhiên</div>
+            </div>
+            <p class="option-desc" style="margin-top:8px; font-size:11px; color:var(--fg-muted)">Ngẫu nhiên: nhắc mỗi 60–120 phút trong giờ hoạt động</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Không Nhắc Sau</label>
+            <input type="time" class="form-input" value="22:00" style="font-family:var(--font-mono)">
+            <p class="option-desc" style="margin-top:4px; font-size:11px; color:var(--fg-muted)">Hệ thống sẽ không gửi thông báo sau giờ này</p>
+          </div>
+
+          <p class="system-hint">[ HỆ THỐNG ] Bạn có thể thay đổi bất cứ lúc nào trong cài đặt</p>
+        </div>
+
+        <div class="onboard-actions">
+          <a href="step-06-schedule.html" class="btn btn--secondary">← Quay lại</a>
+          <a href="step-08-rewards.html" class="btn btn--primary">Tiếp theo →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function selectChipSingle(el) {
+  const parent = el.closest('.chip-select');
+  parent.querySelectorAll('.chip-option').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectToggle(el, group) {
+  const parent = el.closest('.toggle-group');
+  parent.querySelectorAll('.toggle-btn').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>

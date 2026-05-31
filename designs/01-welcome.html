@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Bắt Đầu</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .welcome-screen::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse-glow 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .welcome-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      linear-gradient(180deg, transparent 0%, var(--bg) 100%),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.03) 2px, rgba(0, 240, 255, 0.03) 4px);
+    pointer-events: none;
+  }
+
+  .welcome-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .system-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--glow-cyan), var(--glow-violet);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .system-logo svg {
+    width: 40px;
+    height: 40px;
+    color: var(--bg-deep);
+  }
+
+  .welcome-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--level-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .welcome-subtitle {
+    font-size: 14px;
+    color: var(--fg-secondary);
+    max-width: 280px;
+    line-height: 1.6;
+  }
+
+  .system-message {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--cyan);
+    padding: 12px 20px;
+    background: var(--cyan-dim);
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-md);
+    max-width: 300px;
+    text-align: left;
+    line-height: 1.6;
+  }
+
+  .system-message .prompt {
+    color: var(--fg-muted);
+  }
+
+  .btn-start {
+    width: 100%;
+    max-width: 280px;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--level-gradient);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-start:active {
+    transform: scale(0.97);
+  }
+
+  .btn-start::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  .version-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 8px;
+  }
+
+  .skip-link {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    margin-top: 4px;
+  }
+
+  .skip-link:hover {
+    color: var(--fg);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"></rect><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"></rect><rect x="9" y="1" width="3" height="11" rx="1"></rect><rect x="13.5" y="0" width="2.5" height="12" rx="1"></rect></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2C5.8 2 3.8 2.8 2.3 4.2L0.5 2.4C2.5 0.5 5.1-0.5 8-0.5s5.5 1 7.5 2.9L13.7 4.2C12.2 2.8 10.2 2 8 2z"></path><path d="M8 6C6.6 6 5.3 6.5 4.3 7.4L2.5 5.6C4 4.2 5.9 3.5 8 3.5s4 .7 5.5 2.1L11.7 7.4C10.7 6.5 9.4 6 8 6z"></path><circle cx="8" cy="10.5" r="1.5"></circle></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"></rect><rect x="21" y="4" width="2" height="4" rx="1"></rect><rect x="2" y="3" width="14" height="6" rx="1"></rect></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="welcome-screen">
+        <div class="welcome-content">
+          <div class="system-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+
+          <h1 class="welcome-title">SoloQuest</h1>
+          <p class="welcome-subtitle">Cải thiện cuộc sống mỗi ngày thông qua các nhiệm vụ cá nhân hóa</p>
+
+          <div class="system-message">
+            <span class="prompt">[ HỆ THỐNG ]</span><br>
+            Đang khởi động...<br>
+            Trạng thái: <span class="text-cyan">SẴN SÀNG</span><br>
+            Bắt đầu hành trình cải thiện bản thân?
+          </div>
+
+          <a href="onboarding/step-01-welcome.html" class="btn-start" style="display:inline-block; text-decoration:none;">
+            Bắt đầu thiết lập cá nhân
+          </a>
+
+          <a href="10-morning-checkin.html" class="skip-link">Đã thiết lập? Bỏ qua →</a>
+
+          <span class="version-tag">v1.0.0 — Hệ Thống Trực Tuyến</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Hoàn Tất</title>
+<link rel="stylesheet" href="../soloquest-tokens.css">
+<link rel="stylesheet" href="../onboarding-steps.css">
+<style>
+  .complete-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 20px;
+    text-align: center;
+    position: relative;
+    scrollbar-width: none;
+  }
+
+  .complete-screen::-webkit-scrollbar { display: none; }
+
+  .complete-screen::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--violet-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse-glow 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .complete-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .complete-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--level-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--glow-cyan), var(--glow-violet);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .complete-icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--bg-deep);
+  }
+
+  .complete-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--level-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .complete-subtitle {
+    font-size: 14px;
+    color: var(--fg-secondary);
+    line-height: 1.6;
+  }
+
+  .summary-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    text-align: left;
+    box-shadow: var(--glow-violet);
+  }
+
+  .summary-card__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--violet);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-row__label {
+    font-size: 13px;
+    color: var(--fg-secondary);
+  }
+
+  .summary-row__value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .summary-row__value.highlight {
+    color: var(--cyan);
+  }
+
+  .preview-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    text-align: left;
+    box-shadow: var(--glow-cyan);
+  }
+
+  .preview-card__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .preview-quest {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .preview-quest:last-child { border-bottom: none; }
+
+  .preview-quest__time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+    min-width: 40px;
+  }
+
+  .preview-quest__name {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .preview-quest__exp {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--exp-gold);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="onboard-container">
+        <div class="onboard-header">
+          <div class="onboard-step">Bước 9 / 9 — Hoàn Tất</div>
+        </div>
+
+        <div class="step-progress">
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar active"></div>
+        </div>
+
+        <div class="complete-screen">
+          <div class="complete-content">
+          <div class="complete-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+
+          <h1 class="complete-title">Hồ Sơ Đã Sẵn Sàng</h1>
+          <p class="complete-subtitle">Hệ thống đã ghi nhận dữ liệu. Nhiệm vụ đầu tiên sẽ được tạo ngay.</p>
+
+          <div class="summary-card">
+            <div class="summary-card__title">◆ Tóm Tắt Hồ Sơ</div>
+            <div class="summary-row">
+              <span class="summary-row__label">Tên</span>
+              <span class="summary-row__value">Minh</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Công việc</span>
+              <span class="summary-row__value">Software Engineer</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Lịch làm</span>
+              <span class="summary-row__value">08:30–17:30</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Mục tiêu</span>
+              <span class="summary-row__value highlight">Nước · Vận Động · Học Tập</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Giờ ngủ</span>
+              <span class="summary-row__value">23:00</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Break</span>
+              <span class="summary-row__value">Mỗi 90 phút</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row__label">Phần thưởng</span>
+              <span class="summary-row__value highlight">Game 45p · Phim 1 tập</span>
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-card__title">◆ Lịch Nhiệm Vụ Mẫu</div>
+            <div class="preview-quest">
+              <span class="preview-quest__time">09:30</span>
+              <span class="preview-quest__name">Uống 250ml nước</span>
+              <span class="preview-quest__exp">+5 EXP</span>
+            </div>
+            <div class="preview-quest">
+              <span class="preview-quest__time">10:00</span>
+              <span class="preview-quest__name">Rời khỏi màn hình 5 phút</span>
+              <span class="preview-quest__exp">+10 EXP</span>
+            </div>
+            <div class="preview-quest">
+              <span class="preview-quest__time">18:30</span>
+              <span class="preview-quest__name">Đi bộ 15 phút</span>
+              <span class="preview-quest__exp">+30 EXP</span>
+            </div>
+            <div class="preview-quest">
+              <span class="preview-quest__time">20:30</span>
+              <span class="preview-quest__name">Học Docker cơ bản 20 phút</span>
+              <span class="preview-quest__exp">+35 EXP</span>
+            </div>
+            <div class="preview-quest">
+              <span class="preview-quest__time">23:30</span>
+              <span class="preview-quest__name">Đặt điện thoại xuống 15 phút</span>
+              <span class="preview-quest__exp">+20 EXP</span>
+            </div>
+          </div>
+
+          </div>
+        </div>
+
+        <div class="onboard-actions">
+          <a href="step-08-rewards.html" class="btn btn--secondary">← Quay lại</a>
+          <a href="../10-morning-checkin.html" class="btn btn--primary">Bắt đầu check-in hôm nay →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

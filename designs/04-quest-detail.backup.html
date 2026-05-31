@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Chi Tiết Nhiệm Vụ</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .detail-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-raised);
+  }
+  .back-btn {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md);
+    background: transparent; border: 1px solid var(--border);
+    color: var(--fg); cursor: pointer; flex-shrink: 0; text-decoration: none;
+  }
+  .back-btn svg { width: 20px; height: 20px; }
+  .detail-header-title {
+    font-size: 16px; font-weight: 600; flex: 1;
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .quest-tabs {
+    display: flex; gap: 6px; padding: 12px 20px;
+    overflow-x: auto; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch; flex-shrink: 0;
+  }
+  .quest-tabs::-webkit-scrollbar { display: none; }
+  .quest-tab {
+    flex-shrink: 0; padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--fg-secondary);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .quest-tab.active {
+    background: var(--cyan-dim);
+    border-color: var(--border-glow-cyan);
+    color: var(--cyan);
+  }
+
+  .quest-panel { display: none; }
+  .quest-panel.active { display: block; }
+
+  /* Hero */
+  .quest-hero {
+    text-align: center; padding: 20px 20px 12px; position: relative;
+  }
+  .quest-hero::before {
+    content: ''; position: absolute;
+    top: 50%; left: 50%; width: 120px; height: 120px;
+    background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .quest-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--cyan-dim); border: 2px solid var(--cyan);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 8px; position: relative; z-index: 1;
+    box-shadow: var(--glow-cyan);
+  }
+  .quest-icon svg { width: 22px; height: 22px; color: var(--cyan); }
+  .quest-hero-title {
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    margin-bottom: 2px; position: relative; z-index: 1;
+  }
+  .quest-hero-sub {
+    font-size: 13px; color: var(--fg-secondary);
+    position: relative; z-index: 1;
+  }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 4px 12px;
+    border-radius: var(--radius-full); margin-top: 6px;
+    position: relative; z-index: 1;
+  }
+  .status-badge--ready { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--border-glow-cyan); }
+
+  /* Quick stats — compact row under hero */
+  .quick-stats {
+    display: flex; gap: 8px; padding: 0 20px 12px; justify-content: center;
+  }
+  .quick-stat {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; color: var(--fg-secondary); font-family: var(--font-mono);
+  }
+  .quick-stat svg { width: 14px; height: 14px; color: var(--fg-muted); }
+  .quick-stat strong { color: var(--fg); font-weight: 700; }
+  .quick-stat.exp strong { color: var(--exp-gold); }
+
+  /* Sticky bottom action bar */
+  .sticky-action-bar {
+    position: absolute; bottom: 64px; left: 0; right: 0;
+    display: flex; gap: 8px; padding: 10px 16px;
+    background: var(--bg-raised);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0));
+  }
+  .sticky-action-bar .btn {
+    font-size: 14px; padding: 14px 16px; min-height: 48px; flex: 1;
+    border-radius: var(--radius-md); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; transition: all 0.15s;
+    font-family: var(--font-body);
+  }
+  .sticky-action-bar .btn:active { transform: scale(0.97); }
+  .sticky-action-bar .btn--start {
+    background: var(--cyan); color: var(--bg-deep); font-size: 15px;
+  }
+  .sticky-action-bar .btn--snooze-quick {
+    background: var(--surface); color: var(--fg-secondary);
+    border: 1px solid var(--border);
+    flex: 0 0 auto; padding: 14px 18px;
+    font-weight: 600;
+  }
+  .sticky-action-bar .btn--done {
+    background: var(--success-dim); color: var(--success);
+    border: 1px solid rgba(23,163,74,0.2);
+  }
+  .sticky-action-bar .btn--snoozed {
+    background: var(--warn-dim); color: var(--warn);
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+
+  /* Mission content — the interactive part */
+  .mission-section {
+    padding: 0 20px 16px;
+  }
+  .mission-section-title {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--fg-muted); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  .mission-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px; overflow: hidden;
+  }
+  .mission-action {
+    font-size: 15px; font-weight: 600; color: var(--fg);
+    line-height: 1.5; margin-bottom: 12px;
+  }
+
+  /* Amount selector */
+  .amount-selector { display: flex; gap: 8px; margin-top: 12px; }
+  .amount-btn {
+    flex: 1; padding: 10px 8px; border-radius: var(--radius-md);
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--fg-secondary); font-family: var(--font-mono);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    text-align: center; transition: all 0.2s;
+  }
+  .amount-btn.selected {
+    background: var(--cyan-dim); border-color: var(--border-glow-cyan); color: var(--cyan);
+  }
+  .amount-btn:active { transform: scale(0.96); }
+
+  /* Checklist */
+  .checklist { list-style: none; }
+  .checklist-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-box {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid var(--fg-muted);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .checklist-box svg { width: 14px; height: 14px; color: var(--bg-deep); opacity: 0; }
+  .checklist-item.checked .checklist-box {
+    background: var(--cyan); border-color: var(--cyan);
+  }
+  .checklist-item.checked .checklist-box svg { opacity: 1; }
+  .checklist-item.checked .checklist-text { color: var(--fg-muted); text-decoration: line-through; }
+  .checklist-text { font-size: 14px; color: var(--fg); transition: all 0.2s; }
+
+  /* Timer */
+  .timer-section {
+    text-align: center; padding: 16px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); margin-top: 12px;
+  }
+  .timer-display {
+    font-family: var(--font-mono); font-size: 36px; font-weight: 700;
+    color: var(--cyan); letter-spacing: 0.02em; margin-bottom: 10px;
+  }
+  .timer-btn {
+    padding: 10px 24px; border-radius: var(--radius-md);
+    background: var(--cyan); color: var(--bg-deep);
+    font-weight: 700; font-size: 14px; border: none;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .timer-btn:active { transform: scale(0.97); }
+  .timer-btn.running {
+    background: var(--warn-dim); color: var(--warn);
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+
+  /* Difficulty rating */
+  .difficulty-row { display: flex; gap: 8px; margin-top: 12px; }
+  .diff-btn {
+    flex: 1; padding: 10px 6px; border-radius: var(--radius-md);
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--fg-secondary); font-size: 12px; font-weight: 600;
+    cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .diff-btn.selected {
+    background: var(--cyan-dim); border-color: var(--border-glow-cyan); color: var(--cyan);
+  }
+  .diff-btn:active { transform: scale(0.96); }
+
+  /* Learning textarea */
+  .learning-notes {
+    width: 100%; min-height: 70px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 12px;
+    color: var(--fg); font-family: var(--font-body);
+    font-size: 14px; resize: vertical; margin-top: 12px;
+    box-sizing: border-box;
+  }
+  .learning-notes::placeholder { color: var(--fg-muted); }
+  .learning-notes:focus { border-color: var(--cyan); outline: none; }
+
+  /* Reflection textarea */
+  .reflection-area {
+    width: 100%; min-height: 80px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 12px;
+    color: var(--fg); font-family: var(--font-body);
+    font-size: 14px; line-height: 1.5; resize: vertical;
+    box-sizing: border-box;
+  }
+  .reflection-area::placeholder { color: var(--fg-muted); }
+  .reflection-area:focus { border-color: var(--violet); outline: none; }
+  .prompt-chips {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  }
+  .prompt-chip {
+    padding: 6px 12px; border-radius: var(--radius-full);
+    border: 1px solid var(--border); background: var(--bg-raised);
+    font-size: 12px; color: var(--fg-secondary);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .prompt-chip.selected {
+    background: var(--violet-dim); border-color: var(--border-glow-violet); color: var(--violet);
+  }
+  .prompt-chip:active { transform: scale(0.96); }
+
+  /* Collapsible "Chi tiết thêm" */
+  .details-collapse {
+    margin: 0 20px 16px;
+  }
+  .details-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); cursor: pointer;
+    transition: background 0.15s;
+  }
+  .details-toggle:active { background: var(--surface); }
+  .details-toggle-left {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--fg-secondary);
+  }
+  .details-toggle-left svg { width: 16px; height: 16px; color: var(--fg-muted); }
+  .details-toggle-arrow {
+    width: 16px; height: 16px; color: var(--fg-muted);
+    transition: transform 0.2s;
+  }
+  .details-collapse.open .details-toggle-arrow { transform: rotate(90deg); }
+  .details-body {
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  }
+  .details-collapse.open .details-body { max-height: 3000px; }
+  .details-inner { padding-top: 12px; }
+
+  /* Info grid */
+  .detail-section { margin-bottom: 14px; }
+  .detail-section-title {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--fg-muted); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  .info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .info-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 10px 12px; overflow: hidden;
+  }
+  .info-item-label {
+    font-size: 11px; color: var(--fg-muted); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .info-item-label svg { width: 12px; height: 12px; }
+  .info-item-value {
+    font-family: var(--font-mono); font-size: 14px;
+    font-weight: 600; color: var(--fg);
+  }
+  .info-item-value.exp { color: var(--exp-gold); }
+  .info-item-value.status-active {
+    color: var(--cyan); display: flex; align-items: center; gap: 6px;
+  }
+  .pulse-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan); animation: pulse-glow 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--cyan); }
+    50% { opacity: 0.5; box-shadow: 0 0 8px var(--cyan); }
+  }
+
+  /* Why card */
+  .why-card {
+    background: var(--surface); border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-lg); padding: 14px; overflow: hidden;
+  }
+  .why-card-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .why-icon { width: 20px; height: 20px; color: var(--violet); flex-shrink: 0; }
+  .why-title { font-size: 13px; font-weight: 600; color: var(--violet); }
+  .why-list { list-style: none; padding: 0; }
+  .why-list li {
+    font-size: 13px; color: var(--fg-secondary); line-height: 1.5;
+    padding: 3px 0; padding-left: 16px; position: relative;
+  }
+  .why-list li::before {
+    content: '›'; position: absolute; left: 0; color: var(--violet);
+    font-weight: 700;
+  }
+  .why-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--violet); margin-top: 8px;
+    text-decoration: none; font-weight: 500;
+  }
+  .why-link:hover { text-decoration: underline; }
+
+  /* Condition card */
+  .condition-card {
+    background: var(--violet-dim); border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-md); padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .condition-icon {
+    width: 20px; height: 20px; color: var(--violet); flex-shrink: 0; margin-top: 1px;
+  }
+  .condition-text { font-size: 13px; color: var(--fg-secondary); line-height: 1.5; }
+  .condition-text strong { color: var(--violet); font-weight: 600; }
+
+  /* Reward card */
+  .reward-card {
+    background: var(--exp-gold-dim); border: 1px solid rgba(255,215,0,0.2);
+    border-radius: var(--radius-lg); padding: 14px;
+  }
+  .reward-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 0;
+  }
+  .reward-row + .reward-row { margin-top: 6px; }
+  .reward-icon { width: 18px; height: 18px; color: var(--exp-gold); flex-shrink: 0; }
+  .reward-text { font-size: 13px; color: var(--fg); font-weight: 500; }
+  .reward-text span { color: var(--exp-gold); font-family: var(--font-mono); font-weight: 700; }
+
+  /* Log info */
+  .log-info {
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 12px 14px;
+  }
+  .log-info-text { font-size: 13px; color: var(--fg-secondary); line-height: 1.5; }
+  .log-info-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--cyan); margin-top: 6px;
+    text-decoration: none; font-weight: 500;
+  }
+
+  /* History */
+  .history-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0; border-bottom: 1px solid var(--border-subtle); overflow: hidden;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-date {
+    font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted);
+    min-width: 50px; flex-shrink: 0;
+  }
+  .history-status {
+    font-size: 13px; font-weight: 500; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .history-status.cleared { color: var(--success); }
+  .history-status.skipped { color: var(--fg-muted); }
+
+  /* Tip box */
+  .tip-box {
+    background: var(--violet-dim); border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-md); padding: 12px 14px; margin-top: 12px;
+  }
+  .tip-box-label {
+    font-family: var(--font-mono); font-size: 10px; color: var(--violet);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+  }
+  .tip-box p { font-size: 13px; color: var(--fg-secondary); line-height: 1.5; margin: 0; }
+
+  /* Mission reason */
+  .mission-reason {
+    font-size: 13px; color: var(--fg-secondary); line-height: 1.5;
+    padding-top: 12px; border-top: 1px solid var(--border-subtle);
+  }
+
+  /* Completed state */
+  .completed-overlay { display: none; text-align: center; padding: 32px 20px; }
+  .completed-overlay.show { display: block; }
+  .completed-check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--success-dim); border: 2px solid var(--success);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .completed-check svg { width: 28px; height: 28px; color: var(--success); }
+  .completed-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+
+  /* Bottom Sheet */
+  .sheet-overlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 500;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .sheet-overlay.show { display: block; }
+  .bottom-sheet {
+    display: none; position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--bg-raised);
+    border-top: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    z-index: 501; max-height: 70%;
+    overflow-y: auto; scrollbar-width: none;
+  }
+  .bottom-sheet::-webkit-scrollbar { display: none; }
+  .bottom-sheet.show { display: block; }
+  .sheet-handle {
+    width: 36px; height: 4px; border-radius: 2px;
+    background: var(--fg-muted); margin: 10px auto 0;
+  }
+  .sheet-header { padding: 16px 24px 12px; }
+  .sheet-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .sheet-subtitle { font-size: 13px; color: var(--fg-secondary); line-height: 1.5; }
+  .sheet-body { padding: 0 24px 28px; }
+  .snooze-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .snooze-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: var(--radius-md);
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .snooze-option.selected {
+    background: var(--cyan-dim); border-color: var(--border-glow-cyan);
+  }
+  .snooze-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--fg-muted); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .snooze-option.selected .snooze-radio { border-color: var(--cyan); }
+  .snooze-radio-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan); opacity: 0; transition: opacity 0.15s;
+  }
+  .snooze-option.selected .snooze-radio-dot { opacity: 1; }
+  .snooze-label { font-size: 14px; font-weight: 500; flex: 1; }
+  .snooze-hint { font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted); }
+  .sheet-btn {
+    width: 100%; padding: 14px; border-radius: var(--radius-md);
+    font-size: 14px; font-weight: 700; border: none; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sheet-btn:active { transform: scale(0.98); }
+  .sheet-btn--snooze { background: var(--warn); color: var(--bg-deep); }
+  .skip-options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .skip-chip {
+    padding: 8px 14px; border-radius: var(--radius-full);
+    border: 1px solid var(--border); background: var(--surface);
+    font-size: 13px; color: var(--fg-secondary); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .skip-chip.selected {
+    background: var(--danger-dim); border-color: rgba(239,68,68,0.3); color: var(--danger);
+  }
+  .skip-note {
+    width: 100%; min-height: 60px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 12px; color: var(--fg); font-size: 13px; resize: vertical;
+    margin-bottom: 12px; box-sizing: border-box;
+    font-family: var(--font-body);
+  }
+  .skip-note::placeholder { color: var(--fg-muted); }
+  .skip-note:focus { border-color: var(--danger); outline: none; }
+  .sheet-btn--skip { background: var(--danger); color: white; }
+
+  /* Completion Modal */
+  .completion-overlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(0,0,0,0.8); z-index: 600;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    justify-content: center; align-items: center; padding: 20px;
+  }
+  .completion-overlay.show { display: flex; }
+  .completion-modal {
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: 20px; width: 100%; max-width: 340px;
+    box-shadow: var(--shadow-elevated); overflow: hidden;
+  }
+  @keyframes expFloat {
+    0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    60% { transform: translateX(-50%) translateY(-24px) scale(1.15); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-40px) scale(1); opacity: 0; }
+  }
+  .modal-header { text-align: center; padding: 28px 24px 0; position: relative; }
+  .modal-check-ring {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--success-dim); border: 2px solid var(--success);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; position: relative;
+  }
+  .modal-check-ring svg { width: 28px; height: 28px; color: var(--success); }
+  .modal-title {
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    color: var(--fg); margin-bottom: 8px;
+  }
+  .modal-exp-badge {
+    font-family: var(--font-mono); font-size: 28px; font-weight: 800;
+    color: var(--exp-gold); display: inline-block; position: relative;
+  }
+  .modal-exp-badge.animate::after {
+    content: attr(data-exp); position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%); font-size: 28px; font-weight: 800;
+    color: var(--exp-gold); animation: expFloat 1.2s ease-out forwards;
+    pointer-events: none;
+  }
+  .modal-body { padding: 16px 24px 24px; }
+  .modal-subtitle {
+    font-size: 13px; color: var(--fg-secondary); margin-bottom: 12px; text-align: center;
+  }
+  .modal-textarea {
+    width: 100%; min-height: 70px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 12px;
+    color: var(--fg); font-family: var(--font-body);
+    font-size: 13px; resize: vertical; margin-bottom: 16px;
+    box-sizing: border-box;
+  }
+  .modal-textarea::placeholder { color: var(--fg-muted); }
+  .modal-textarea:focus { border-color: var(--cyan); outline: none; }
+  .modal-question {
+    font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 10px;
+  }
+  .modal-feeling-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .modal-feeling-btn {
+    flex: 1; padding: 10px 6px; border-radius: var(--radius-md);
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--fg-secondary); font-size: 13px; font-weight: 600;
+    cursor: pointer; text-align: center; transition: all 0.15s;
+  }
+  .modal-feeling-btn.selected {
+    background: var(--cyan-dim); border-color: var(--border-glow-cyan); color: var(--cyan);
+  }
+  .modal-feeling-btn:active { transform: scale(0.96); }
+  .modal-scale-row { display: flex; gap: 6px; margin-bottom: 16px; }
+  .modal-scale-btn {
+    flex: 1; height: 40px; border-radius: var(--radius-md);
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--fg-secondary); font-family: var(--font-mono);
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .modal-scale-btn.selected {
+    background: var(--exp-gold-dim, rgba(245,158,11,0.15));
+    border-color: var(--exp-gold, #F59E0B); color: var(--exp-gold, #F59E0B);
+  }
+  .modal-scale-btn:active { transform: scale(0.94); }
+  .modal-scale-label {
+    font-size: 11px; color: var(--fg-muted);
+    display: flex; justify-content: space-between;
+    margin-top: -10px; margin-bottom: 16px; padding: 0 2px;
+  }
+  .modal-diff-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .modal-diff-btn {
+    flex: 1; padding: 10px 6px; border-radius: var(--radius-md);
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--fg-secondary); font-size: 13px; font-weight: 600;
+    cursor: pointer; text-align: center; transition: all 0.15s;
+  }
+  .modal-diff-btn.selected {
+    background: var(--cyan-dim); border-color: var(--border-glow-cyan); color: var(--cyan);
+  }
+  .modal-diff-btn:active { transform: scale(0.96); }
+  .modal-confirm-btn {
+    width: 100%; padding: 14px 16px; border-radius: var(--radius-md);
+    border: none; background: var(--cyan); color: var(--bg-deep);
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .modal-confirm-btn:active { transform: scale(0.97); }
+  .modal-variant { display: none; }
+  .modal-variant.active { display: block; }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    display: flex; justify-content: space-around; align-items: center;
+    height: 64px; background: var(--bg-raised);
+    border-top: 1px solid var(--border); flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; text-decoration: none; color: var(--fg-muted);
+    font-size: 10px; font-weight: 500; padding: 6px 12px;
+    transition: color 0.15s;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">18:30</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-content" style="height: calc(852px - 44px - 64px - 60px); padding-bottom: 16px;">
+      <div class="detail-header">
+        <a href="03-home.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <span class="detail-header-title">Chi Tiết Nhiệm Vụ</span>
+      </div>
+
+      <div class="quest-tabs">
+        <button class="quest-tab active" onclick="switchQuest('water')">Nước</button>
+        <button class="quest-tab" onclick="switchQuest('break')">Nghỉ</button>
+        <button class="quest-tab" onclick="switchQuest('movement')">Vận Động</button>
+        <button class="quest-tab" onclick="switchQuest('learning')">Học Tập</button>
+        <button class="quest-tab" onclick="switchQuest('sleep')">Ngủ</button>
+        <button class="quest-tab" onclick="switchQuest('reflection')">Suy Ngẫm</button>
+        <button class="quest-tab" onclick="switchQuest('review')">Review</button>
+      </div>
+
+      <!-- ========== WATER QUEST ========== -->
+      <div class="quest-panel active" id="panel-water">
+        <div class="quest-hero">
+          <div class="quest-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Uống Một Ly Nước</h1>
+          <p class="quest-hero-sub">Buổi sáng · 09:30</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>1 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+10 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Uống một ly nước nhỏ ngay bây giờ.</p>
+            <div class="amount-selector">
+              <button class="amount-btn" onclick="selectAmount(this)">150ml</button>
+              <button class="amount-btn selected" onclick="selectAmount(this)">250ml</button>
+              <button class="amount-btn" onclick="selectAmount(this)">500ml</button>
+            </div>
+            <p class="mission-reason">Không cần ép bản thân đạt 2 lít/ngày. Mục tiêu là tạo thói quen uống nước ổn định, nhiều lần nhỏ trong ngày.</p>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-water">
+          <div class="details-toggle" onclick="toggleDetails('water')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Nhắc ngẫu nhiên mỗi 60–120 phút trong giờ hoạt động</li>
+                    <li>Bạn đang trong giờ học/làm, cần duy trì nước</li>
+                    <li>Streak uống nước đang 5 ngày — giữ thói quen</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+10 EXP</span></span>
+                  </div>
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    <span class="reward-text">Streak thói quen nước <span>+1</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Sẽ Được Ghi Nhận Thế Nào?</div>
+                <div class="log-info">
+                  <p class="log-info-text">Khi hoàn thành: lưu loại quest, thời gian, trạng thái, cập nhật EXP và streak.</p>
+                  <a href="05-logs.html" class="log-info-link">Xem Nhật Ký →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Lịch Sử Gần Đây</div>
+                <div class="mission-card" style="padding: 12px 14px;">
+                  <div class="history-item">
+                    <span class="history-date">28/05</span>
+                    <span class="history-status cleared">✓ Đã xong — 250ml</span>
+                  </div>
+                  <div class="history-item">
+                    <span class="history-date">27/05</span>
+                    <span class="history-status cleared">✓ Đã xong — 500ml</span>
+                  </div>
+                  <div class="history-item">
+                    <span class="history-date">26/05</span>
+                    <span class="history-status skipped">— Đã bỏ qua</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== BREAK QUEST ========== -->
+      <div class="quest-panel" id="panel-break">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #C084FC; background: rgba(168,85,247,0.15); box-shadow: var(--glow-violet);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Nghỉ Mắt 5 Phút</h1>
+          <p class="quest-hero-sub">Buổi sáng · 10:00</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>5 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+15 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Rời khỏi màn hình 5 phút. Thư giãn mắt và cơ thể.</p>
+            <ul class="checklist">
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Đứng dậy</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Nhìn xa khoảng 20 giây</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Hít thở chậm</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Thả lỏng vai gáy</span>
+              </li>
+            </ul>
+            <div class="timer-section">
+              <div class="timer-display" id="break-timer">05:00</div>
+              <button class="timer-btn" id="break-timer-btn" onclick="toggleTimer('break')">Bắt Đầu Đếm Giờ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-break">
+          <div class="details-toggle" onclick="toggleDetails('break')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Bạn đã tập trung 90 phút — đến lúc nghỉ mắt</li>
+                    <li>Nghỉ định kỳ giúp giảm mỏi mắt và đau đầu</li>
+                    <li>Logs cho thấy Break Quest hay bị hoãn buổi sáng</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Điều Kiện Hoàn Thành</div>
+                <div class="condition-card">
+                  <svg class="condition-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <p class="condition-text">Hoàn thành checklist và bấm <strong>"Bắt Đầu Nghỉ"</strong>.</p>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+15 EXP</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== MOVEMENT QUEST ========== -->
+      <div class="quest-panel" id="panel-movement">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #4ADE80; background: rgba(34,197,94,0.15); box-shadow: 0 0 20px rgba(34,197,94,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Vận Động Nhẹ 3 Phút</h1>
+          <p class="quest-hero-sub">Buổi chiều · 13:30</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>3–5 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+20 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Đứng dậy và vận động nhẹ.</p>
+            <ul class="checklist">
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Xoay vai 10 lần</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Duỗi cổ tay</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Đi lại quanh phòng</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Stretch nhẹ</span>
+              </li>
+            </ul>
+            <div class="difficulty-row">
+              <button class="diff-btn" onclick="selectDiff(this)">Dễ</button>
+              <button class="diff-btn selected" onclick="selectDiff(this)">Vừa</button>
+              <button class="diff-btn" onclick="selectDiff(this)">Khó</button>
+              <button class="diff-btn" onclick="selectDiff(this)">Quá Mệt</button>
+            </div>
+            <div class="tip-box">
+              <div class="tip-box-label">Mẹo</div>
+              <p>Kết hợp với lúc năng lượng giảm sau ăn trưa. Nếu bị bỏ qua nhiều, hệ thống sẽ đề xuất giảm tần suất.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-movement">
+          <div class="details-toggle" onclick="toggleDetails('movement')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Bạn đã ngồi 120 phút — cần vận động nhẹ</li>
+                    <li>Năng lượng 3/5 nên chỉ đề xuất 3 phút</li>
+                    <li>Nếu bị bỏ qua nhiều, hệ thống sẽ giảm tần suất</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+20 EXP</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Lịch Sử Gần Đây</div>
+                <div class="mission-card" style="padding: 12px 14px;">
+                  <div class="history-item">
+                    <span class="history-date">28/05</span>
+                    <span class="history-status cleared">✓ Đã xong — 4 phút</span>
+                  </div>
+                  <div class="history-item">
+                    <span class="history-date">27/05</span>
+                    <span class="history-status skipped">— Đã bỏ qua</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== LEARNING QUEST ========== -->
+      <div class="quest-panel" id="panel-learning">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #FBBF24; background: rgba(245,158,11,0.15); box-shadow: 0 0 20px rgba(245,158,11,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Học Docker Cơ Bản</h1>
+          <p class="quest-hero-sub">Buổi tối · 20:00</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>15 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+40 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Mục Tiêu</div>
+          <div class="mission-card">
+            <p class="mission-action">Hiểu sự khác nhau giữa container và image, sau đó ghi lại 3 ý chính.</p>
+            <ul class="checklist">
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Đọc/xem nội dung trong 10 phút</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Ghi lại 3 ý chính</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Chạy thử 1 lệnh docker</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Đánh dấu phần chưa hiểu</span>
+              </li>
+            </ul>
+            <textarea class="learning-notes" placeholder="Ghi lại 1–3 ý chính bạn học được..."></textarea>
+            <p class="mission-reason">Học mỗi ngày 15 phút giúp xây dựng thói quen và tích lũy kiến thức theo thời gian.</p>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-learning">
+          <div class="details-toggle" onclick="toggleDetails('learning')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Mục tiêu học Docker đang được ưu tiên trong roadmap</li>
+                    <li>Weekly Summary: bạn học hiệu quả hơn sau 20:00</li>
+                    <li>Năng lượng 3/5 nên giữ ở mức nhẹ 15 phút</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+40 EXP</span></span>
+                  </div>
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span class="reward-text">Docker Roadmap <span>+3%</span></span>
+                  </div>
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                    <span class="reward-text">Learning streak <span>+1</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Sẽ Được Ghi Nhận Thế Nào?</div>
+                <div class="log-info">
+                  <p class="log-info-text">Lưu loại quest, thời gian, ghi chú học tập. Roadmap Docker tăng tiến độ.</p>
+                  <a href="05-logs.html" class="log-info-link">Xem Nhật Ký →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SLEEP QUEST ========== -->
+      <div class="quest-panel" id="panel-sleep">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #818CF8; background: rgba(99,102,241,0.15); box-shadow: 0 0 20px rgba(99,102,241,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Chuẩn Bị Ngủ</h1>
+          <p class="quest-hero-sub">Buổi đêm · 22:30</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>15 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+25 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Giảm kích thích trước giờ ngủ.</p>
+            <ul class="checklist">
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Giảm ánh sáng màn hình</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Dừng việc học/làm nặng</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Chuẩn bị việc cần làm ngày mai</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Thư giãn 5 phút</span>
+              </li>
+            </ul>
+            <p class="mission-reason">Ngắt thiết bị trước khi ngủ giúp cải thiện chất lượng giấc ngủ.</p>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-sleep">
+          <div class="details-toggle" onclick="toggleDetails('sleep')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Nhắc 30 phút trước giờ ngủ mục tiêu 23:00</li>
+                    <li>Daily Review cho thấy bạn hơi mệt — cần ngủ đúng giờ</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+25 EXP</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Sẽ Được Ghi Nhận?</div>
+                <div class="log-info">
+                  <p class="log-info-text">Ghi nhận thời gian bắt đầu wind-down. Dữ liệu giúp hiểu thói quen ngủ.</p>
+                  <a href="05-logs.html" class="log-info-link">Xem Nhật Ký →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== REFLECTION QUEST ========== -->
+      <div class="quest-panel" id="panel-reflection">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #F472B6; background: rgba(236,72,153,0.15); box-shadow: 0 0 20px rgba(236,72,153,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Ghi Chú 1 Dòng</h1>
+          <p class="quest-hero-sub">Tùy chọn · 21:00</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>2 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+15 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Ghi lại một điều đáng chú ý hôm nay.</p>
+            <div class="prompt-chips">
+              <button class="prompt-chip" onclick="selectPrompt(this, 'Hôm nay điều gì làm bạn mệt?')">Điều gì mệt?</button>
+              <button class="prompt-chip" onclick="selectPrompt(this, 'Điều gì giúp bạn tập trung hơn?')">Tập trung hơn?</button>
+              <button class="prompt-chip" onclick="selectPrompt(this, 'Quest nào phù hợp nhất?')">Quest nào phù hợp?</button>
+              <button class="prompt-chip" onclick="selectPrompt(this, 'Ngày mai nên nhẹ hơn hay thử thách hơn?')">Ngày mai?</button>
+            </div>
+            <textarea class="reflection-area" id="reflection-text" placeholder="Ví dụ: học buổi tối tập trung hơn sáng, bị nhắc uống nước quá nhiều..."></textarea>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-reflection">
+          <div class="details-toggle" onclick="toggleDetails('reflection')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Ghi chú giúp SoloQuest hiểu bạn tốt hơn</li>
+                    <li>Dữ liệu dùng để điều chỉnh quest ngày mai</li>
+                    <li>Có thể chọn hoặc bỏ qua — không bắt buộc</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+15 EXP</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Sẽ Được Ghi Nhận?</div>
+                <div class="log-info">
+                  <p class="log-info-text">Ghi chú lưu vào Nhật ký và dùng để điều chỉnh quest.</p>
+                  <a href="05-logs.html" class="log-info-link">Xem Nhật Ký →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== REVIEW QUEST ========== -->
+      <div class="quest-panel" id="panel-review">
+        <div class="quest-hero">
+          <div class="quest-icon" style="border-color: #60A5FA; background: rgba(59,130,246,0.15); box-shadow: 0 0 20px rgba(59,130,246,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h1 class="quest-hero-title">Đánh Giá Cuối Ngày</h1>
+          <p class="quest-hero-sub">Buổi đêm · 21:30</p>
+          <div class="status-badge status-badge--ready">● Cần làm</div>
+        </div>
+
+        <div class="quick-stats">
+          <span class="quick-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <strong>5 phút</strong></span>
+          <span class="quick-stat exp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <strong>+30 EXP</strong></span>
+        </div>
+
+        <div class="mission-section">
+          <div class="mission-section-title">Nhiệm Vụ</div>
+          <div class="mission-card">
+            <p class="mission-action">Phản hồi nhanh để hệ thống điều chỉnh quest cho ngày mai.</p>
+            <ul class="checklist">
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Hôm nay quest có vừa sức không?</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Quest nào hữu ích nhất?</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Quest nào gây khó chịu?</span>
+              </li>
+              <li class="checklist-item" onclick="toggleCheck(this)">
+                <div class="checklist-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="checklist-text">Ngày mai muốn nhẹ hơn hay thử thách hơn?</span>
+              </li>
+            </ul>
+            <p class="mission-reason">Phản hồi của bạn là dữ liệu quan trọng nhất để SoloQuest cá nhân hóa.</p>
+          </div>
+        </div>
+
+        <div class="details-collapse" id="details-review">
+          <div class="details-toggle" onclick="toggleDetails('review')">
+            <div class="details-toggle-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Chi tiết thêm
+            </div>
+            <svg class="details-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="details-body">
+            <div class="details-inner">
+              <div class="detail-section">
+                <div class="detail-section-title">Vì Sao Quest Này Xuất Hiện?</div>
+                <div class="why-card">
+                  <div class="why-card-header">
+                    <svg class="why-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span class="why-title">Hệ thống đề xuất</span>
+                  </div>
+                  <ul class="why-list">
+                    <li>Daily Review giúp hệ thống điều chỉnh quest ngày mai</li>
+                    <li>Bạn đã hoàn thành 6/9 quest — nên review để tối ưu</li>
+                  </ul>
+                  <a href="16-quest-rules.html" class="why-link">Xem luật điều chỉnh →</a>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Phần Thưởng</div>
+                <div class="reward-card">
+                  <div class="reward-row">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="reward-text">Nhận <span>+30 EXP</span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-section-title">Sẽ Được Ghi Nhận?</div>
+                <div class="log-info">
+                  <p class="log-info-text">Phản hồi lưu vào Nhật ký và dùng để tạo đề xuất tuần sau.</p>
+                  <a href="05-logs.html" class="log-info-link">Xem Nhật Ký →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Sheet: Hoãn -->
+      <div class="sheet-overlay" id="snooze-overlay" onclick="closeSheet('snooze')"></div>
+      <div class="bottom-sheet" id="snooze-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <div class="sheet-title">Hoãn nhiệm vụ</div>
+          <p class="sheet-subtitle">Bạn muốn hệ thống nhắc lại sau bao lâu?</p>
+        </div>
+        <div class="sheet-body">
+          <div class="snooze-options">
+            <div class="snooze-option selected" onclick="selectSnooze(this, 10)">
+              <div class="snooze-radio"><div class="snooze-radio-dot"></div></div>
+              <span class="snooze-label">10 phút</span>
+            </div>
+            <div class="snooze-option" onclick="selectSnooze(this, 15)">
+              <div class="snooze-radio"><div class="snooze-radio-dot"></div></div>
+              <span class="snooze-label">15 phút</span>
+            </div>
+            <div class="snooze-option" onclick="selectSnooze(this, 30)">
+              <div class="snooze-radio"><div class="snooze-radio-dot"></div></div>
+              <span class="snooze-label">30 phút</span>
+            </div>
+            <div class="snooze-option" onclick="selectSnooze(this, 'custom')">
+              <div class="snooze-radio"><div class="snooze-radio-dot"></div></div>
+              <span class="snooze-label">Chọn giờ khác</span>
+            </div>
+          </div>
+          <button class="sheet-btn sheet-btn--snooze" onclick="confirmSnooze()">Xác nhận hoãn</button>
+        </div>
+      </div>
+
+      <!-- Bottom Sheet: Bỏ qua -->
+      <div class="sheet-overlay" id="skip-overlay" onclick="closeSheet('skip')"></div>
+      <div class="bottom-sheet" id="skip-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+          <div class="sheet-title">Bỏ qua nhiệm vụ</div>
+          <p class="sheet-subtitle">Vì sao bạn muốn bỏ qua quest này?</p>
+        </div>
+        <div class="sheet-body">
+          <div class="skip-options">
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Đang bận</button>
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Không có năng lượng</button>
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Không phù hợp</button>
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Quên mất</button>
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Không muốn làm</button>
+            <button class="skip-chip" onclick="toggleSkipChip(this)">Khác</button>
+          </div>
+          <textarea class="skip-note" placeholder="Ghi chú thêm nếu cần..."></textarea>
+          <button class="sheet-btn sheet-btn--skip" onclick="confirmSkip()">Xác nhận bỏ qua</button>
+        </div>
+      </div>
+
+      <!-- Completion Modal -->
+      <div class="completion-overlay" id="completion-overlay">
+        <div class="completion-modal">
+          <div class="modal-header">
+            <div class="modal-check-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="modal-title">Nhiệm vụ hoàn thành</div>
+            <div class="modal-exp-badge" id="modal-exp" data-exp="+10 EXP">+10 EXP</div>
+          </div>
+          <div class="modal-body">
+            <div class="modal-variant active" id="variant-default">
+              <p class="modal-subtitle">Bạn muốn ghi chú nhanh không?</p>
+              <textarea class="modal-textarea" placeholder="Ví dụ: Đỡ mỏi mắt hơn, hơi mệt..."></textarea>
+              <div class="modal-question">Bạn cảm thấy thế nào?</div>
+              <div class="modal-feeling-row">
+                <button class="modal-feeling-btn" onclick="selectFeeling(this)">Tốt hơn</button>
+                <button class="modal-feeling-btn selected" onclick="selectFeeling(this)">Bình thường</button>
+                <button class="modal-feeling-btn" onclick="selectFeeling(this)">Mệt hơn</button>
+              </div>
+            </div>
+            <div class="modal-variant" id="variant-learning">
+              <div class="modal-question">Bạn đã học được gì?</div>
+              <textarea class="modal-textarea" placeholder="Ghi lại 1–3 ý chính..."></textarea>
+              <div class="modal-question">Mức độ hiểu:</div>
+              <div class="modal-scale-row">
+                <button class="modal-scale-btn" onclick="selectScale(this)">1</button>
+                <button class="modal-scale-btn" onclick="selectScale(this)">2</button>
+                <button class="modal-scale-btn selected" onclick="selectScale(this)">3</button>
+                <button class="modal-scale-btn" onclick="selectScale(this)">4</button>
+                <button class="modal-scale-btn" onclick="selectScale(this)">5</button>
+              </div>
+              <div class="modal-scale-label"><span>Chưa hiểu</span><span>Hiểu rõ</span></div>
+            </div>
+            <div class="modal-variant" id="variant-movement">
+              <p class="modal-subtitle">Ghi chú nhanh nếu cần.</p>
+              <textarea class="modal-textarea" placeholder="Cảm nhận sau khi vận động..."></textarea>
+              <div class="modal-question">Mức độ bài này?</div>
+              <div class="modal-diff-row">
+                <button class="modal-diff-btn" onclick="selectModalDiff(this)">Dễ</button>
+                <button class="modal-diff-btn selected" onclick="selectModalDiff(this)">Vừa sức</button>
+                <button class="modal-diff-btn" onclick="selectModalDiff(this)">Khó</button>
+              </div>
+            </div>
+            <button class="modal-confirm-btn" onclick="closeCompletionModal()">Xong</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sticky Action Bar — always visible at bottom -->
+    <div class="sticky-action-bar" id="sticky-bar">
+      <button class="btn btn--start" id="sticky-start-btn" onclick="handleStickyStart()">Bắt Đầu</button>
+      <button class="btn btn--snooze-quick" onclick="openSheet('snooze')">Hoãn</button>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Trang Chủ
+      </a>
+      <a href="05-logs.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Nhật Ký
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Tiến Trình
+      </a>
+      <a href="07-rewards.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Thưởng
+      </a>
+      <a href="09-profile.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hồ Sơ
+      </a>
+    </nav>
+  </div>
+
+<script>
+var stickyBtnTexts = {
+  'water': 'Đã Uống',
+  'break': 'Bắt Đầu Nghỉ',
+  'movement': 'Bắt Đầu Vận Động',
+  'learning': 'Hoàn Thành Học',
+  'sleep': 'Bắt Đầu Wind-Down',
+  'reflection': 'Viết Log',
+  'review': 'Bắt Đầu Daily Review'
+};
+
+var currentQuest = 'water';
+
+function updateStickyBar() {
+  var btn = document.getElementById('sticky-start-btn');
+  var bar = document.getElementById('sticky-bar');
+  if (!btn || !bar) return;
+  btn.textContent = stickyBtnTexts[currentQuest] || 'Bắt Đầu';
+  btn.className = 'btn btn--start';
+  btn.onclick = function() { handleStickyStart(); };
+  bar.querySelector('.btn--snooze-quick').style.display = '';
+}
+
+function handleStickyStart() {
+  var panel = document.getElementById('panel-' + currentQuest);
+  if (!panel) return;
+  completeQuest(panel);
+}
+
+function switchQuest(type) {
+  currentQuest = type;
+  document.querySelectorAll('.quest-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.quest-panel').forEach(function(p) { p.classList.remove('active'); });
+  var tabs = document.querySelectorAll('.quest-tab');
+  var tabNames = ['water', 'break', 'movement', 'learning', 'sleep', 'reflection', 'review'];
+  var idx = tabNames.indexOf(type);
+  if (idx !== -1 && tabs[idx]) tabs[idx].classList.add('active');
+  var panel = document.getElementById('panel-' + type);
+  if (panel) panel.classList.add('active');
+  var content = document.querySelector('.page-content');
+  if (content) content.scrollTop = 0;
+  updateStickyBar();
+}
+
+function selectAmount(btn) {
+  btn.parentElement.querySelectorAll('.amount-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+function selectDiff(btn) {
+  btn.parentElement.querySelectorAll('.diff-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+}
+
+function selectPrompt(chip, text) {
+  chip.parentElement.querySelectorAll('.prompt-chip').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  var textarea = document.getElementById('reflection-text');
+  if (textarea) textarea.value = text;
+}
+
+function toggleDetails(type) {
+  var el = document.getElementById('details-' + type);
+  if (el) el.classList.toggle('open');
+}
+
+var timers = {};
+function toggleTimer(type) {
+  var display = document.getElementById(type + '-timer');
+  var btn = document.getElementById(type + '-timer-btn');
+  if (timers[type]) {
+    clearInterval(timers[type]);
+    timers[type] = null;
+    btn.textContent = 'Tiếp Tục';
+    btn.classList.remove('running');
+  } else {
+    btn.classList.add('running');
+    btn.textContent = 'Tạm Dừng';
+    var parts = display.textContent.split(':');
+    var seconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    timers[type] = setInterval(function() {
+      seconds--;
+      if (seconds <= 0) {
+        clearInterval(timers[type]);
+        timers[type] = null;
+        display.textContent = '00:00';
+        btn.textContent = 'Hoàn Thành!';
+        btn.classList.remove('running');
+        return;
+      }
+      var m = Math.floor(seconds / 60);
+      var s = seconds % 60;
+      display.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }, 1000);
+  }
+}
+
+function completeQuest(panel) {
+  var panelId = panel.id || panel.closest('.quest-panel').id;
+  if (!panelId && panel.closest) panelId = panel.closest('.quest-panel').id;
+  var expMap = {
+    'panel-water': '+10 EXP', 'panel-break': '+15 EXP', 'panel-movement': '+20 EXP',
+    'panel-learning': '+40 EXP', 'panel-sleep': '+25 EXP',
+    'panel-reflection': '+15 EXP', 'panel-review': '+30 EXP'
+  };
+  var variantMap = {
+    'panel-water': 'default', 'panel-break': 'default', 'panel-movement': 'movement',
+    'panel-learning': 'learning', 'panel-sleep': 'default',
+    'panel-reflection': 'default', 'panel-review': 'default'
+  };
+  var expText = expMap[panelId] || '+10 EXP';
+  var variant = variantMap[panelId] || 'default';
+  var badge = document.getElementById('modal-exp');
+  badge.textContent = expText;
+  badge.setAttribute('data-exp', expText);
+  badge.classList.remove('animate');
+  void badge.offsetWidth;
+  badge.classList.add('animate');
+  document.querySelectorAll('.modal-variant').forEach(function(v) { v.classList.remove('active'); });
+  document.getElementById('variant-' + variant).classList.add('active');
+  document.getElementById('completion-overlay').classList.add('show');
+}
+
+function closeCompletionModal() {
+  var overlay = document.getElementById('completion-overlay');
+  overlay.classList.remove('show');
+  var panel = document.querySelector('.quest-panel.active');
+  if (panel) {
+    var badge = panel.querySelector('.status-badge');
+    if (badge) { badge.className = 'status-badge status-badge--done'; badge.textContent = '✓ Hoàn thành'; }
+  }
+  var btn = document.getElementById('sticky-start-btn');
+  var snoozeBtn = document.querySelector('.btn--snooze-quick');
+  if (btn) { btn.textContent = '✓ Hoàn Thành'; btn.className = 'btn btn--done'; btn.onclick = function() { location.href = '03-home.html'; }; }
+  if (snoozeBtn) snoozeBtn.style.display = 'none';
+}
+
+function selectFeeling(btn) {
+  btn.parentElement.querySelectorAll('.modal-feeling-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+function selectScale(btn) {
+  btn.parentElement.querySelectorAll('.modal-scale-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+function selectModalDiff(btn) {
+  btn.parentElement.querySelectorAll('.modal-diff-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+var selectedSnoozeMin = 10;
+
+function openSheet(type) {
+  document.getElementById(type + '-overlay').classList.add('show');
+  document.getElementById(type + '-sheet').classList.add('show');
+}
+
+function closeSheet(type) {
+  document.getElementById(type + '-overlay').classList.remove('show');
+  document.getElementById(type + '-sheet').classList.remove('show');
+}
+
+function selectSnooze(el, min) {
+  document.querySelectorAll('.snooze-option').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedSnoozeMin = min;
+}
+
+function confirmSnooze() {
+  var label = selectedSnoozeMin === 'custom' ? 'lịch hẹn khác' : selectedSnoozeMin + ' phút';
+  closeSheet('snooze');
+  var panel = document.querySelector('.quest-panel.active');
+  var badge = panel.querySelector('.status-badge');
+  if (badge) { badge.className = 'status-badge status-badge--snoozed'; badge.textContent = '● Đã hoãn'; }
+  var btn = document.getElementById('sticky-start-btn');
+  var snoozeBtn = document.querySelector('.btn--snooze-quick');
+  if (btn) { btn.textContent = 'Đã hoãn — nhắc sau ' + label; btn.className = 'btn btn--snoozed'; btn.onclick = function() {}; }
+  if (snoozeBtn) snoozeBtn.style.display = 'none';
+}
+
+function toggleSkipChip(chip) {
+  chip.classList.toggle('selected');
+}
+
+function confirmSkip() {
+  closeSheet('skip');
+  var panel = document.querySelector('.quest-panel.active');
+  var badge = panel.querySelector('.status-badge');
+  if (badge) { badge.className = 'status-badge'; badge.style.cssText = 'background:rgba(107,107,107,0.15);color:var(--fg-muted);border:1px solid rgba(107,107,107,0.2);'; badge.textContent = '— Đã bỏ qua'; }
+  var btn = document.getElementById('sticky-start-btn');
+  var snoozeBtn = document.querySelector('.btn--snooze-quick');
+  if (btn) { btn.textContent = 'Đã bỏ qua'; btn.className = 'btn btn--done'; btn.style.cssText = 'background:rgba(107,107,107,0.15);color:var(--fg-muted);'; btn.onclick = function() { location.href = '03-home.html'; }; }
+  if (snoozeBtn) snoozeBtn.style.display = 'none';
+}
+
+document.getElementById('completion-overlay').addEventListener('click', function(e) {
+  if (e.target === this) { closeCompletionModal(); }
+});
+
+// Init sticky bar on load
+updateStickyBar();
+
+// Auto-switch tab from URL param
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var tab = params.get('tab');
+  var validTabs = ['water', 'break', 'movement', 'learning', 'sleep', 'reflection', 'review'];
+  if (tab && validTabs.indexOf(tab) !== -1) {
+    switchQuest(tab);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Check-in Buổi Sáng</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .checkin-header {
+    padding: 20px 20px 0;
+    text-align: center;
+  }
+
+  .checkin-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan-dim), var(--violet-dim));
+    border: 1px solid var(--border-glow-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 22px;
+  }
+
+  .checkin-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .checkin-subtitle {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+  }
+
+  .checkin-section {
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .checkin-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .checkin-label .label-icon {
+    font-size: 15px;
+  }
+
+  .rating-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .rating-btn {
+    flex: 1;
+    height: 52px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--fg-secondary);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rating-btn:active {
+    transform: scale(0.95);
+  }
+
+  .rating-btn.selected {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 12px var(--cyan-glow);
+  }
+
+  .rating-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 0 2px;
+  }
+
+  .rating-labels span {
+    font-size: 10px;
+    color: var(--fg-muted);
+  }
+
+  .toggle-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    height: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--fg-secondary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .toggle-btn:active {
+    transform: scale(0.97);
+  }
+
+  .toggle-btn.selected {
+    border-color: var(--violet);
+    color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .time-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .time-chip {
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .time-chip:active {
+    transform: scale(0.96);
+  }
+
+  .time-chip.selected {
+    background: var(--cyan-dim);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  .notes-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  .notes-input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px var(--cyan-dim);
+  }
+
+  .notes-input::placeholder {
+    color: var(--fg-muted);
+  }
+
+  .checkin-actions {
+    padding: 16px 20px 24px;
+  }
+
+  .btn-generate {
+    width: 100%;
+    height: 56px;
+    background: linear-gradient(135deg, var(--cyan), #00C4FF);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--bg-deep);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 0 24px var(--cyan-glow);
+  }
+
+  .btn-generate:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  .btn-generate svg {
+    flex-shrink: 0;
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .loading-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 3px solid var(--border);
+    border-top-color: var(--cyan);
+    border-right-color: var(--violet);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--cyan);
+    letter-spacing: 0.04em;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .loading-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 8px;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .scan-bar {
+    width: 200px;
+    height: 2px;
+    background: var(--surface);
+    border-radius: 1px;
+    margin-top: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .scan-bar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, var(--cyan), var(--violet));
+    border-radius: 1px;
+    animation: scan-move 1.5s ease-in-out infinite;
+  }
+
+  @keyframes scan-move {
+    0% { left: -40%; }
+    100% { left: 100%; }
+  }
+
+  /* System hint */
+  .system-line {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--fg-muted);
+    text-align: center;
+    padding: 8px 20px 0;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">06:45</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full" style="display:flex; flex-direction:column;" id="checkinPage">
+      <div class="checkin-header">
+        <div class="checkin-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+        <h1 class="checkin-title text-cyan">CHECK-IN BUỔI SÁNG</h1>
+        <p class="checkin-subtitle">Hệ thống cần scan trạng thái hôm nay<br>để tạo nhiệm vụ tối ưu cho bạn</p>
+      </div>
+
+      <div style="flex:1; overflow-y:auto; scrollbar-width:none; padding-bottom:12px;">
+        <!-- Sleep quality -->
+        <div class="checkin-section" style="margin-top:20px;">
+          <div class="checkin-label">
+            <span class="label-icon">🌙</span> Hôm nay bạn ngủ thế nào?
+          </div>
+          <div class="rating-row" data-group="sleep">
+            <button class="rating-btn" onclick="selectRating(this, 'sleep')">1</button>
+            <button class="rating-btn" onclick="selectRating(this, 'sleep')">2</button>
+            <button class="rating-btn" onclick="selectRating(this, 'sleep')">3</button>
+            <button class="rating-btn selected" onclick="selectRating(this, 'sleep')">4</button>
+            <button class="rating-btn" onclick="selectRating(this, 'sleep')">5</button>
+          </div>
+          <div class="rating-labels">
+            <span>Rất tệ</span>
+            <span>Tuyệt vời</span>
+          </div>
+        </div>
+
+        <!-- Energy level -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">⚡</span> Năng lượng hiện tại?
+          </div>
+          <div class="rating-row" data-group="energy">
+            <button class="rating-btn" onclick="selectRating(this, 'energy')">1</button>
+            <button class="rating-btn" onclick="selectRating(this, 'energy')">2</button>
+            <button class="rating-btn selected" onclick="selectRating(this, 'energy')">3</button>
+            <button class="rating-btn" onclick="selectRating(this, 'energy')">4</button>
+            <button class="rating-btn" onclick="selectRating(this, 'energy')">5</button>
+          </div>
+          <div class="rating-labels">
+            <span>Kiệt sức</span>
+            <span>Tràn đầy</span>
+          </div>
+        </div>
+
+        <!-- Mood -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">😊</span> Tâm trạng hôm nay?
+          </div>
+          <div class="rating-row" data-group="mood">
+            <button class="rating-btn" onclick="selectRating(this, 'mood')">1</button>
+            <button class="rating-btn" onclick="selectRating(this, 'mood')">2</button>
+            <button class="rating-btn selected" onclick="selectRating(this, 'mood')">3</button>
+            <button class="rating-btn" onclick="selectRating(this, 'mood')">4</button>
+            <button class="rating-btn" onclick="selectRating(this, 'mood')">5</button>
+          </div>
+          <div class="rating-labels">
+            <span>Chán nản</span>
+            <span>Vui vẻ</span>
+          </div>
+        </div>
+
+        <!-- Stress -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">🧠</span> Mức stress?
+          </div>
+          <div class="rating-row" data-group="stress">
+            <button class="rating-btn selected" onclick="selectRating(this, 'stress')">1</button>
+            <button class="rating-btn" onclick="selectRating(this, 'stress')">2</button>
+            <button class="rating-btn" onclick="selectRating(this, 'stress')">3</button>
+            <button class="rating-btn" onclick="selectRating(this, 'stress')">4</button>
+            <button class="rating-btn" onclick="selectRating(this, 'stress')">5</button>
+          </div>
+          <div class="rating-labels">
+            <span>Rất thấp</span>
+            <span>Cực cao</span>
+          </div>
+        </div>
+
+        <!-- Busy toggle -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">📅</span> Hôm nay có bận bất thường không?
+          </div>
+          <div class="toggle-row">
+            <button class="toggle-btn" onclick="selectToggle(this, 'busy')">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8"/></svg>
+              Có
+            </button>
+            <button class="toggle-btn selected" onclick="selectToggle(this, 'busy')">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M8 4v8"/></svg>
+              Không
+            </button>
+          </div>
+        </div>
+
+        <!-- Free time -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">⏱</span> Hôm nay bạn có bao nhiêu phút rảnh?
+          </div>
+          <div class="time-chips">
+            <button class="time-chip" onclick="selectChip(this)">15 phút</button>
+            <button class="time-chip" onclick="selectChip(this)">30 phút</button>
+            <button class="time-chip selected" onclick="selectChip(this)">60 phút</button>
+            <button class="time-chip" onclick="selectChip(this)">90+ phút</button>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="checkin-section">
+          <div class="checkin-label">
+            <span class="label-icon">📝</span> Ghi chú nhanh
+          </div>
+          <textarea class="notes-input" placeholder="Ví dụ: Hơi mệt, có họp buổi chiều, tối muốn học nhẹ..."></textarea>
+        </div>
+
+        <p class="system-line">[ HỆ THỐNG ] Dữ liệu chỉ dùng để tối ưu nhiệm vụ hôm nay</p>
+      </div>
+
+      <!-- Generate button -->
+      <div class="checkin-actions">
+        <button class="btn-generate" onclick="startGenerate()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--bg-deep)" stroke-width="2" stroke-linecap="round"><polygon points="10,1 12.5,7.5 19,8 14,12.5 15.5,19 10,15.5 4.5,19 6,12.5 1,8 7.5,7.5"/></svg>
+          TẠO NHIỆM VỤ HÔM NAY
+        </button>
+      </div>
+
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Hệ thống đang phân tích<br>trạng thái hôm nay...</div>
+        <div class="loading-sub">Đang scan: giấc ngủ · năng lượng · tâm trạng · lịch trình</div>
+        <div class="scan-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectRating(btn, group) {
+      const row = btn.parentElement;
+      row.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function selectToggle(btn, group) {
+      const row = btn.parentElement;
+      row.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function selectChip(chip) {
+      chip.classList.toggle('selected');
+    }
+
+    function startGenerate() {
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('visible');
+      setTimeout(() => {
+        window.location.href = '03-home.html';
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

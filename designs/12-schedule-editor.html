@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Lịch Quest</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .editor-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .editor-back {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: var(--fg);
+    transition: background 0.15s;
+  }
+
+  .editor-back:active { background: var(--surface-hover); }
+  .editor-back svg { width: 18px; height: 18px; }
+
+  .editor-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+
+  .editor-save {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cyan);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+
+  .editor-save:active { background: var(--cyan-dim); }
+
+  /* View toggle */
+  .view-toggle {
+    display: flex;
+    gap: 0;
+    margin: 16px 20px 12px;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .view-toggle__btn {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .view-toggle__btn.active {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+  }
+
+  .view-toggle__btn:active { transform: scale(0.97); }
+
+  /* Section headers */
+  .se-section {
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .se-section__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .se-section__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .collapsible-header__arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--muted);
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
+  }
+
+  .collapsible-header__arrow.open {
+    transform: rotate(90deg);
+  }
+
+  .collapsible-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .collapsible-body.open {
+    max-height: 2000px;
+  }
+
+  /* Pending suggestions card */
+  .pending-card {
+    background: var(--surface);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin: 0 20px 16px;
+  }
+
+  .pending-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .pending-card__badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--violet);
+    background: var(--violet-dim);
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .pending-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .pending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .pending-item:first-of-type { border-top: none; }
+
+  .pending-item__check {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    margin-top: 1px;
+  }
+
+  .pending-item__check.checked {
+    background: var(--violet);
+    border-color: var(--violet);
+  }
+
+  .pending-item__check.checked::after {
+    content: '✓';
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .pending-item__text {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .pending-item__text strong {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .pending-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .pending-actions .btn { flex: 1; }
+
+  /* Timeline */
+  .timeline {
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 4px;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-item__time {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    width: 44px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-top: 14px;
+  }
+
+  .timeline-item__line {
+    width: 2px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .timeline-item__line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: absolute;
+    top: 16px;
+    left: -4px;
+    z-index: 1;
+  }
+
+  .timeline-item__content {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    transition: all 0.15s;
+  }
+
+  .timeline-item__content:active {
+    background: var(--surface-hover);
+  }
+
+  .timeline-item--done .timeline-item__content {
+    opacity: 0.55;
+  }
+
+  .timeline-item--done .timeline-item__dot { background: var(--success); }
+  .timeline-item--active .timeline-item__dot { background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); }
+  .timeline-item--upcoming .timeline-item__dot { background: var(--fg-muted); }
+  .timeline-item--snoozed .timeline-item__dot { background: var(--warn); }
+  .timeline-item--skipped .timeline-item__dot { background: var(--fg-muted); }
+
+  .timeline-item__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-item__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .timeline-item--skipped .timeline-item__name {
+    text-decoration: line-through;
+    color: var(--fg-muted);
+  }
+
+  .timeline-item__status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .timeline-item__status--done { background: var(--success-dim); color: var(--success); }
+  .timeline-item__status--active { background: var(--cyan-dim); color: var(--cyan); }
+  .timeline-item__status--upcoming { background: var(--surface-active); color: var(--fg-muted); }
+  .timeline-item__status--snoozed { background: var(--warn-dim); color: var(--warn); }
+  .timeline-item__status--skipped { background: var(--danger-dim); color: var(--danger); }
+
+  .timeline-item__desc {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-bottom: 8px;
+  }
+
+  .timeline-item__actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tl-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .tl-action:active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+
+  /* Quest repeat rules */
+  .rule-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .rule-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .rule-card__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rule-card__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .rule-card__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .rule-card__edit {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cyan);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .rule-card__edit:active { background: var(--cyan-dim); }
+
+  .rule-card__detail {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+    padding-left: 42px;
+  }
+
+  .rule-card__detail + .rule-card__detail { margin-top: 2px; }
+
+  /* DND section */
+  .dnd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .dnd-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .dnd-row + .dnd-row { border-top: 1px solid var(--border); }
+
+  .dnd-row__label {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    flex: 1;
+  }
+
+  .dnd-row__value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cyan);
+    flex-shrink: 0;
+  }
+
+  .toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--fg-muted);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--cyan); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after { transform: translateX(18px); }
+
+  /* Day type grid */
+  .day-type-grid {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .day-type-chip {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .day-type-chip:active { transform: scale(0.95); }
+
+  .day-type-chip__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+  }
+
+  .day-type-chip__badge {
+    font-size: 8px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .day-type-chip__badge--work { background: var(--cyan-dim); color: var(--cyan); }
+  .day-type-chip__badge--mixed { background: var(--warn-dim); color: var(--warn); }
+  .day-type-chip__badge--rest { background: var(--success-dim); color: var(--success); }
+
+  .day-type-chip[data-type="work"] { border-color: var(--cyan); }
+  .day-type-chip[data-type="mixed"] { border-color: var(--warn); }
+  .day-type-chip[data-type="rest"] { border-color: var(--success); }
+
+  .day-type-hint {
+    font-size: 11px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+    margin: 6px 0 0;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  .day-type-hint strong { color: var(--fg-secondary); }
+
+  /* Per-day cards — compact */
+  .day-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 20px;
+    margin-bottom: 16px;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .day-card:active { background: var(--surface-hover); }
+
+  .day-card--active {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 1px var(--cyan);
+  }
+
+  .day-card__left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .day-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .day-card__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+
+  .day-card__badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .day-card__badge--work {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+  }
+
+  .day-card__badge--rest {
+    background: var(--success-dim);
+    color: var(--success);
+  }
+
+  .day-card__badge--mixed {
+    background: var(--warn-dim);
+    color: var(--warn);
+  }
+
+  .day-card__summary {
+    font-size: 12px;
+    color: var(--fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .day-card__summary strong {
+    color: var(--fg-secondary);
+    font-weight: 600;
+  }
+
+  .day-card__chevron {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--fg-muted);
+  }
+
+  .day-card__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .day-card__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--fg-secondary);
+  }
+
+  .day-card__row-icon {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .day-card__row-label {
+    color: var(--fg-muted);
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+
+  .day-card__row-value {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .day-card__quests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .day-card__quest-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--surface-active);
+    color: var(--fg-secondary);
+  }
+
+  /* Per-day editor sheet */
+  .day-editor {
+    padding: 0;
+  }
+
+  .day-editor__section {
+    margin-bottom: 16px;
+  }
+
+  .day-editor__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .day-editor__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .day-editor__row-label {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  .day-editor__input {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cyan);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .day-editor__input:focus {
+    border-color: var(--cyan);
+  }
+
+  .day-editor__time-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .day-editor__time-range .day-editor__input {
+    width: 70px;
+    flex: none;
+  }
+
+  .day-editor__separator {
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+
+  .day-editor__quest-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .day-editor__quest-toggle:last-child { border-bottom: none; }
+
+  .day-editor__quest-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .day-editor__quest-time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+
+  .day-editor__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .day-editor__actions .btn { flex: 1; }
+
+  .copy-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .copy-chip {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .copy-chip:active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+  }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    right: 20px;
+    padding: 14px 20px;
+    background: var(--success);
+    color: var(--bg-deep);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: var(--radius-md);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 600;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Bottom sheet (time picker reuse) */
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 20px;
+    z-index: 501;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 60%;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .sheet::-webkit-scrollbar { display: none; }
+  .sheet.open { transform: translateY(0); }
+
+  .sheet__handle {
+    width: 36px;
+    height: 4px;
+    background: var(--fg-muted);
+    border-radius: var(--radius-full);
+    margin: 0 auto 16px;
+  }
+
+  .sheet__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--fg);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .sheet__option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .sheet__option:active { background: var(--surface-hover); }
+
+  .sheet__option-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .sheet__option-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  /* Action bar */
+  .action-bar {
+    padding: 16px 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .action-bar .btn { flex: 1; }
+
+  /* Links row */
+  .links-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .link-chip:active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-bottom:80px">
+      <!-- Header -->
+      <div class="editor-header">
+        <button class="editor-back" onclick="history.back()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="editor-title">Lịch Quest</div>
+        <button class="editor-save" onclick="saveSchedule()">Lưu</button>
+      </div>
+
+      <!-- View toggle -->
+      <div class="view-toggle">
+        <button class="view-toggle__btn active" onclick="switchView('today', this)">Hôm nay</button>
+        <button class="view-toggle__btn" onclick="switchView('week', this)">Tuần này</button>
+      </div>
+
+      <!-- ========== TODAY VIEW ========== -->
+      <div id="view-today">
+
+        <!-- Pending suggestions from Weekly Summary -->
+        <div class="pending-card" id="pendingCard">
+          <div class="pending-card__header">
+            <span class="pending-card__badge">Đề xuất chờ</span>
+            <span class="pending-card__title">Từ Weekly Summary</span>
+          </div>
+          <div class="pending-item">
+            <div class="pending-item__check checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="pending-item__text"><strong>Chuyển Learning Quest sang 20:00–21:30</strong> — bạn hoàn thành tốt hơn vào buổi tối</div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-item__check checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="pending-item__text"><strong>Giảm Movement Quest còn 3 lần/tuần</strong> — bị bỏ qua 4 lần tuần này</div>
+          </div>
+          <div class="pending-item">
+            <div class="pending-item__check checked" onclick="this.classList.toggle('checked')"></div>
+            <div class="pending-item__text"><strong>Đổi Break Quest buổi sáng sang mỗi 120 phút</strong> — thường bị hoãn buổi sáng</div>
+          </div>
+          <div class="pending-actions">
+            <button class="btn btn--primary btn--small" onclick="applySuggestions()">Áp dụng đã chọn</button>
+            <button class="btn btn--secondary btn--small" onclick="dismissSuggestions()">Bỏ qua</button>
+          </div>
+        </div>
+
+        <!-- Today's timeline -->
+        <div class="se-section">
+          <div class="se-section__title">
+            <span class="se-section__dot" style="background:var(--cyan)"></span>
+            Lịch hôm nay — Thứ 3
+          </div>
+        </div>
+
+        <div class="timeline">
+          <!-- 07:30 Check-in -->
+          <div class="timeline-item timeline-item--done">
+            <div class="timeline-item__time">07:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">☀ Morning Check-in</span>
+                <span class="timeline-item__status timeline-item__status--done">Xong</span>
+              </div>
+              <div class="timeline-item__desc">Năng lượng 3/5, stress 2/5, rảnh 60 phút</div>
+            </div>
+          </div>
+
+          <!-- 08:30 Water -->
+          <div class="timeline-item timeline-item--done">
+            <div class="timeline-item__time">08:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">💧 Water Quest</span>
+                <span class="timeline-item__status timeline-item__status--done">Xong</span>
+              </div>
+              <div class="timeline-item__desc">Uống một ly nước</div>
+            </div>
+          </div>
+
+          <!-- 09:30 Break - snoozed -->
+          <div class="timeline-item timeline-item--snoozed">
+            <div class="timeline-item__time">09:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">🧘 Break Quest</span>
+                <span class="timeline-item__status timeline-item__status--snoozed">Đã hoãn</span>
+              </div>
+              <div class="timeline-item__desc">Hoãn đến 10:00 — nghỉ mắt 5 phút</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="location.href='04-quest-detail.html?tab=break'">Bắt đầu</button>
+                <button class="tl-action">Bỏ qua</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 10:30 Water -->
+          <div class="timeline-item timeline-item--active">
+            <div class="timeline-item__time">10:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">💧 Water Quest</span>
+                <span class="timeline-item__status timeline-item__status--active">Cần làm</span>
+              </div>
+              <div class="timeline-item__desc">Uống một ly nước</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="location.href='04-quest-detail.html?tab=water'">Bắt đầu</button>
+                <button class="tl-action" onclick="snoozeQuest(this)">Hoãn</button>
+                <button class="tl-action" onclick="skipQuest(this)">Bỏ qua</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 13:30 Movement -->
+          <div class="timeline-item timeline-item--upcoming">
+            <div class="timeline-item__time">13:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">🏃 Movement Quest</span>
+                <span class="timeline-item__status timeline-item__status--upcoming">Sắp tới</span>
+              </div>
+              <div class="timeline-item__desc">Vận động nhẹ 3 phút</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="changeTime(this)">Đổi giờ</button>
+                <button class="tl-action" onclick="offToday(this)">Tắt hôm nay</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 15:00 Break -->
+          <div class="timeline-item timeline-item--upcoming">
+            <div class="timeline-item__time">15:00</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">🧘 Break Quest</span>
+                <span class="timeline-item__status timeline-item__status--upcoming">Sắp tới</span>
+              </div>
+              <div class="timeline-item__desc">Nghỉ mắt 5 phút sau 90 phút tập trung</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="changeTime(this)">Đổi giờ</button>
+                <button class="tl-action" onclick="offToday(this)">Tắt hôm nay</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 17:00 Water -->
+          <div class="timeline-item timeline-item--upcoming">
+            <div class="timeline-item__time">17:00</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">💧 Water Quest</span>
+                <span class="timeline-item__status timeline-item__status--upcoming">Sắp tới</span>
+              </div>
+              <div class="timeline-item__desc">Uống một ly nước</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="changeTime(this)">Đổi giờ</button>
+                <button class="tl-action" onclick="offToday(this)">Tắt hôm nay</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 20:00 Learning -->
+          <div class="timeline-item timeline-item--upcoming">
+            <div class="timeline-item__time">20:00</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">📖 Learning Quest</span>
+                <span class="timeline-item__status timeline-item__status--upcoming">Sắp tới</span>
+              </div>
+              <div class="timeline-item__desc">Học Docker cơ bản 15 phút</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="changeTime(this)">Đổi giờ</button>
+                <button class="tl-action" onclick="offToday(this)">Tắt hôm nay</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 22:30 Sleep -->
+          <div class="timeline-item timeline-item--upcoming">
+            <div class="timeline-item__time">22:30</div>
+            <div class="timeline-item__line">
+              <div class="timeline-item__dot"></div>
+            </div>
+            <div class="timeline-item__content">
+              <div class="timeline-item__top">
+                <span class="timeline-item__name">🌙 Sleep Quest</span>
+                <span class="timeline-item__status timeline-item__status--upcoming">Sắp tới</span>
+              </div>
+              <div class="timeline-item__desc">Chuẩn bị ngủ — nhắc trước 30 phút</div>
+              <div class="timeline-item__actions">
+                <button class="tl-action" onclick="changeTime(this)">Đổi giờ</button>
+                <button class="tl-action" onclick="offToday(this)">Tắt hôm nay</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repeat rules (collapsible) -->
+        <div class="se-section">
+          <div class="collapsible-header" onclick="toggleCollapse('repeatRules', this)">
+            <div class="se-section__title" style="margin-bottom:0">
+              <span class="se-section__dot" style="background:var(--violet)"></span>
+              Quest lặp lại
+            </div>
+            <svg class="collapsible-header__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="collapsible-body" id="repeatRules">
+          <div class="rule-card">
+            <div class="rule-card__header">
+              <div class="rule-card__left">
+                <div class="rule-card__icon" style="background:var(--info-dim)">🧘</div>
+                <div class="rule-card__name">Break Quest</div>
+              </div>
+              <button class="rule-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh</button>
+            </div>
+            <div class="rule-card__detail">▸ Mỗi 90 phút trong giờ học/làm</div>
+            <div class="rule-card__detail">▸ Thời lượng nghỉ: 5 phút</div>
+            <div class="rule-card__detail">▸ Không nhắc trong deep work</div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-card__header">
+              <div class="rule-card__left">
+                <div class="rule-card__icon" style="background:rgba(59,130,246,0.15)">💧</div>
+                <div class="rule-card__name">Water Quest</div>
+              </div>
+              <button class="rule-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh</button>
+            </div>
+            <div class="rule-card__detail">▸ Ngẫu nhiên mỗi 60–120 phút</div>
+            <div class="rule-card__detail">▸ Tối đa 6 lần/ngày</div>
+            <div class="rule-card__detail">▸ Không nhắc sau 22:30</div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-card__header">
+              <div class="rule-card__left">
+                <div class="rule-card__icon" style="background:var(--warn-dim)">📖</div>
+                <div class="rule-card__name">Learning Quest</div>
+              </div>
+              <button class="rule-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh</button>
+            </div>
+            <div class="rule-card__detail">▸ Ưu tiên 20:00–21:30</div>
+            <div class="rule-card__detail">▸ Thời lượng: 15–25 phút</div>
+            <div class="rule-card__detail">▸ Giảm còn 10–15 phút nếu năng lượng thấp</div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-card__header">
+              <div class="rule-card__left">
+                <div class="rule-card__icon" style="background:var(--success-dim)">🏃</div>
+                <div class="rule-card__name">Movement Quest</div>
+              </div>
+              <button class="rule-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh</button>
+            </div>
+            <div class="rule-card__detail">▸ Sau mỗi 120 phút ngồi lâu</div>
+            <div class="rule-card__detail">▸ Thời lượng: 3–5 phút</div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-card__header">
+              <div class="rule-card__left">
+                <div class="rule-card__icon" style="background:rgba(99,102,241,0.15)">🌙</div>
+                <div class="rule-card__name">Sleep Quest</div>
+              </div>
+              <button class="rule-card__edit" onclick="location.href='15-reminder-settings.html'">Chỉnh</button>
+            </div>
+            <div class="rule-card__detail">▸ Nhắc trước 30 phút</div>
+            <div class="rule-card__detail">▸ Giờ ngủ mục tiêu: 23:00</div>
+          </div>
+          </div><!-- /collapsible-body -->
+        </div>
+
+        <!-- DND settings (collapsible) -->
+        <div class="se-section">
+          <div class="collapsible-header" onclick="toggleCollapse('dndSettings', this)">
+            <div class="se-section__title" style="margin-bottom:0">
+              <span class="se-section__dot" style="background:var(--warn)"></span>
+              Khung giờ không làm phiền
+            </div>
+            <svg class="collapsible-header__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="collapsible-body" id="dndSettings">
+          <div class="dnd-card">
+            <div class="dnd-row">
+              <span class="dnd-row__label">Giờ ngủ</span>
+              <span class="dnd-row__value">23:00 – 07:00</span>
+            </div>
+            <div class="dnd-row">
+              <span class="dnd-row__label">Deep work</span>
+              <span class="dnd-row__value">09:00 – 11:00</span>
+            </div>
+            <div class="dnd-row">
+              <span class="dnd-row__label">Tối đa thông báo/giờ</span>
+              <span class="dnd-row__value">2 lần</span>
+            </div>
+            <div class="dnd-row">
+              <span class="dnd-row__label">Khoảng cách tối thiểu</span>
+              <span class="dnd-row__value">30 phút</span>
+            </div>
+          </div>
+          </div><!-- /collapsible-body -->
+        </div>
+
+        <div class="links-row">
+          <a class="link-chip" href="15-reminder-settings.html">⚙ Chỉnh nhắc nhở</a>
+          <a class="link-chip" href="16-quest-rules.html">📋 Luật điều chỉnh</a>
+        </div>
+
+      </div>
+
+      <!-- ========== WEEK VIEW ========== -->
+      <div id="view-week" style="display:none">
+
+        <div class="se-section">
+          <div class="se-section__title">
+            <span class="se-section__dot" style="background:var(--cyan)"></span>
+            Chỉnh lịch theo từng ngày
+          </div>
+          <p style="font-size:12px;color:var(--fg-muted);margin:0 0 12px;line-height:1.5">
+            Bấm vào ngày để chỉnh giờ học/làm, thời gian rảnh và quest riêng.
+          </p>
+        </div>
+
+        <!-- Day type selector -->
+        <div class="se-section">
+          <div class="se-section__title">
+            <span class="se-section__dot" style="background:var(--warn)"></span>
+            Loại ngày
+          </div>
+          <div class="day-type-grid" id="dayTypeGrid">
+            <!-- Generated by JS -->
+          </div>
+          <div class="day-type-hint">
+            <strong>Từ onboarding:</strong> Bạn là Software Engineer, lịch mặc định T2–T6 là ngày học/làm. Bấm vào từng ngày để đổi sang <strong>Nhẹ</strong> hoặc <strong>Nghỉ</strong> nếu lịch thực tế khác.
+          </div>
+        </div>
+
+        <!-- 7 day cards -->
+        <div class="day-cards" id="dayCards">
+          <!-- Generated by JS -->
+        </div>
+
+        <div class="links-row">
+          <a class="link-chip" href="15-reminder-settings.html">⚙ Chỉnh nhắc nhở</a>
+          <a class="link-chip" href="16-quest-rules.html">📋 Luật điều chỉnh</a>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <button class="btn btn--primary" onclick="saveSchedule()">Lưu lịch Quest</button>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Trang Chủ
+      </a>
+      <a href="05-logs.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Nhật Ký
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        Tiến Trình
+      </a>
+      <a href="07-rewards.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Thưởng
+      </a>
+      <a href="09-profile.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hồ Sơ
+      </a>
+    </nav>
+
+    <!-- Action sheet -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
+      <div class="sheet__handle"></div>
+      <div class="sheet__title" id="sheetTitle">Chọn hành động</div>
+      <div id="sheetOptions"></div>
+    </div>
+
+    <!-- Day editor sheet -->
+    <div class="sheet-overlay" id="dayEditorOverlay" onclick="closeDayEditor()"></div>
+    <div class="sheet" id="dayEditor" style="max-height:85%">
+      <div class="sheet__handle"></div>
+      <div class="sheet__title" id="dayEditorTitle">Chỉnh lịch ngày</div>
+      <div id="dayEditorContent" class="day-editor"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">✓ Đã lưu lịch thành công</div>
+  </div>
+
+  <script>
+    // ===== Per-day schedule data =====
+    const weekData = {
+      T2: {
+        label: 'Thứ 2', type: 'work',
+        workStart: '08:30', workEnd: '17:30',
+        lunchStart: '12:00', lunchEnd: '13:30',
+        freeStart: '20:00', freeEnd: '22:00',
+        wakeTime: '07:00', sleepTime: '23:00',
+        quests: [
+          { icon: '🧘', name: 'Break', time: '09:30', enabled: true },
+          { icon: '💧', name: 'Water', time: '10:45', enabled: true },
+          { icon: '🏃', name: 'Move', time: '13:30', enabled: true },
+          { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+          { icon: '🌙', name: 'Sleep', time: '22:30', enabled: true }
+        ]
+      },
+      T3: {
+        label: 'Thứ 3', type: 'work',
+        workStart: '08:30', workEnd: '17:30',
+        lunchStart: '12:00', lunchEnd: '13:30',
+        freeStart: '20:00', freeEnd: '22:00',
+        wakeTime: '07:00', sleepTime: '23:00',
+        quests: [
+          { icon: '🧘', name: 'Break', time: '09:30', enabled: true },
+          { icon: '💧', name: 'Water', time: '10:30', enabled: true },
+          { icon: '🏃', name: 'Move', time: '13:30', enabled: true },
+          { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+          { icon: '🌙', name: 'Sleep', time: '22:30', enabled: true }
+        ]
+      },
+      T4: {
+        label: 'Thứ 4', type: 'work',
+        workStart: '08:30', workEnd: '17:30',
+        lunchStart: '12:00', lunchEnd: '13:30',
+        freeStart: '20:00', freeEnd: '22:00',
+        wakeTime: '07:00', sleepTime: '23:00',
+        quests: [
+          { icon: '🧘', name: 'Break', time: '09:30', enabled: true },
+          { icon: '💧', name: 'Water', time: '11:00', enabled: true },
+          { icon: '🏃', name: 'Move', time: '14:00', enabled: true },
+          { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+          { icon: '🌙', name: 'Sleep', time: '22:30', enabled: true }
+        ]
+      },
+      T5: {
+        label: 'Thứ 5', type: 'work',
+        workStart: '08:30', workEnd: '17:30',
+        lunchStart: '12:00', lunchEnd: '13:30',
+        freeStart: '20:00', freeEnd: '22:00',
+        wakeTime: '07:00', sleepTime: '23:00',
+        quests: [
+          { icon: '🧘', name: 'Break', time: '09:30', enabled: true },
+          { icon: '💧', name: 'Water', time: '10:45', enabled: true },
+          { icon: '🏃', name: 'Move', time: '13:30', enabled: true },
+          { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+          { icon: '🌙', name: 'Sleep', time: '22:30', enabled: true }
+        ]
+      },
+      T6: {
+        label: 'Thứ 6', type: 'work',
+        workStart: '08:30', workEnd: '17:00',
+        lunchStart: '12:00', lunchEnd: '13:30',
+        freeStart: '19:00', freeEnd: '22:30',
+        wakeTime: '07:00', sleepTime: '23:00',
+        quests: [
+          { icon: '🧘', name: 'Break', time: '10:00', enabled: true },
+          { icon: '💧', name: 'Water', time: '11:30', enabled: true },
+          { icon: '🏃', name: 'Move', time: '14:00', enabled: true },
+          { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+          { icon: '🌙', name: 'Sleep', time: '23:00', enabled: true }
+        ]
+      },
+      T7: {
+        label: 'Thứ 7', type: 'mixed',
+        workStart: '', workEnd: '',
+        lunchStart: '', lunchEnd: '',
+        freeStart: '09:00', freeEnd: '22:00',
+        wakeTime: '08:00', sleepTime: '23:30',
+        quests: [
+          { icon: '📖', name: 'Review', time: '10:00', enabled: true },
+          { icon: '💧', name: 'Water', time: '11:00', enabled: true },
+          { icon: '🧘', name: 'Break nhẹ', time: '14:00', enabled: true }
+        ]
+      },
+      CN: {
+        label: 'Chủ nhật', type: 'rest',
+        workStart: '', workEnd: '',
+        lunchStart: '', lunchEnd: '',
+        freeStart: '09:00', freeEnd: '22:00',
+        wakeTime: '08:30', sleepTime: '23:00',
+        quests: [
+          { icon: '🛋', name: 'Phục hồi', time: '—', enabled: true },
+          { icon: '💧', name: 'Water', time: '—', enabled: true },
+          { icon: '📋', name: 'Review tuần', time: '20:00', enabled: true }
+        ]
+      }
+    };
+
+    const dayKeys = ['T2','T3','T4','T5','T6','T7','CN'];
+    let selectedDay = null;
+
+    // ===== Quest templates by day type =====
+    const questTemplates = {
+      work: [
+        { icon: '🧘', name: 'Break', time: '09:30', enabled: true },
+        { icon: '💧', name: 'Water', time: '10:45', enabled: true },
+        { icon: '🏃', name: 'Move', time: '13:30', enabled: true },
+        { icon: '📖', name: 'Learn', time: '20:00', enabled: true },
+        { icon: '🌙', name: 'Sleep', time: '22:30', enabled: true }
+      ],
+      mixed: [
+        { icon: '📖', name: 'Review', time: '10:00', enabled: true },
+        { icon: '💧', name: 'Water', time: '11:00', enabled: true },
+        { icon: '🧘', name: 'Break nhẹ', time: '14:00', enabled: true },
+        { icon: '🌙', name: 'Sleep', time: '23:00', enabled: true }
+      ],
+      rest: [
+        { icon: '🛋', name: 'Phục hồi', time: '—', enabled: true },
+        { icon: '💧', name: 'Water', time: '—', enabled: true },
+        { icon: '📋', name: 'Review tuần', time: '20:00', enabled: true }
+      ]
+    };
+
+    // ===== Render day type grid =====
+    function renderDayTypeGrid() {
+      const container = document.getElementById('dayTypeGrid');
+      const typeLabels = { work: 'Học/Làm', mixed: 'Nhẹ', rest: 'Nghỉ' };
+      container.innerHTML = dayKeys.map(key => {
+        const d = weekData[key];
+        return `
+          <div class="day-type-chip" data-type="${d.type}" onclick="cycleDayType('${key}')">
+            <span class="day-type-chip__label">${d.label}</span>
+            <span class="day-type-chip__badge day-type-chip__badge--${d.type}">${typeLabels[d.type]}</span>
+          </div>`;
+      }).join('');
+    }
+
+    // ===== Cycle day type: work → mixed → rest → work =====
+    function cycleDayType(key) {
+      const d = weekData[key];
+      const cycle = { work: 'mixed', mixed: 'rest', rest: 'work' };
+      const newType = cycle[d.type];
+      applyDayType(key, newType);
+      renderDayTypeGrid();
+      renderDayCards();
+    }
+
+    function changeDayTypeFromEditor(key, newType, btn) {
+      applyDayType(key, newType);
+      // Re-open editor with new type
+      openDayEditor(key);
+    }
+
+    function applyDayType(key, newType) {
+      const d = weekData[key];
+      d.type = newType;
+
+      if (newType === 'work') {
+        d.workStart = '08:30'; d.workEnd = '17:30';
+        d.lunchStart = '12:00'; d.lunchEnd = '13:30';
+        d.freeStart = '20:00'; d.freeEnd = '22:00';
+        d.wakeTime = '07:00'; d.sleepTime = '23:00';
+      } else if (newType === 'mixed') {
+        d.workStart = ''; d.workEnd = '';
+        d.lunchStart = ''; d.lunchEnd = '';
+        d.freeStart = '09:00'; d.freeEnd = '22:00';
+        d.wakeTime = '08:00'; d.sleepTime = '23:30';
+      } else {
+        d.workStart = ''; d.workEnd = '';
+        d.lunchStart = ''; d.lunchEnd = '';
+        d.freeStart = '09:00'; d.freeEnd = '22:00';
+        d.wakeTime = '08:30'; d.sleepTime = '23:00';
+      }
+
+      d.quests = questTemplates[newType].map(q => ({...q}));
+    }
+
+    // ===== Render day cards — compact =====
+    function renderDayCards() {
+      const container = document.getElementById('dayCards');
+      const chevron = '<svg class="day-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>';
+
+      container.innerHTML = dayKeys.map(key => {
+        const d = weekData[key];
+        const badgeClass = d.type === 'work' ? 'work' : d.type === 'rest' ? 'rest' : 'mixed';
+        const badgeText = d.type === 'work' ? 'Học/Làm' : d.type === 'rest' ? 'Nghỉ' : 'Nhẹ';
+        const activeQuests = d.quests.filter(q => q.enabled);
+        const questIcons = activeQuests.map(q => q.icon).join(' ');
+
+        let timeSummary = '';
+        if (d.type === 'work') {
+          timeSummary = `<strong>${d.workStart}–${d.workEnd}</strong> · Rảnh ${d.freeStart}–${d.freeEnd}`;
+        } else {
+          timeSummary = `Rảnh <strong>${d.freeStart}–${d.freeEnd}</strong>`;
+        }
+
+        return `
+          <div class="day-card${selectedDay === key ? ' day-card--active' : ''}" onclick="openDayEditor('${key}')">
+            <div class="day-card__left">
+              <div class="day-card__header">
+                <span class="day-card__name">${d.label}</span>
+                <span class="day-card__badge day-card__badge--${badgeClass}">${badgeText}</span>
+              </div>
+              <div class="day-card__summary">${timeSummary} · ${activeQuests.length} quest ${questIcons}</div>
+            </div>
+            ${chevron}
+          </div>`;
+      }).join('');
+    }
+
+    // ===== Open day editor =====
+    function openDayEditor(key) {
+      selectedDay = key;
+      const d = weekData[key];
+      document.getElementById('dayEditorTitle').textContent = `Chỉnh lịch — ${d.label}`;
+
+      const isWork = d.type === 'work';
+      const typeLabels = { work: 'Học/Làm', mixed: 'Nhẹ', rest: 'Nghỉ' };
+      const typeColors = { work: 'var(--cyan)', mixed: 'var(--warn)', rest: 'var(--success)' };
+      let html = '';
+
+      // Day type selector
+      html += `
+      <div class="day-editor__section">
+        <div class="day-editor__label">Loại ngày</div>
+        <div style="display:flex;gap:6px;margin-bottom:4px">
+          ${['work','mixed','rest'].map(t => `
+            <button class="copy-chip${d.type === t ? ' checked' : ''}" 
+              style="${d.type === t ? 'background:' + typeColors[t] + ';color:#fff;border-color:' + typeColors[t] : ''}"
+              onclick="changeDayTypeFromEditor('${key}','${t}',this)">
+              ${typeLabels[t]}
+            </button>
+          `).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--fg-muted);margin-top:4px">
+          Thay đổi loại ngày sẽ cập nhật quest gợi ý bên dưới
+        </div>
+      </div>`;
+
+      // Copy from bar (contextual)
+      const otherDays = dayKeys.filter(k => k !== key);
+      html += `
+      <div class="day-editor__section">
+        <div class="day-editor__label">Sao chép lịch từ ngày khác</div>
+        <div class="copy-bar">
+          ${otherDays.map(k => `<button class="copy-chip" onclick="copyFrom('${k}')">${weekData[k].label}</button>`).join('')}
+        </div>
+      </div>`;
+
+      // Work/study section
+      if (isWork) {
+        html += `
+        <div class="day-editor__section">
+          <div class="day-editor__label">Giờ học / làm việc</div>
+          <div class="day-editor__row">
+            <span class="day-editor__row-label">Bắt đầu</span>
+            <div class="day-editor__time-range">
+              <input class="day-editor__input" type="time" id="deWorkStart" value="${d.workStart}">
+            </div>
+          </div>
+          <div class="day-editor__row">
+            <span class="day-editor__row-label">Kết thúc</span>
+            <div class="day-editor__time-range">
+              <input class="day-editor__input" type="time" id="deWorkEnd" value="${d.workEnd}">
+            </div>
+          </div>
+          <div class="day-editor__row">
+            <span class="day-editor__row-label">Nghỉ trưa</span>
+            <div class="day-editor__time-range">
+              <input class="day-editor__input" type="time" id="deLunchStart" value="${d.lunchStart}">
+              <span class="day-editor__separator">–</span>
+              <input class="day-editor__input" type="time" id="deLunchEnd" value="${d.lunchEnd}">
+            </div>
+          </div>
+        </div>`;
+      }
+
+      // Free time section
+      html += `
+      <div class="day-editor__section">
+        <div class="day-editor__label">Thời gian rảnh</div>
+        <div class="day-editor__row">
+          <span class="day-editor__row-label">Từ</span>
+          <div class="day-editor__time-range">
+            <input class="day-editor__input" type="time" id="deFreeStart" value="${d.freeStart}">
+            <span class="day-editor__separator">–</span>
+            <input class="day-editor__input" type="time" id="deFreeEnd" value="${d.freeEnd}">
+          </div>
+        </div>
+      </div>`;
+
+      // Wake / sleep
+      html += `
+      <div class="day-editor__section">
+        <div class="day-editor__label">Giờ sinh hoạt</div>
+        <div class="day-editor__row">
+          <span class="day-editor__row-label">Thức dậy</span>
+          <input class="day-editor__input" type="time" id="deWake" value="${d.wakeTime}" style="width:100px">
+        </div>
+        <div class="day-editor__row">
+          <span class="day-editor__row-label">Ngủ</span>
+          <input class="day-editor__input" type="time" id="deSleep" value="${d.sleepTime}" style="width:100px">
+        </div>
+      </div>`;
+
+      // Quest toggles
+      html += `
+      <div class="day-editor__section">
+        <div class="day-editor__label">Quest trong ngày</div>
+        ${d.quests.map((q, i) => `
+          <div class="day-editor__quest-toggle">
+            <div>
+              <div class="day-editor__quest-name">${q.icon} ${q.name}</div>
+              <div class="day-editor__quest-time">${q.time}</div>
+            </div>
+            <div class="toggle ${q.enabled ? 'on' : ''}" onclick="toggleQuest(${i}, this)"></div>
+          </div>
+        `).join('')}
+      </div>`;
+
+      // Save button
+      html += `
+      <div class="day-editor__actions">
+        <button class="btn btn--primary" onclick="saveDayEditor('${key}')">Lưu ngày này</button>
+        <button class="btn btn--secondary" onclick="closeDayEditor()">Hủy</button>
+      </div>`;
+
+      document.getElementById('dayEditorContent').innerHTML = html;
+      document.getElementById('dayEditorOverlay').classList.add('open');
+      document.getElementById('dayEditor').classList.add('open');
+      renderDayCards();
+    }
+
+    function closeDayEditor() {
+      document.getElementById('dayEditorOverlay').classList.remove('open');
+      document.getElementById('dayEditor').classList.remove('open');
+      selectedDay = null;
+      renderDayCards();
+    }
+
+    function toggleQuest(index, el) {
+      const key = selectedDay;
+      if (!key) return;
+      weekData[key].quests[index].enabled = !weekData[key].quests[index].enabled;
+      el.classList.toggle('on');
+    }
+
+    function saveDayEditor(key) {
+      const d = weekData[key];
+      const isWork = d.type === 'work';
+
+      if (isWork) {
+        d.workStart = document.getElementById('deWorkStart').value;
+        d.workEnd = document.getElementById('deWorkEnd').value;
+        d.lunchStart = document.getElementById('deLunchStart').value;
+        d.lunchEnd = document.getElementById('deLunchEnd').value;
+      }
+      d.freeStart = document.getElementById('deFreeStart').value;
+      d.freeEnd = document.getElementById('deFreeEnd').value;
+      d.wakeTime = document.getElementById('deWake').value;
+      d.sleepTime = document.getElementById('deSleep').value;
+
+      closeDayEditor();
+      showToast(`✓ Đã lưu lịch ${d.label}`);
+    }
+
+    // ===== Copy from another day =====
+    function copyFrom(fromKey) {
+      if (!selectedDay) {
+        showToast('Chọn ngày trước khi sao chép');
+        return;
+      }
+      const src = weekData[fromKey];
+      const dst = weekData[selectedDay];
+      dst.workStart = src.workStart;
+      dst.workEnd = src.workEnd;
+      dst.lunchStart = src.lunchStart;
+      dst.lunchEnd = src.lunchEnd;
+      dst.freeStart = src.freeStart;
+      dst.freeEnd = src.freeEnd;
+      dst.wakeTime = src.wakeTime;
+      dst.sleepTime = src.sleepTime;
+      dst.quests = src.quests.map(q => ({...q}));
+      openDayEditor(selectedDay);
+      showToast(`✓ Đã sao chép từ ${src.label}`);
+    }
+
+    // ===== Apply all =====
+    function applyAllDays() {
+      // removed — was confusing
+    }
+
+    // ===== View toggle =====
+    function switchView(view, btn) {
+      document.querySelectorAll('.view-toggle__btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-today').style.display = view === 'today' ? 'block' : 'none';
+      document.getElementById('view-week').style.display = view === 'week' ? 'block' : 'none';
+      if (view === 'week') { renderDayTypeGrid(); renderDayCards(); }
+    }
+
+    // ===== Today view actions =====
+    function applySuggestions() {
+      const checks = document.querySelectorAll('.pending-item__check.checked');
+      const count = checks.length;
+      document.getElementById('pendingCard').style.display = 'none';
+      showToast(`✓ Đã áp dụng ${count} đề xuất`);
+    }
+
+    function dismissSuggestions() {
+      document.getElementById('pendingCard').style.display = 'none';
+    }
+
+    function snoozeQuest(btn) {
+      openSheet('Hoãn quest', [
+        { icon: '⏰', text: 'Hoãn 10 phút', action: () => markQuest(btn, 'snoozed', 'Hoãn 10p') },
+        { icon: '⏰', text: 'Hoãn 15 phút', action: () => markQuest(btn, 'snoozed', 'Hoãn 15p') },
+        { icon: '⏰', text: 'Hoãn 30 phút', action: () => markQuest(btn, 'snoozed', 'Hoãn 30p') },
+        { icon: '🕐', text: 'Đổi giờ khác', action: () => { closeSheet(); changeTime(btn); } }
+      ]);
+    }
+
+    function skipQuest(btn) {
+      openSheet('Bỏ qua quest', [
+        { icon: '😕', text: 'Quá khó', action: () => markQuest(btn, 'skipped', 'Bỏ qua') },
+        { icon: '⏰', text: 'Sai thời điểm', action: () => markQuest(btn, 'skipped', 'Bỏ qua') },
+        { icon: '🔄', text: 'Không cần hôm nay', action: () => markQuest(btn, 'skipped', 'Bỏ qua') }
+      ]);
+    }
+
+    function changeTime(btn) {
+      openSheet('Đổi giờ', [
+        { icon: '⏰', text: 'Sớm hơn 15 phút', action: () => markQuest(btn, 'changed', 'Đã đổi giờ') },
+        { icon: '⏰', text: 'Trễ hơn 15 phút', action: () => markQuest(btn, 'changed', 'Đã đổi giờ') },
+        { icon: '⏰', text: 'Trễ hơn 30 phút', action: () => markQuest(btn, 'changed', 'Đã đổi giờ') },
+        { icon: '📅', text: 'Chuyển sang ngày khác', action: () => markQuest(btn, 'changed', 'Đã chuyển') }
+      ]);
+    }
+
+    function offToday(btn) {
+      markQuest(btn, 'skipped', 'Tắt hôm nay');
+    }
+
+    function markQuest(btn, type, label) {
+      const content = btn.closest('.timeline-item__content');
+      const statusEl = content.querySelector('.timeline-item__status');
+      const item = btn.closest('.timeline-item');
+
+      if (type === 'snoozed') {
+        statusEl.className = 'timeline-item__status timeline-item__status--snoozed';
+        statusEl.textContent = label;
+        item.className = 'timeline-item timeline-item--snoozed';
+      } else if (type === 'skipped') {
+        statusEl.className = 'timeline-item__status timeline-item__status--skipped';
+        statusEl.textContent = label;
+        item.className = 'timeline-item timeline-item--skipped';
+        content.querySelector('.timeline-item__actions').style.display = 'none';
+      } else if (type === 'changed') {
+        statusEl.textContent = label;
+      }
+      closeSheet();
+      showToast(`✓ ${label}`);
+    }
+
+    function openSheet(title, options) {
+      document.getElementById('sheetTitle').textContent = title;
+      const container = document.getElementById('sheetOptions');
+      container.innerHTML = options.map((opt, i) =>
+        `<div class="sheet__option" onclick="sheetAction(${i})">
+          <div class="sheet__option-icon" style="background:var(--surface-active)">${opt.icon}</div>
+          <div class="sheet__option-text">${opt.text}</div>
+        </div>`
+      ).join('');
+      window._sheetActions = options.map(o => o.action);
+      document.getElementById('sheetOverlay').classList.add('open');
+      document.getElementById('sheet').classList.add('open');
+    }
+
+    function sheetAction(index) {
+      if (window._sheetActions && window._sheetActions[index]) window._sheetActions[index]();
+    }
+
+    function closeSheet() {
+      document.getElementById('sheetOverlay').classList.remove('open');
+      document.getElementById('sheet').classList.remove('open');
+    }
+
+    function saveSchedule() {
+      showToast('✓ Đã lưu lịch Quest');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // ===== Collapsible sections =====
+    function toggleCollapse(id, header) {
+      const body = document.getElementById(id);
+      const arrow = header.querySelector('.collapsible-header__arrow');
+      body.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

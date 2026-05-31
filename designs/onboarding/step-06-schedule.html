@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Lịch Sinh Hoạt</title>
+<link rel="stylesheet" href="../soloquest-tokens.css">
+<link rel="stylesheet" href="../onboarding-steps.css">
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-full">
+      <div class="onboard-container">
+        <div class="onboard-header">
+          <div class="onboard-step">Bước 6 / 9 — Lịch Sinh Hoạt</div>
+          <h1 class="onboard-title">Lịch Sinh Hoạt</h1>
+          <p class="onboard-desc">Hệ thống cần biết nhịp sinh hoạt để xếp quest đúng giờ</p>
+        </div>
+
+        <div class="step-progress">
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar done"></div>
+          <div class="step-bar active"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+          <div class="step-bar"></div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-group">
+            <label class="form-label">Giờ Thức Dậy</label>
+            <input type="time" class="form-input" value="07:00" style="font-family:var(--font-mono)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Giờ Ngủ Mục Tiêu</label>
+            <input type="time" class="form-input" value="23:00" style="font-family:var(--font-mono)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Thời Gian Rảnh Trong Ngày</label>
+            <div class="form-row" style="margin-bottom:12px">
+              <div>
+                <label class="form-label" style="margin-bottom:4px">Từ</label>
+                <input type="time" class="form-input" value="20:00" style="font-family:var(--font-mono)">
+              </div>
+              <div>
+                <label class="form-label" style="margin-bottom:4px">Đến</label>
+                <input type="time" class="form-input" value="22:00" style="font-family:var(--font-mono)">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Khung Giờ Muốn Học</label>
+            <div class="chip-select">
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Sáng sớm</div>
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Nghỉ trưa</div>
+              <div class="chip-option selected" onclick="this.classList.toggle('selected')">Tối (20–22h)</div>
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Trước khi ngủ</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Khung Giờ Muốn Vận Động</label>
+            <div class="chip-select">
+              <div class="chip-option selected" onclick="this.classList.toggle('selected')">Sáng sớm</div>
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Nghỉ trưa</div>
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Sau giờ làm</div>
+              <div class="chip-option" onclick="this.classList.toggle('selected')">Tối</div>
+            </div>
+          </div>
+
+          <p class="system-hint">[ HỆ THỐNG ] Quest sẽ được xếp trong khoảng thời gian bạn chọn</p>
+        </div>
+
+        <div class="onboard-actions">
+          <a href="step-05-goals.html" class="btn btn--secondary">← Quay lại</a>
+          <a href="step-07-reminders.html" class="btn btn--primary">Tiếp theo →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Phần Thưởng — SoloQuest</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .page-header {
+    padding: 16px 20px 4px;
+  }
+  .page-header__title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .page-header__desc {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* ── Wallet compact ── */
+  .wallet-compact {
+    margin: 16px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glow-violet);
+  }
+  .wallet-compact__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .wallet-compact__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .wallet-compact__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--exp-gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .wallet-compact__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .wallet-compact__points {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--exp-gold);
+    line-height: 1;
+  }
+  .wallet-compact__exchange {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+  .wallet-compact__exchange span {
+    color: var(--success);
+    font-weight: 600;
+  }
+  .wallet-compact__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .wallet-compact__stat {
+    background: var(--bg-raised);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .wallet-compact__stat-val {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--fg);
+    line-height: 1;
+  }
+  .wallet-compact__stat-lbl {
+    font-size: 10px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 20px 20px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-label__left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-label__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .section-label__action {
+    font-size: 11px;
+    color: var(--cyan);
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: pointer;
+  }
+
+  /* ── Reward cards — horizontal scroll ── */
+  .rewards-scroll {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .rewards-scroll::-webkit-scrollbar { display: none; }
+
+  .reward-card {
+    flex: 0 0 155px;
+    scroll-snap-align: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+  .reward-card:active {
+    border-color: var(--border-glow-violet);
+  }
+  .reward-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .reward-card__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+    min-height: 34px;
+  }
+  .reward-card__cost {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--exp-gold);
+  }
+  .reward-card__btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reward-card__btn--available {
+    background: var(--exp-gold);
+    color: var(--bg-deep);
+  }
+  .reward-card__btn--available:active {
+    transform: scale(0.96);
+  }
+  .reward-card__btn--locked {
+    background: var(--surface-active);
+    color: var(--fg-muted);
+    cursor: not-allowed;
+  }
+
+  /* ── Badge showcase ── */
+  .badge-showcase {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .badge-showcase::-webkit-scrollbar { display: none; }
+
+  .badge-card {
+    flex: 0 0 120px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .badge-card--locked {
+    opacity: 0.35;
+  }
+  .badge-card__ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    position: relative;
+  }
+  .badge-card__ring--unlocked {
+    background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(168,85,247,0.15));
+    border: 2px solid var(--border-glow-cyan);
+    box-shadow: 0 0 12px rgba(0,240,255,0.1);
+  }
+  .badge-card__ring--locked {
+    background: var(--surface-active);
+    border: 2px solid var(--border);
+  }
+  .badge-card__ring--locked::after {
+    content: '🔒';
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    font-size: 12px;
+    background: var(--bg-raised);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .badge-card__name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .badge-card__status {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge-card__status--unlocked {
+    color: var(--success);
+  }
+  .badge-card__status--locked {
+    color: var(--fg-muted);
+  }
+
+  /* ── Progress ring ── */
+  .badge-progress {
+    margin: 0 16px 10px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .badge-progress__ring-wrap {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+  .badge-progress__ring {
+    transform: rotate(-90deg);
+  }
+  .badge-progress__ring-bg {
+    fill: none;
+    stroke: var(--surface-active);
+    stroke-width: 4;
+  }
+  .badge-progress__ring-fill {
+    fill: none;
+    stroke: var(--cyan);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+  .badge-progress__ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--cyan);
+  }
+  .badge-progress__body {
+    flex: 1;
+    min-width: 0;
+  }
+  .badge-progress__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .badge-progress__desc {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+  .badge-progress__bar {
+    margin-top: 8px;
+  }
+
+  /* ── Create reward (collapsed) ── */
+  .create-section {
+    margin: 0 16px 10px;
+  }
+  .create-toggle {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--fg-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .create-toggle:active {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  .create-toggle__icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cyan-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .create-form {
+    display: none;
+    margin-top: 10px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .create-form.open { display: block; }
+  .form-group {
+    margin-bottom: 12px;
+  }
+  .form-group__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .form-group__input {
+    width: 100%;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--fg);
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-group__input:focus {
+    border-color: var(--cyan);
+  }
+  .form-group__input::placeholder {
+    color: var(--fg-muted);
+  }
+  .form-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .form-chip {
+    padding: 6px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .form-chip.selected {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+  .form-chip:active { transform: scale(0.95); }
+  .form-row {
+    display: flex;
+    gap: 8px;
+  }
+  .form-row .form-group { flex: 1; }
+  .btn-create {
+    width: 100%;
+    padding: 12px;
+    background: var(--cyan);
+    color: var(--bg-deep);
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .btn-create:active { transform: scale(0.98); }
+
+  /* ── History compact ── */
+  .history-list {
+    margin: 0 16px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-item__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .history-item__body {
+    flex: 1;
+    min-width: 0;
+  }
+  .history-item__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .history-item__desc {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 1px;
+  }
+  .history-item__points {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .history-item__points--minus { color: var(--fg-muted); }
+  .history-item__points--plus { color: var(--success); }
+
+  /* ── Protection banner ── */
+  .protection-banner {
+    margin: 0 16px 10px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(0,240,255,0.04));
+    border: 1px solid rgba(34,197,94,0.15);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .protection-banner__icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .protection-banner__text {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+  }
+  .protection-banner__text strong {
+    color: var(--success);
+  }
+
+  /* ── Link row ── */
+  .link-row {
+    display: flex;
+    gap: 8px;
+    margin: 0 16px 10px;
+  }
+  .link-row__item {
+    flex: 1;
+    padding: 12px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .link-row__item:active {
+    border-color: var(--border-glow-cyan);
+    transform: scale(0.97);
+  }
+  .link-row__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .link-row__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .link-row__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+  }
+
+  /* ── Toast ── */
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--border-glow-cyan);
+    border-radius: var(--radius-full);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    width: calc(100% - 48px);
+    background: var(--bg-raised);
+    border: 1px solid var(--border-glow-violet);
+    border-radius: var(--radius-xl);
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: var(--glow-violet);
+    animation: slide-up 0.3s ease-out;
+  }
+  .modal-box__icon { font-size: 40px; margin-bottom: 12px; }
+  .modal-box__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+  .modal-box__desc {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    margin-bottom: 12px;
+  }
+  .modal-box__cost {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--exp-gold);
+    margin-bottom: 4px;
+  }
+  .modal-box__balance {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-bottom: 16px;
+  }
+  .modal-box__btns {
+    display: flex;
+    gap: 8px;
+  }
+  .modal-box__btns button {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+  }
+  .modal-box__btns .btn-confirm {
+    background: var(--exp-gold);
+    color: var(--bg-deep);
+  }
+  .modal-box__btns .btn-cancel {
+    background: var(--surface);
+    color: var(--fg-secondary);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span class="status-bar__time">09:41</span>
+      <div class="status-bar__icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2C5.8 2 3.8 2.8 2.3 4.2L0.5 2.4C2.5 0.5 5.1-0.5 8-0.5s5.5 1 7.5 2.9L13.7 4.2C12.2 2.8 10.2 2 8 2z"/><path d="M8 6C6.6 6 5.3 6.5 4.3 7.4L2.5 5.6C4 4.2 5.9 3.5 8 3.5s4 .7 5.5 2.1L11.7 7.4C10.7 6.5 9.4 6 8 6z"/><circle cx="8" cy="10.5" r="1.5"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="page-header__title">Phần Thưởng</div>
+        <div class="page-header__desc">Dùng Reward Points để đổi phần thưởng giúp bạn duy trì động lực.</div>
+      </div>
+
+      <!-- ═══ WALLET ═══ -->
+      <div class="wallet-compact">
+        <div class="wallet-compact__top">
+          <div class="wallet-compact__left">
+            <div class="wallet-compact__icon">💎</div>
+            <div>
+              <div class="wallet-compact__label">Reward Points</div>
+              <div class="wallet-compact__points">320</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="wallet-compact__exchange">Quy đổi: <span>≈ 2 phần thưởng nhỏ</span></div>
+            <div class="wallet-compact__exchange" style="margin-top:2px">EXP: 1,250 / 1,500</div>
+          </div>
+        </div>
+        <div class="wallet-compact__stats">
+          <div class="wallet-compact__stat">
+            <div class="wallet-compact__stat-val" style="color:var(--cyan)">+120</div>
+            <div class="wallet-compact__stat-lbl">Tuần này</div>
+          </div>
+          <div class="wallet-compact__stat">
+            <div class="wallet-compact__stat-val" style="color:var(--success)">2</div>
+            <div class="wallet-compact__stat-lbl">Đã đổi</div>
+          </div>
+          <div class="wallet-compact__stat">
+            <div class="wallet-compact__stat-val" style="color:var(--violet)">5</div>
+            <div class="wallet-compact__stat-lbl">Badge</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ REWARDS ═══ -->
+      <div class="section-label">
+        <div class="section-label__left">
+          <span class="section-label__dot" style="background:var(--exp-gold)"></span>
+          Phần thưởng
+        </div>
+      </div>
+
+      <div class="rewards-scroll">
+        <div class="reward-card" data-cost="80" data-name="Nghỉ giải trí 20 phút" data-icon="🛋️">
+          <div class="reward-card__icon" style="background:var(--success-dim)">🛋️</div>
+          <div class="reward-card__name">Nghỉ giải trí 20 phút</div>
+          <div class="reward-card__cost">80 pts</div>
+          <button class="reward-card__btn reward-card__btn--available" onclick="redeemReward(this)">Đổi</button>
+        </div>
+        <div class="reward-card" data-cost="120" data-name="Xem 1 tập phim" data-icon="📺">
+          <div class="reward-card__icon" style="background:var(--info-dim)">📺</div>
+          <div class="reward-card__name">Xem 1 tập phim</div>
+          <div class="reward-card__cost">120 pts</div>
+          <button class="reward-card__btn reward-card__btn--available" onclick="redeemReward(this)">Đổi</button>
+        </div>
+        <div class="reward-card" data-cost="150" data-name="Cafe yêu thích" data-icon="☕">
+          <div class="reward-card__icon" style="background:var(--warn-dim)">☕</div>
+          <div class="reward-card__name">Cafe yêu thích</div>
+          <div class="reward-card__cost">150 pts</div>
+          <button class="reward-card__btn reward-card__btn--available" onclick="redeemReward(this)">Đổi</button>
+        </div>
+        <div class="reward-card" data-cost="180" data-name="Chơi game 30 phút" data-icon="🎮">
+          <div class="reward-card__icon" style="background:var(--violet-dim)">🎮</div>
+          <div class="reward-card__name">Chơi game 30 phút</div>
+          <div class="reward-card__cost">180 pts</div>
+          <button class="reward-card__btn reward-card__btn--locked">Chưa đủ</button>
+        </div>
+        <div class="reward-card" data-cost="300" data-name="Mua món nhỏ" data-icon="🛍️">
+          <div class="reward-card__icon" style="background:var(--danger-dim)">🛍️</div>
+          <div class="reward-card__name">Mua món nhỏ cho bản thân</div>
+          <div class="reward-card__cost">300 pts</div>
+          <button class="reward-card__btn reward-card__btn--available" onclick="redeemReward(this)">Đổi</button>
+        </div>
+        <div class="reward-card" data-cost="400" data-name="Buổi nghỉ nhẹ" data-icon="🌿">
+          <div class="reward-card__icon" style="background:var(--success-dim)">🌿</div>
+          <div class="reward-card__name">Một buổi nghỉ nhẹ</div>
+          <div class="reward-card__cost">400 pts</div>
+          <button class="reward-card__btn reward-card__btn--locked">Chưa đủ</button>
+        </div>
+      </div>
+
+      <!-- ═══ BADGES ═══ -->
+      <div class="section-label">
+        <div class="section-label__left">
+          <span class="section-label__dot" style="background:var(--violet)"></span>
+          Badge thành tích
+        </div>
+        <span class="section-label__action">5/9 đã mở</span>
+      </div>
+
+      <div class="badge-showcase">
+        <div class="badge-card">
+          <div class="badge-card__ring badge-card__ring--unlocked">⭐</div>
+          <div class="badge-card__name">First Quest</div>
+          <div class="badge-card__status badge-card__status--unlocked">Đã mở</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-card__ring badge-card__ring--unlocked">💧</div>
+          <div class="badge-card__name">Hydration</div>
+          <div class="badge-card__status badge-card__status--unlocked">Đã mở</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-card__ring badge-card__ring--unlocked">📖</div>
+          <div class="badge-card__name">Focus Builder</div>
+          <div class="badge-card__status badge-card__status--unlocked">Đã mở</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-card__ring badge-card__ring--unlocked">🧘</div>
+          <div class="badge-card__name">Break Friendly</div>
+          <div class="badge-card__status badge-card__status--unlocked">Đã mở</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-card__ring badge-card__ring--unlocked">🔥</div>
+          <div class="badge-card__name">Consistency 5</div>
+          <div class="badge-card__status badge-card__status--unlocked">Đã mở</div>
+        </div>
+        <div class="badge-card badge-card--locked">
+          <div class="badge-card__ring badge-card__ring--locked">🌙</div>
+          <div class="badge-card__name">Night Learner</div>
+          <div class="badge-card__status badge-card__status--locked">5 buổi tối</div>
+        </div>
+        <div class="badge-card badge-card--locked">
+          <div class="badge-card__ring badge-card__ring--locked">💪</div>
+          <div class="badge-card__name">Comeback</div>
+          <div class="badge-card__status badge-card__status--locked">Quay lại</div>
+        </div>
+        <div class="badge-card badge-card--locked">
+          <div class="badge-card__ring badge-card__ring--locked">📊</div>
+          <div class="badge-card__name">Weekly Review</div>
+          <div class="badge-card__status badge-card__status--locked">Hoàn thành</div>
+        </div>
+        <div class="badge-card badge-card--locked">
+          <div class="badge-card__ring badge-card__ring--locked">🏃</div>
+          <div class="badge-card__name">Movement Pro</div>
+          <div class="badge-card__status badge-card__status--locked">7 ngày</div>
+        </div>
+      </div>
+
+      <!-- Badge progress hint -->
+      <div class="badge-progress">
+        <div class="badge-progress__ring-wrap">
+          <svg class="badge-progress__ring" width="48" height="48" viewBox="0 0 48 48">
+            <circle class="badge-progress__ring-bg" cx="24" cy="24" r="20"/>
+            <circle class="badge-progress__ring-fill" cx="24" cy="24" r="20"
+              stroke-dasharray="125.6" stroke-dashoffset="50.2"/>
+          </svg>
+          <div class="badge-progress__ring-text">60%</div>
+        </div>
+        <div class="badge-progress__body">
+          <div class="badge-progress__title">Tiến độ badge tiếp theo</div>
+          <div class="badge-progress__desc">Night Learner — còn 3 buổi tối học tập</div>
+          <div class="badge-progress__bar">
+            <div class="progress-bar">
+              <div class="progress-bar__fill" style="width:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CREATE REWARD ═══ -->
+      <div class="create-section">
+        <button class="create-toggle" onclick="toggleCreate()">
+          <div class="create-toggle__icon">+</div>
+          Tạo phần thưởng riêng
+        </button>
+        <div class="create-form" id="createForm">
+          <div class="form-group">
+            <label class="form-group__label">Tên phần thưởng</label>
+            <input class="form-group__input" type="text" placeholder="Ví dụ: Đi dạo công viên 30 phút">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label">Số điểm</label>
+              <input class="form-group__input" type="number" placeholder="100">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label">Giới hạn</label>
+              <div class="form-chips">
+                <div class="form-chip selected" onclick="selectChip(this)">Một lần</div>
+                <div class="form-chip" onclick="selectChip(this)">Hàng tuần</div>
+                <div class="form-chip" onclick="selectChip(this)">Milestone</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">Loại</label>
+            <div class="form-chips">
+              <div class="form-chip selected" onclick="selectChip(this)">Nghỉ ngơi</div>
+              <div class="form-chip" onclick="selectChip(this)">Giải trí</div>
+              <div class="form-chip" onclick="selectChip(this)">Ăn uống</div>
+              <div class="form-chip" onclick="selectChip(this)">Mua sắm</div>
+              <div class="form-chip" onclick="selectChip(this)">Trải nghiệm</div>
+            </div>
+          </div>
+          <button class="btn-create" onclick="showToast('Đã thêm reward mới!');toggleCreate();">Thêm Reward</button>
+        </div>
+      </div>
+
+      <!-- ═══ HISTORY ═══ -->
+      <div class="section-label">
+        <div class="section-label__left">
+          <span class="section-label__dot" style="background:var(--fg-muted)"></span>
+          Lịch sử
+        </div>
+      </div>
+
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-item__icon" style="background:var(--success-dim)">🛋️</div>
+          <div class="history-item__body">
+            <div class="history-item__title">Đổi "Nghỉ giải trí 20 phút"</div>
+            <div class="history-item__desc">Hôm qua</div>
+          </div>
+          <div class="history-item__points history-item__points--minus">-80</div>
+        </div>
+        <div class="history-item">
+          <div class="history-item__icon" style="background:var(--warn-dim)">🔥</div>
+          <div class="history-item__body">
+            <div class="history-item__title">Mở khóa "Consistency 5"</div>
+            <div class="history-item__desc">Thứ 4 — Nhận +50 pts thưởng</div>
+          </div>
+          <div class="history-item__points history-item__points--plus">+50</div>
+        </div>
+        <div class="history-item">
+          <div class="history-item__icon" style="background:var(--warn-dim)">☕</div>
+          <div class="history-item__body">
+            <div class="history-item__title">Đổi "Cafe yêu thích"</div>
+            <div class="history-item__desc">Tuần trước</div>
+          </div>
+          <div class="history-item__points history-item__points--minus">-150</div>
+        </div>
+      </div>
+
+      <!-- ═══ PROTECTION ═══ -->
+      <div class="protection-banner">
+        <div class="protection-banner__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="protection-banner__text">
+          <strong>Rewards bền vững.</strong> Không mất hết tiến trình khi có ngày bận. Có Streak Shield và ngày nhẹ. Tạm dừng quest không bị phạt.
+        </div>
+      </div>
+
+      <!-- ═══ LINK ROW ═══ -->
+      <div class="link-row">
+        <a href="06-progress.html" class="link-row__item">
+          <div class="link-row__icon" style="background:var(--cyan-dim);color:var(--cyan)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          </div>
+          <div class="link-row__label">Tiến trình</div>
+        </a>
+        <a href="05-logs.html" class="link-row__item">
+          <div class="link-row__icon" style="background:var(--violet-dim);color:var(--violet)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="link-row__label">Nhật ký</div>
+        </a>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="03-home.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Trang Chủ
+      </a>
+      <a href="05-logs.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Nhật Ký
+      </a>
+      <a href="06-progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+        Tiến Trình
+      </a>
+      <a href="07-rewards.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Thưởng
+      </a>
+      <a href="09-profile.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Hồ Sơ
+      </a>
+    </nav>
+
+    <!-- Redeem modal -->
+    <div class="modal-overlay" id="redeemModal">
+      <div class="modal-box">
+        <div class="modal-box__icon" id="modalIcon">🛋️</div>
+        <div class="modal-box__title">Đổi phần thưởng?</div>
+        <div class="modal-box__desc" id="modalName">Nghỉ giải trí 20 phút</div>
+        <div class="modal-box__cost" id="modalCost">-80 pts</div>
+        <div class="modal-box__balance" id="modalBalance">Còn lại: 240 pts</div>
+        <div class="modal-box__btns">
+          <button class="btn-cancel" onclick="closeModal()">Huỷ</button>
+          <button class="btn-confirm" onclick="confirmRedeem()">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    let currentBtn = null;
+    let currentCost = 0;
+    let totalPoints = 320;
+
+    function redeemReward(btn) {
+      const card = btn.closest('.reward-card');
+      currentBtn = btn;
+      currentCost = parseInt(card.dataset.cost);
+      document.getElementById('modalIcon').textContent = card.dataset.icon;
+      document.getElementById('modalName').textContent = card.dataset.name;
+      document.getElementById('modalCost').textContent = '-' + currentCost + ' pts';
+      document.getElementById('modalBalance').textContent = 'Còn lại: ' + (totalPoints - currentCost) + ' pts';
+      document.getElementById('redeemModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('redeemModal').classList.remove('active');
+      currentBtn = null;
+    }
+
+    function confirmRedeem() {
+      if (currentBtn) {
+        totalPoints -= currentCost;
+        currentBtn.textContent = 'Đã đổi';
+        currentBtn.disabled = true;
+        currentBtn.className = 'reward-card__btn reward-card__btn--locked';
+        document.querySelector('.wallet-compact__points').textContent = totalPoints;
+      }
+      closeModal();
+      showToast('Đã đổi phần thưởng thành công!');
+    }
+
+    function selectChip(chip) {
+      const group = chip.parentElement;
+      group.querySelectorAll('.form-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    }
+
+    function toggleCreate() {
+      document.getElementById('createForm').classList.toggle('open');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    document.getElementById('redeemModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>

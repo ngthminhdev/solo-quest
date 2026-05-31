@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SoloQuest — Báo Cáo Tuần</title>
+<link rel="stylesheet" href="soloquest-tokens.css">
+<style>
+  .week-header {
+    text-align: center;
+    padding: 20px 20px 16px;
+  }
+  .week-header__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 4px;
+  }
+  .week-header__title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .week-header__sub {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    margin-top: 4px;
+  }
+  .week-header__desc {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-top: 8px;
+    padding: 0 12px;
+    line-height: 1.5;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 0 16px 16px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 10px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .stat-card__label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--fg-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .stat-card__value {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .stat-card__sub {
+    font-size: 10px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+  .stat-card--highlight {
+    border-color: var(--border-glow-cyan);
+    box-shadow: var(--glow-cyan);
+  }
+  .stat-card--highlight .stat-card__value { color: var(--cyan); }
+
+  /* Chart */
+  .chart-section { padding: 0 16px 16px; }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    overflow: hidden;
+  }
+  .chart-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding-bottom: 24px;
+    position: relative;
+  }
+  .bar-chart::before {
+    content: '';
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+  .bar-col__bar {
+    width: 100%;
+    max-width: 32px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.6s ease;
+  }
+  .bar-col__bar--cyan {
+    background: linear-gradient(to top, rgba(0,240,255,0.3), var(--cyan));
+  }
+  .bar-col__bar--violet {
+    background: linear-gradient(to top, rgba(168,85,247,0.3), var(--violet));
+  }
+  .bar-col__label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    position: absolute;
+    bottom: -20px;
+  }
+  .bar-col__value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--fg-secondary);
+    position: absolute;
+    top: -18px;
+  }
+
+  /* Comparison */
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row__label { color: var(--fg-secondary); }
+  .compare-row__value { font-family: var(--font-mono); font-weight: 700; color: var(--fg); }
+  .compare-row__change {
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .compare-row__change--up { color: var(--success); }
+  .compare-row__change--down { color: var(--danger); }
+  .compare-row__change--same { color: var(--fg-muted); }
+
+  /* Insight cards */
+  .insights-section { padding: 0 16px 8px; }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .insight-card__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .insight-card__icon--success { background: var(--success-dim); }
+  .insight-card__icon--danger { background: var(--danger-dim); }
+  .insight-card__icon--info { background: var(--info-dim); }
+  .insight-card__icon--warn { background: var(--warn-dim); }
+  .insight-card__icon--violet { background: var(--violet-dim); }
+  .insight-card__body { flex: 1; min-width: 0; overflow: hidden; }
+  .insight-card__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 2px;
+  }
+  .insight-card__label--success { color: var(--success); }
+  .insight-card__label--danger { color: var(--danger); }
+  .insight-card__label--info { color: var(--info); }
+  .insight-card__label--warn { color: var(--warn); }
+  .insight-card__label--violet { color: var(--violet); }
+  .insight-card__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 2px;
+  }
+  .insight-card__desc {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+  }
+  .insight-card__bar {
+    margin-top: 8px;
+    height: 4px;
+    background: var(--surface-active);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+  .insight-card__bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+  }
+
+  /* Quest ranking */
+  .quest-rank {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+  }
+  .quest-rank__pos {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--fg-muted);
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .quest-rank__info { flex: 1; min-width: 0; }
+  .quest-rank__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+  .quest-rank__note {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    margin-top: 1px;
+  }
+  .quest-rank__rate {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  /* Suggestion toggle cards */
+  .suggestion-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .suggestion-card--off {
+    opacity: 0.5;
+  }
+  .suggestion-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .suggestion-card__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .suggestion-card__reason {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    line-height: 1.4;
+  }
+  .suggestion-card__link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--cyan);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Toggle switch */
+  .toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--fg-muted);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.25s;
+    flex-shrink: 0;
+    border: none;
+    padding: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bg);
+    top: 3px;
+    left: 3px;
+    transition: transform 0.25s;
+  }
+  .toggle--on {
+    background: var(--cyan);
+  }
+  .toggle--on::after {
+    transform: translateX(18px);
+  }
+
+  /* Schedule preview */
+  .schedule-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin: 0 16px 16px;
+    overflow: hidden;
+  }
+  .schedule-preview__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .schedule-preview__group {
+    margin-bottom: 12px;
+  }
+  .schedule-preview__group:last-child { margin-bottom: 0; }
+  .schedule-preview__label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .schedule-preview__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+    color: var(--fg-secondary);
+  }
+  .schedule-preview__time {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--fg);
+    width: 44px;
+    flex-shrink: 0;
+  }
+
+  /* Protection card */
+  .protection-card {
+    background: linear-gradient(135deg, rgba(0,240,255,0.04), rgba(168,85,247,0.04));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    margin: 0 16px 16px;
+    overflow: hidden;
+  }
+  .protection-card__icon {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .protection-card__text {
+    font-size: 13px;
+    color: var(--fg-secondary);
+    line-height: 1.5;
+  }
+
+  /* CTA */
+  .cta-section { padding: 8px 16px 12px; }
+  .btn--cta {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--cyan), #00C4FF);
+    color: var(--bg-deep);
+    box-shadow: 0 4px 16px rgba(0, 240, 255, 0.25);
+    border: none;
+    cursor: pointer;
+  }
+  .btn--cta:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 240, 255, 0.2);
+  }
+  .btn--sub {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn--sub:active { background: var(--surface); }
+
+  /* Links row */
+  .links-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 12px 16px 24px;
+    flex-wrap: wrap;
+  }
+  .links-row a {
+    font-size: 12px;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .links-row a:hover { color: var(--cyan); }
+
+  .bottom-nav .nav-item--progress { color: var(--cyan); }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="status-bar">
+    <span class="status-bar__time">14:32</span>
+    <div class="status-bar__icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="0.5"/><rect x="4.5" y="5" width="3" height="7" rx="0.5"/><rect x="9" y="2" width="3" height="10" rx="0.5"/><rect x="13.5" y="0" width="2.5" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5l1.4 1.4C4.6 5 6.2 4.2 8 4.2s3.4.8 4.8 2.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4zM8 6.4c-1.6 0-3 .6-4 1.6L5.4 9.4c.6-.6 1.4-1 2.6-1s2 .4 2.6 1l1.4-1.4c-1-1-2.4-1.6-4-1.6zM8 10.4c-.6 0-1 .4-1 1s.4 1 1 1 1-.4 1-1-.4-1-1-1z"/></svg>
+      <svg width="24" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="2" y="3" width="14" height="6" rx="1"/></svg>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <!-- Header -->
+    <div class="week-header">
+      <div class="week-header__label">◆ BÁO CÁO TUẦN</div>
+      <div class="week-header__title">Tổng Kết Tuần</div>
+      <div class="week-header__sub">Tuần 22 · 26/05 – 01/06/2026</div>
+      <div class="week-header__desc">Xem lại dữ liệu tuần này và chọn những điều chỉnh bạn muốn áp dụng cho tuần sau.</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card--highlight">
+        <div class="stat-card__label">Hoàn thành</div>
+        <div class="stat-card__value">70%</div>
+        <div class="stat-card__sub">42 / 60</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">EXP tuần</div>
+        <div class="stat-card__value" style="color:var(--exp-gold);">+1,250</div>
+        <div class="stat-card__sub">+180 vs tuần trước</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Streak</div>
+        <div class="stat-card__value" style="color:var(--success);">5</div>
+        <div class="stat-card__sub">ngày liên tiếp</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Đã hoãn</div>
+        <div class="stat-card__value" style="color:var(--warn);">12</div>
+        <div class="stat-card__sub">lần trong tuần</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Bỏ qua</div>
+        <div class="stat-card__value" style="color:var(--danger);">6</div>
+        <div class="stat-card__sub">quest</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Daily Review</div>
+        <div class="stat-card__value" style="color:var(--violet);">4/7</div>
+        <div class="stat-card__sub">ngày hoàn thành</div>
+      </div>
+    </div>
+
+    <!-- Completion chart -->
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-card__title">Tỷ lệ hoàn thành theo ngày</div>
+        <div class="bar-chart">
+          <div class="bar-col">
+            <span class="bar-col__value">85%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:85%"></div>
+            <span class="bar-col__label">T2</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">60%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:60%"></div>
+            <span class="bar-col__label">T3</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">75%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:75%"></div>
+            <span class="bar-col__label">T4</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">90%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:90%"></div>
+            <span class="bar-col__label">T5</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">55%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:55%"></div>
+            <span class="bar-col__label">T6</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">70%</span>
+            <div class="bar-col__bar bar-col__bar--cyan" style="height:70%"></div>
+            <span class="bar-col__label">T7</span>
+          </div>
+          <div class="bar-col">
+            <span class="bar-col__value">65%</span>
+            <div class="bar-col__bar bar-col__bar--violet" style="height:65%"></div>
+            <span class="bar-col__label">CN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- So sánh tuần trước -->
+    <div class="section-header">
+      <span class="section-title">◆ So sánh tuần trước</span>
+    </div>
+    <div class="card">
+      <div class="compare-row">
+        <span class="compare-row__label">Tỷ lệ hoàn thành</span>
+        <span class="compare-row__value">70% <span class="compare-row__change compare-row__change--up">↑ 8%</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-row__label">EXP nhận được</span>
+        <span class="compare-row__value">+1,250 <span class="compare-row__change compare-row__change--up">↑ 180</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-row__label">Quest bỏ qua</span>
+        <span class="compare-row__value">6 <span class="compare-row__change compare-row__change--down">↓ 2</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-row__label">Daily Review</span>
+        <span class="compare-row__value">4/7 <span class="compare-row__change compare-row__change--up">↑ 1 ngày</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-row__label">Sleep Quest</span>
+        <span class="compare-row__value">ổn định <span class="compare-row__change compare-row__change--same">—</span></span>
+      </div>
+    </div>
+
+    <!-- Điểm nổi bật -->
+    <div class="section-header">
+      <span class="section-title">◆ Điểm nổi bật tuần này</span>
+    </div>
+    <div class="insights-section">
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--success">💧</div>
+        <div class="insight-card__body">
+          <div class="insight-card__label insight-card__label--success">Ổn định</div>
+          <div class="insight-card__title">Water Quest 5/7 ngày</div>
+          <div class="insight-card__desc">Thói quen uống nước đang rất ổn định. Hệ thống sẽ giữ nguyên tần suất.</div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--info">📖</div>
+        <div class="insight-card__body">
+          <div class="insight-card__label insight-card__label--info">Hiệu quả</div>
+          <div class="insight-card__title">Learning Quest tốt nhất sau 20:00</div>
+          <div class="insight-card__desc">Bạn hoàn thành học tập tốt hơn vào buổi tối. Khung giờ 20:00–21:30 phù hợp nhất.</div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--warn">☕</div>
+        <div class="insight-card__body">
+          <div class="insight-card__label insight-card__label--warn">Cần chú ý</div>
+          <div class="insight-card__title">Break Quest hay bị hoãn buổi sáng</div>
+          <div class="insight-card__desc">Bạn thường hoãn nghỉ mắt vào buổi sáng. Có thể đổi thời điểm nhắc.</div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--danger">🏃</div>
+        <div class="insight-card__body">
+          <div class="insight-card__label insight-card__label--danger">Bỏ qua nhiều</div>
+          <div class="insight-card__title">Movement Quest bị bỏ qua 4 lần</div>
+          <div class="insight-card__desc">Quest vận động đang bị bỏ qua nhiều nhất. Có thể giảm tần suất hoặc đổi loại.</div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--violet">📝</div>
+        <div class="insight-card__body">
+          <div class="insight-card__label insight-card__label--violet">Tốt</div>
+          <div class="insight-card__title">Daily Review 4/7 ngày</div>
+          <div class="insight-card__desc">Bạn đang đều đặn đánh giá cuối ngày. Dữ liệu này giúp hệ thống hiểu bạn hơn.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quest hiệu quả nhất -->
+    <div class="section-header">
+      <span class="section-title">◆ Quest hiệu quả nhất</span>
+    </div>
+    <div style="padding:0 16px 16px">
+      <div class="quest-rank">
+        <span class="quest-rank__pos">1</span>
+        <div class="quest-rank__info">
+          <div class="quest-rank__name">Learning Quest</div>
+          <div class="quest-rank__note">Hiệu quả nhất sau 20:00</div>
+        </div>
+        <span class="quest-rank__rate" style="color:var(--success)">85%</span>
+      </div>
+      <div class="quest-rank">
+        <span class="quest-rank__pos">2</span>
+        <div class="quest-rank__info">
+          <div class="quest-rank__name">Water Quest</div>
+          <div class="quest-rank__note">Ổn định khi nhắc cách nhau 90 phút</div>
+        </div>
+        <span class="quest-rank__rate" style="color:var(--success)">78%</span>
+      </div>
+      <div class="quest-rank">
+        <span class="quest-rank__pos">3</span>
+        <div class="quest-rank__info">
+          <div class="quest-rank__name">Break Quest</div>
+          <div class="quest-rank__note">Thường bị hoãn vào buổi sáng</div>
+        </div>
+        <span class="quest-rank__rate" style="color:var(--warn)">65%</span>
+      </div>
+    </div>
+
+    <!-- Quest cần điều chỉnh -->
+    <div class="section-header">
+      <span class="section-title">◆ Quest cần điều chỉnh</span>
+    </div>
+    <div class="insights-section">
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--danger">🏃</div>
+        <div class="insight-card__body">
+          <div class="insight-card__title">Movement Quest</div>
+          <div class="insight-card__desc">Bị bỏ qua 4 lần trong tuần. Có thể giảm từ 5 lần/tuần xuống 3 lần/tuần.</div>
+          <div class="insight-card__bar"><div class="insight-card__bar-fill" style="width:30%;background:var(--danger)"></div></div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--warn">☕</div>
+        <div class="insight-card__body">
+          <div class="insight-card__title">Break Quest buổi sáng</div>
+          <div class="insight-card__desc">Hay bị hoãn vào buổi sáng. Đề xuất đổi từ mỗi 90 phút sang mỗi 120 phút trong buổi sáng.</div>
+          <div class="insight-card__bar"><div class="insight-card__bar-fill" style="width:50%;background:var(--warn)"></div></div>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card__icon insight-card__icon--info">📖</div>
+        <div class="insight-card__body">
+          <div class="insight-card__title">Learning Quest giờ học</div>
+          <div class="insight-card__desc">Hiệu quả hơn vào buổi tối. Đề xuất ưu tiên nhắc lúc 20:00–21:30 thay vì linh hoạt cả ngày.</div>
+          <div class="insight-card__bar"><div class="insight-card__bar-fill" style="width:85%;background:var(--success)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Đề xuất cho tuần sau (toggle) -->
+    <div class="section-header">
+      <span class="section-title">◆ Đề xuất cho tuần sau</span>
+    </div>
+    <div style="padding:0 16px 8px">
+      <div class="suggestion-card" id="sug-1">
+        <div class="suggestion-card__header">
+          <div>
+            <div class="suggestion-card__title">Chuyển Learning Quest sang 20:00–21:30</div>
+            <div class="suggestion-card__reason">Tuần này bạn hoàn thành tốt hơn vào buổi tối.</div>
+          </div>
+          <button class="toggle toggle--on" onclick="toggleSuggestion(this, 'sug-1')" aria-label="Bật/tắt đề xuất"></button>
+        </div>
+        <a href="15-reminder-settings.html" class="suggestion-card__link">Chỉnh nhắc nhở →</a>
+      </div>
+      <div class="suggestion-card" id="sug-2">
+        <div class="suggestion-card__header">
+          <div>
+            <div class="suggestion-card__title">Giảm Movement Quest còn 3 lần/tuần</div>
+            <div class="suggestion-card__reason">Quest này bị bỏ qua 4 lần trong tuần.</div>
+          </div>
+          <button class="toggle toggle--on" onclick="toggleSuggestion(this, 'sug-2')" aria-label="Bật/tắt đề xuất"></button>
+        </div>
+      </div>
+      <div class="suggestion-card" id="sug-3">
+        <div class="suggestion-card__header">
+          <div>
+            <div class="suggestion-card__title">Đổi Break Quest buổi sáng: mỗi 90 phút → 120 phút</div>
+            <div class="suggestion-card__reason">Bạn thường hoãn Break Quest vào buổi sáng.</div>
+          </div>
+          <button class="toggle toggle--on" onclick="toggleSuggestion(this, 'sug-3')" aria-label="Bật/tắt đề xuất"></button>
+        </div>
+        <a href="15-reminder-settings.html" class="suggestion-card__link">Chỉnh nhắc nhở →</a>
+      </div>
+      <div class="suggestion-card suggestion-card--off" id="sug-4">
+        <div class="suggestion-card__header">
+          <div>
+            <div class="suggestion-card__title">Tăng Learning Quest từ 15 phút lên 25 phút</div>
+            <div class="suggestion-card__reason">Tỷ lệ hoàn thành học tập đang tốt, nhưng tuần này vẫn có 2 ngày mệt.</div>
+          </div>
+          <button class="toggle" onclick="toggleSuggestion(this, 'sug-4')" aria-label="Bật/tắt đề xuất"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mẫu tuần sau -->
+    <div class="section-header">
+      <span class="section-title">◆ Mẫu tuần sau</span>
+    </div>
+    <div class="schedule-preview">
+      <div class="schedule-preview__title">Nếu áp dụng đề xuất, SoloQuest sẽ ưu tiên:</div>
+      <div class="schedule-preview__group">
+        <div class="schedule-preview__label">Thứ 2 – Thứ 6</div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">09:30</span>
+          <span>Break Quest — nghỉ mắt 5 phút</span>
+        </div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">11:00</span>
+          <span>Water Quest — uống nước</span>
+        </div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">14:00</span>
+          <span>Movement Quest — vận động nhẹ 3 phút</span>
+        </div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">20:00</span>
+          <span>Learning Quest — học 15 phút</span>
+        </div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">22:30</span>
+          <span>Sleep Quest — chuẩn bị ngủ</span>
+        </div>
+      </div>
+      <div class="schedule-preview__group">
+        <div class="schedule-preview__label">Cuối tuần</div>
+        <div class="schedule-preview__item">
+          <span class="schedule-preview__time">—</span>
+          <span>Quest nhẹ hơn, review tuần</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protection card -->
+    <div class="protection-card">
+      <div class="protection-card__icon">🛡️</div>
+      <div class="protection-card__text">SoloQuest chỉ đề xuất điều chỉnh. Bạn luôn có thể bật/tắt, chỉnh thủ công hoặc không áp dụng đề xuất nào.</div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-section">
+      <button class="btn btn--cta" onclick="applySelected()">Áp dụng đề xuất đã chọn</button>
+      <button class="btn btn--sub" onclick="location.href='12-schedule-editor.html'">Chỉnh thủ công</button>
+    </div>
+
+    <!-- Links -->
+    <div class="links-row">
+      <a href="05-logs.html">📊 Xem Nhật ký chi tiết</a>
+      <a href="16-quest-rules.html">⚙ Luật điều chỉnh</a>
+      <a href="15-reminder-settings.html">🔔 Chỉnh nhắc nhở</a>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <a class="nav-item" href="03-home.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      <span>Trang Chủ</span>
+    </a>
+    <a class="nav-item" href="05-logs.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      <span>Nhật Ký</span>
+    </a>
+    <a class="nav-item nav-item--progress" href="06-progress.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <span>Tiến Trình</span>
+    </a>
+    <a class="nav-item" href="07-rewards.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>Phần Thưởng</span>
+    </a>
+    <a class="nav-item" href="09-profile.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Hồ Sơ</span>
+    </a>
+  </div>
+</div>
+
+<script>
+function toggleSuggestion(btn, cardId) {
+  const card = document.getElementById(cardId);
+  btn.classList.toggle('toggle--on');
+  card.classList.toggle('suggestion-card--off');
+}
+
+function applySelected() {
+  const btn = document.querySelector('.btn--cta');
+  const active = document.querySelectorAll('.suggestion-card:not(.suggestion-card--off) .toggle--on');
+  const count = active.length;
+  btn.textContent = '✓ Đã áp dụng ' + count + ' đề xuất';
+  btn.style.background = 'var(--success)';
+  btn.style.boxShadow = '0 4px 16px rgba(34,197,94,0.3)';
+  setTimeout(() => {
+    btn.textContent = 'Áp dụng đề xuất đã chọn';
+    btn.style.background = '';
+    btn.style.boxShadow = '';
+  }, 2500);
+}
+</script>
+</body>
+</html>

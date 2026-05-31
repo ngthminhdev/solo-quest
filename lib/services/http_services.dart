@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-import '../config/app_config.dart';
 import '../config/app_session.dart';
 import 'app_logger_service.dart';
 import 'auth_token_storage.dart';
