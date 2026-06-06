@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
-import '../constants/onboarding_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import '../models/onboarding_data.dart';
 
 class OnboardingCompleteStep extends StatelessWidget {
@@ -15,6 +14,8 @@ class OnboardingCompleteStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -24,7 +25,7 @@ class OnboardingCompleteStep extends StatelessWidget {
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: AppColor.levelGradient,
+            color: AppColor.bgDeep,
             boxShadow: const [
               BoxShadow(
                 color: AppColor.cyanGlow,
@@ -38,15 +39,15 @@ class OnboardingCompleteStep extends StatelessWidget {
               ),
             ],
           ),
-          child: const Icon(
-            RemixIcons.star_line,
-            size: 40,
-            color: AppColor.bgDeep,
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/icons/app_icon_foreground.png',
+            fit: BoxFit.contain,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step8Title,
+          l10n.onboardingStep8Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w800,
             fontSize: 24,
@@ -56,7 +57,7 @@ class OnboardingCompleteStep extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          OnboardingConstants.step8Subtitle,
+          l10n.onboardingStep8Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 14,
@@ -65,14 +66,60 @@ class OnboardingCompleteStep extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
-        _buildSummaryCard(),
+        _buildSummaryCard(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildPreviewCard(),
+        _buildPreviewCard(context),
       ],
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(BuildContext context) {
+    final l10n = context.l10n;
+
+    String getLocalizedActivity(String key) {
+      switch (key) {
+        case 'Software Engineer':
+          return l10n.onboardingStep2ActivityDeveloper;
+        case 'Sinh Viên':
+          return l10n.onboardingStep2ActivityStudent;
+        case 'Nhân Viên Văn Phòng':
+          return l10n.onboardingStep2ActivityOffice;
+        case 'Freelancer':
+          return l10n.onboardingStep2ActivityFreelancer;
+        case 'Khác':
+          return l10n.onboardingStep2ActivityOther;
+        default:
+          return key;
+      }
+    }
+
+    String getLocalizedGoals(List<String> keys) {
+      if (keys.isEmpty) return '—';
+      final localized = keys.map((key) {
+        switch (key) {
+          case 'Uống Nước':
+            return l10n.onboardingGoalWater;
+          case 'Vận Động':
+            return l10n.onboardingGoalFitness;
+          case 'Học Tập':
+            return l10n.onboardingGoalLearning;
+          case 'Chánh Niệm':
+            return l10n.onboardingGoalMindfulness;
+          case 'Ngủ Tốt Hơn':
+            return l10n.onboardingGoalSleep;
+          case 'Tập Trung Tốt Hơn':
+            return l10n.onboardingGoalFocus;
+          case 'Giảm Cân':
+            return l10n.onboardingGoalWeight;
+          case 'Kỷ Luật Hơn':
+            return l10n.onboardingGoalDiscipline;
+          default:
+            return key;
+        }
+      });
+      return localized.join(' · ');
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -81,61 +128,53 @@ class OnboardingCompleteStep extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColor.borderGlowViolet),
         boxShadow: const [
-          BoxShadow(
-            color: AppColor.violetGlow,
-            blurRadius: 8,
-            spreadRadius: 0,
-          ),
+          BoxShadow(color: AppColor.violetGlow, blurRadius: 8, spreadRadius: 0),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            OnboardingConstants.summaryTitle,
+            l10n.onboardingStep8SummaryTitle,
             style: AppTextStyle.monoLabel.copyWith(
               color: AppColor.violet,
               letterSpacing: 0.08,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          _buildSummaryRow('Tên', data.displayName.isEmpty ? '—' : data.displayName),
           _buildSummaryRow(
-            'Công việc',
-            data.mainActivity.isEmpty ? '—' : data.mainActivity,
+            l10n.onboardingStep8LabelName,
+            data.displayName.isEmpty ? '—' : data.displayName,
           ),
           _buildSummaryRow(
-            'Lịch làm',
+            l10n.onboardingStep8LabelWork,
+            data.mainActivity.isEmpty
+                ? '—'
+                : getLocalizedActivity(data.mainActivity),
+          ),
+          _buildSummaryRow(
+            l10n.onboardingStep8LabelSchedule,
             data.workStartTime.isNotEmpty && data.workEndTime.isNotEmpty
                 ? '${data.workStartTime}–${data.workEndTime}'
                 : '—',
           ),
           _buildSummaryRow(
-            'Mục tiêu',
-            data.mainGoals.isEmpty ? '—' : data.mainGoals.join(' · '),
+            l10n.onboardingStep8LabelGoals,
+            getLocalizedGoals(data.mainGoals),
             highlight: true,
           ),
           _buildSummaryRow(
-            'Giờ ngủ',
+            l10n.onboardingStep8LabelSleep,
             data.targetSleepTime.isEmpty ? '—' : data.targetSleepTime,
-          ),
-          _buildSummaryRow(
-            'Break',
-            'Mỗi ${data.breakReminderInterval} phút',
-          ),
-          _buildSummaryRow(
-            'Phần thưởng',
-            data.preferredRewards.isEmpty
-                ? '—'
-                : data.preferredRewards.join(' · '),
-            highlight: true,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPreviewCard() {
+  Widget _buildPreviewCard(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -144,35 +183,47 @@ class OnboardingCompleteStep extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColor.borderGlowCyan),
         boxShadow: const [
-          BoxShadow(
-            color: AppColor.cyanGlow,
-            blurRadius: 8,
-            spreadRadius: 0,
-          ),
+          BoxShadow(color: AppColor.cyanGlow, blurRadius: 8, spreadRadius: 0),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            OnboardingConstants.previewTitle,
+            l10n.onboardingStep8PreviewTitle,
             style: AppTextStyle.monoLabel.copyWith(
               color: AppColor.cyan,
               letterSpacing: 0.08,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          _buildPreviewQuest('09:30', 'Uống 250ml nước', '+5 EXP'),
-          _buildPreviewQuest('10:00', 'Rời khỏi màn hình 5 phút', '+10 EXP'),
-          _buildPreviewQuest('18:30', 'Đi bộ 15 phút', '+30 EXP'),
-          _buildPreviewQuest('20:30', 'Học Docker cơ bản 20 phút', '+35 EXP'),
-          _buildPreviewQuest('23:30', 'Đặt điện thoại xuống 15 phút', '+20 EXP'),
+          _buildPreviewQuest('09:30', l10n.onboardingStep8QuestWater, '+5 EXP'),
+          _buildPreviewQuest(
+            '10:00',
+            l10n.onboardingStep8QuestBreak,
+            '+10 EXP',
+          ),
+          _buildPreviewQuest('18:30', l10n.onboardingStep8QuestWalk, '+30 EXP'),
+          _buildPreviewQuest(
+            '20:30',
+            l10n.onboardingStep8QuestStudy,
+            '+35 EXP',
+          ),
+          _buildPreviewQuest(
+            '23:30',
+            l10n.onboardingStep8QuestSleep,
+            '+20 EXP',
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool highlight = false}) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    bool highlight = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -180,11 +231,9 @@ class OnboardingCompleteStep extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColor.fgSecondary,
-            ),
+            style: const TextStyle(fontSize: 13, color: AppColor.fgSecondary),
           ),
+          SizedBox(width: AppSpacing.md),
           Flexible(
             child: Text(
               value,
@@ -209,11 +258,7 @@ class OnboardingCompleteStep extends StatelessWidget {
         children: [
           Text(
             time,
-            style: const TextStyle(
-              fontFamily: 'Exo2',
-              fontSize: 12,
-              color: AppColor.fgMuted,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColor.fgMuted),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -230,7 +275,6 @@ class OnboardingCompleteStep extends StatelessWidget {
           Text(
             exp,
             style: const TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColor.expGold,

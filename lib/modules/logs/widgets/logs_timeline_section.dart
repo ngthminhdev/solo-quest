@@ -4,7 +4,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_style.dart';
 import '../../../models/log_entry_model.dart';
-import '../constants/logs_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import 'log_empty_view.dart';
 import 'log_timeline_item.dart';
 
@@ -53,14 +53,14 @@ class LogsTimelineSection extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.s8),
                 Text(
-                  LogsConstants.sectionTitle,
+                  context.l10n.logsSectionTitle,
                   style: AppTextStyle.sectionLabel.copyWith(
                     color: AppColor.fgSecondary,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  '${logs.length} hoạt động',
+                  context.l10n.logsTimelineCount(logs.length),
                   style: const TextStyle(
                     fontFamily: 'JetBrains Mono',
                     fontSize: 10,

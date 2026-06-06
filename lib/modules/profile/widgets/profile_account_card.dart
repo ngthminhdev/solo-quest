@@ -57,6 +57,19 @@ class ProfileAccountCard extends StatelessWidget {
             .toUpperCase()
         : '?';
 
+    Widget buildFallbackAvatar() {
+      return Center(
+        child: Text(
+          initials,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColor.bgDeep,
+          ),
+        ),
+      );
+    }
+
     return Column(
       children: [
         Row(
@@ -67,18 +80,34 @@ class ProfileAccountCard extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: AppColor.levelGradient,
+                gradient: authUser.avatarUrl != null && authUser.avatarUrl!.isNotEmpty
+                    ? null
+                    : AppColor.levelGradient,
+                color: authUser.avatarUrl != null && authUser.avatarUrl!.isNotEmpty
+                    ? AppColor.surface
+                    : null,
               ),
-              child: Center(
-                child: Text(
-                  initials,
-                  style: const TextStyle(
-                    fontFamily: 'Exo2',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColor.bgDeep,
-                  ),
-                ),
+              child: ClipOval(
+                child: authUser.avatarUrl != null && authUser.avatarUrl!.isNotEmpty
+                    ? Image.network(
+                        authUser.avatarUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => buildFallbackAvatar(),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(AppColor.cyan),
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : buildFallbackAvatar(),
               ),
             ),
             const SizedBox(width: AppSpacing.s12),
@@ -151,9 +180,9 @@ class ProfileAccountCard extends StatelessWidget {
             height: 40,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.transparent,
+              color: AppColor.transparent,
               borderRadius: BorderRadius.circular(AppRadius.sm),
-              border: Border.all(color: AppColor.danger.withAlpha(60)),
+              border: Border.all(color: AppColor.errorBorder),
             ),
             child: Center(
               child: isLoading

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.solo_quest"
+    namespace = "com.min.solo_quest"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,9 +21,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.solo_quest"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // TODO(Google Auth): OAuth Android client credentials must use this exact
+        // applicationId plus the app signing SHA-1/SHA-256.
+        applicationId = "com.min.solo_quest"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

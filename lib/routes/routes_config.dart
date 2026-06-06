@@ -8,7 +8,6 @@ class RoutesConfig {
   static const String questDetail = '/quest-detail';
   static const String logs = '/logs';
   static const String progress = '/progress';
-  static const String rewards = '/rewards';
   static const String dailyReview = '/daily-review';
   static const String weeklySummary = '/weekly-summary';
   static const String profile = '/profile';

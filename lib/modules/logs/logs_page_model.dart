@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../base/app_load_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
+import '../../core/utils/app_time_formatter.dart';
 import '../../models/log_entry_model.dart';
 import '../../models/enums/log_enums.dart';
 import '../../services/log_service.dart';
@@ -17,7 +18,7 @@ class LogsPageState extends BasePageState {
   final String? errorMessage;
 
   LogsPageState({
-    this.loadState = AppLoadState.idle,
+    this.loadState = AppLoadState.loading,
     this.logs = const [],
     this.filteredLogs = const [],
     DateTime? selectedDate,
@@ -81,35 +82,47 @@ class LogsPageModel extends BasePageModel<LogsPageState> {
     state = state.updateState(loadState: AppLoadState.loading);
 
     try {
-      final logs = await logService.getLogs();
+      final dateStr = AppTimeFormatter.formatDateOnly(state.selectedDate) ?? '';
+
+      final logs = await logService.getLogs(
+        date: dateStr,
+        type: state.selectedType?.apiValue,
+      );
       logs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       state = state.updateState(
         loadState: AppLoadState.ready,
         logs: logs,
+        filteredLogs: logs,
       );
-      _applyFilters();
     } catch (e) {
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: 'Không thể tải nhật ký: ${e.toString()}',
+        errorMessage: 'Unable to load logs: ${e.toString()}',
       );
     }
   }
 
   Future<void> refreshLogs() async {
     try {
-      final logs = await logService.getLogs();
+      final dateStr = AppTimeFormatter.formatDateOnly(state.selectedDate) ?? '';
+
+      final logs = await logService.getLogs(
+        date: dateStr,
+        type: state.selectedType?.apiValue,
+      );
       logs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      state = state.updateState(logs: logs);
-      _applyFilters();
+      state = state.updateState(
+        logs: logs,
+        filteredLogs: logs,
+      );
     } catch (_) {}
   }
 
   void selectDate(DateTime date) {
     state = state.updateState(selectedDate: date);
-    _applyFilters();
+    loadLogs(); // Reload with new date filter from backend
   }
 
   void selectType(LogEntryType? type) {
@@ -117,7 +130,7 @@ class LogsPageModel extends BasePageModel<LogsPageState> {
       selectedType: type,
       clearSelectedType: type == null,
     );
-    _applyFilters();
+    loadLogs(); // Reload with new type filter from backend
   }
 
   void clearFilter() {
@@ -125,31 +138,7 @@ class LogsPageModel extends BasePageModel<LogsPageState> {
       selectedDate: DateTime.now(),
       clearSelectedType: true,
     );
-    _applyFilters();
-  }
-
-  void _applyFilters() {
-    final selectedDate = state.selectedDate;
-    final selectedType = state.selectedType;
-
-    var filtered = state.logs.where((log) {
-      final sameDate = _isSameDate(log.createdAt, selectedDate);
-      if (!sameDate) return false;
-
-      if (selectedType != null && log.type != selectedType) {
-        return false;
-      }
-
-      return true;
-    }).toList();
-
-    filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-    state = state.updateState(filteredLogs: filtered);
-  }
-
-  bool _isSameDate(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+    loadLogs(); // Reload without filters
   }
 }
 

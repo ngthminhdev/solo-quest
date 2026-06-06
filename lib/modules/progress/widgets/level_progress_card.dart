@@ -5,6 +5,7 @@ import '../../../constants/app_spacing.dart';
 import '../../../models/progress_model.dart';
 import '../../../widgets/app_card/app_glow_card.dart';
 import '../../../widgets/app_progress/app_progress_bar.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LevelProgressCard extends StatelessWidget {
   final ProgressModel progress;
@@ -32,9 +33,9 @@ class LevelProgressCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Cấp độ hiện tại',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.progressLevelCurrentLevel,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fgSecondary,
@@ -67,9 +68,9 @@ class LevelProgressCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
-                    'Tổng EXP',
-                    style: TextStyle(fontSize: 11, color: AppColor.fgSecondary),
+                  Text(
+                    context.l10n.progressLevelTotalEXP,
+                    style: const TextStyle(fontSize: 11, color: AppColor.fgSecondary),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -95,7 +96,7 @@ class LevelProgressCard extends StatelessWidget {
           if (progress.expToNextLevel > 0) ...[
             const SizedBox(height: AppSpacing.s8),
             Text(
-              'Còn ${progress.expToNextLevel} EXP để lên level tiếp theo',
+              context.l10n.progressLevelEXPToNext(progress.expToNextLevel),
               style: const TextStyle(fontSize: 12, color: AppColor.fgSecondary),
             ),
           ],

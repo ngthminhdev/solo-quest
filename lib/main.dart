@@ -8,11 +8,15 @@ import 'config/app_theme_registry.dart';
 import 'generated/l10n/app_localizations.dart';
 import 'routes/router.dart';
 import 'routes/routes_config.dart';
+import 'services/http_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await AppConfig.load(configFile: 'assets/config.yaml');
+  HttpService.setSharedHost(AppConfig.instance.apiHost);
+
+  // Debug: Print API host configuration
+  debugPrint('[CONFIG] API Host: ${AppConfig.instance.apiHost}');
 
   runApp(const ProviderScope(child: MyApp()));
 }

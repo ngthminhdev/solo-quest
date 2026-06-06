@@ -43,7 +43,6 @@ class PageHeader extends StatelessWidget {
                 style:
                     titleStyle ??
                     const TextStyle(
-                      fontFamily: 'Exo2',
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,

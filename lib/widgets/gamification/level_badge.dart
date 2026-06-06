@@ -23,11 +23,7 @@ class LevelBadge extends StatelessWidget {
         vertical: AppSpacing.s4,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColor.cyan, AppColor.violet],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColor.levelGradient,
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(

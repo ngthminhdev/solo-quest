@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../models/weekly_summary_model.dart';
 import '../constants/weekly_summary_constants.dart';
 
 class WeeklySchedulePreview extends StatelessWidget {
-  const WeeklySchedulePreview({super.key});
+  final WeeklySummaryModel? summary;
+
+  const WeeklySchedulePreview({super.key, this.summary});
 
   @override
   Widget build(BuildContext context) {
@@ -78,34 +81,34 @@ class _ScheduleGroup extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s6),
         ...items.map((item) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 44,
-                child: Text(
-                  item.time,
-                  style: const TextStyle(
-                    fontFamily: 'JetBrains Mono',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                    color: AppColor.fg,
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 44,
+                    child: Text(
+                      item.time,
+                      style: const TextStyle(
+                        fontFamily: 'JetBrains Mono',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: AppColor.fg,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.s8),
-              Expanded(
-                child: Text(
-                  item.label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColor.fgSecondary,
+                  const SizedBox(width: AppSpacing.s8),
+                  Expanded(
+                    child: Text(
+                      item.label,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColor.fgSecondary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        )),
+            )),
       ],
     );
   }

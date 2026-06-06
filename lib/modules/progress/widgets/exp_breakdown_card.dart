@@ -1,15 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
-import '../constants/progress_constants.dart';
+import '../../../extensions/localization_extension.dart';
+
+class _ExpBreakdownItem {
+  final String name;
+  final String note;
+  final int exp;
+  final IconData icon;
+  final Color bgColor;
+
+  const _ExpBreakdownItem({
+    required this.name,
+    required this.note,
+    required this.exp,
+    required this.icon,
+    required this.bgColor,
+  });
+}
 
 class ExpBreakdownCard extends StatelessWidget {
   const ExpBreakdownCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    final items = [
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemLearning,
+        note: l10n.progressExpItemLearningNote,
+        exp: 40,
+        icon: RemixIcons.book_open_line,
+        bgColor: AppColor.chipLearningBg,
+      ),
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemSleep,
+        note: l10n.progressExpItemSleepNote,
+        exp: 25,
+        icon: RemixIcons.moon_line,
+        bgColor: AppColor.chipSleepBg,
+      ),
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemMovement,
+        note: l10n.progressExpItemMovementNote,
+        exp: 20,
+        icon: RemixIcons.run_line,
+        bgColor: AppColor.chipMovementBg,
+      ),
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemBreak,
+        note: l10n.progressExpItemBreakNote,
+        exp: 15,
+        icon: RemixIcons.heart_pulse_line,
+        bgColor: AppColor.chipBreakBg,
+      ),
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemWater,
+        note: l10n.progressExpItemWaterNote,
+        exp: 10,
+        icon: RemixIcons.drop_line,
+        bgColor: AppColor.chipWaterBg,
+      ),
+      _ExpBreakdownItem(
+        name: l10n.progressExpItemReview,
+        note: l10n.progressExpItemReviewNote,
+        exp: 30,
+        icon: RemixIcons.checkbox_circle_line,
+        bgColor: AppColor.cyanDim,
+      ),
+    ];
+
     return Container(
       margin: const EdgeInsets.fromLTRB(
         AppSpacing.s16,
@@ -38,9 +102,9 @@ class ExpBreakdownCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.s6),
-              const Text(
-                'EXP THEO LOẠI QUEST',
-                style: TextStyle(
+              Text(
+                l10n.progressExpBreakdownSection,
+                style: const TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -51,7 +115,7 @@ class ExpBreakdownCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s12),
-          ...ProgressExpBreakdown.items.map(
+          ...items.map(
             (item) => _ExpRow(item: item),
           ),
         ],
@@ -61,7 +125,7 @@ class ExpBreakdownCard extends StatelessWidget {
 }
 
 class _ExpRow extends StatelessWidget {
-  final ExpBreakdownItem item;
+  final _ExpBreakdownItem item;
 
   const _ExpRow({required this.item});
 

@@ -3,13 +3,15 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/learning_goals_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LearningGoalsHeader extends StatelessWidget {
   const LearningGoalsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Row(
@@ -20,7 +22,7 @@ class LearningGoalsHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColor.cyanDim,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColor.cyan.withOpacity(0.3)),
+              border: Border.all(color: AppColor.primaryBorder),
             ),
             child: const Icon(
               RemixIcons.book_open_line,
@@ -34,7 +36,7 @@ class LearningGoalsHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  LearningGoalsConstants.pageTitle,
+                  l10n.lgPageTitle,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -43,7 +45,7 @@ class LearningGoalsHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.s4),
                 Text(
-                  LearningGoalsConstants.pageSubtitle,
+                  l10n.lgPageSubtitle,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgMuted,

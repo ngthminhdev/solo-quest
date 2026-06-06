@@ -5,6 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../models/progress_model.dart';
+import '../../../extensions/localization_extension.dart';
 
 class ProgressStatsGrid extends StatelessWidget {
   final ProgressModel progress;
@@ -24,19 +25,19 @@ class ProgressStatsGrid extends StatelessWidget {
         childAspectRatio: 1.72,
         children: [
           _StatCard(
-            label: 'Tổng EXP',
+            label: context.l10n.progressStatsTotalEXP,
             value: '${progress.totalExp}',
             icon: RemixIcons.flashlight_line,
             color: AppColor.expGold,
           ),
           _StatCard(
-            label: 'Quest hoàn thành',
+            label: context.l10n.progressStatsCompletedQuests,
             value: '${progress.totalCompletedQuests}',
             icon: RemixIcons.checkbox_circle_line,
             color: AppColor.success,
           ),
           _StatCard(
-            label: 'Quest bỏ qua',
+            label: context.l10n.progressStatsSkippedQuests,
             value: '${progress.totalSkippedQuests}',
             icon: RemixIcons.close_circle_line,
             color: AppColor.fgMuted,
@@ -44,7 +45,7 @@ class ProgressStatsGrid extends StatelessWidget {
           _StatCard(
             label: 'Streak',
             value: '${progress.streakDays}',
-            suffix: 'ngày',
+            suffix: context.l10n.progressStatsStreakDays,
             icon: RemixIcons.fire_line,
             color: AppColor.warn,
           ),

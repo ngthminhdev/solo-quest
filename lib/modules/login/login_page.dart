@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../base/base_page.dart';
@@ -40,7 +41,7 @@ class _LoginPageState
                     colors: [
                       AppColor.cyan.withAlpha(20),
                       AppColor.violet.withAlpha(10),
-                      Colors.transparent,
+                      AppColor.transparent,
                     ],
                     stops: const [0.0, 0.4, 1.0],
                   ),
@@ -57,7 +58,8 @@ class _LoginPageState
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height -
+                    minHeight:
+                        MediaQuery.of(context).size.height -
                         MediaQuery.of(context).padding.vertical -
                         AppSpacing.xxxl * 2,
                   ),
@@ -75,7 +77,6 @@ class _LoginPageState
                       Text(
                         context.l10n.loginTitle,
                         style: const TextStyle(
-                          fontFamily: 'Exo2',
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -99,11 +100,8 @@ class _LoginPageState
                       const SizedBox(height: AppSpacing.xl),
 
                       // Error banner
-                      LoginErrorBanner(
-                        message: state.errorMessage != null
-                            ? context.l10n.loginError
-                            : null,
-                      ),
+                      if (state.errorMessage != null)
+                        LoginErrorBanner(message: state.errorMessage),
 
                       if (state.errorMessage != null)
                         const SizedBox(height: AppSpacing.s16),
@@ -113,6 +111,14 @@ class _LoginPageState
                         isLoading: state.isLoading,
                         onPressed: _handleGoogleSignIn,
                       ),
+
+                      if (kDebugMode) ...[
+                        const SizedBox(height: AppSpacing.s12),
+                        _DevLoginButton(
+                          isLoading: state.isLoading,
+                          onPressed: _handleDevSignIn,
+                        ),
+                      ],
 
                       const SizedBox(height: AppSpacing.xxxl),
 
@@ -137,11 +143,50 @@ class _LoginPageState
     if (!mounted) return;
 
     if (route != null) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        route,
-        (route) => false,
-      );
+      Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
     }
+  }
+
+  Future<void> _handleDevSignIn() async {
+    final route = await pageModel.signInWithDevLogin();
+
+    if (!mounted) return;
+
+    if (route != null) {
+      Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
+    }
+  }
+}
+
+class _DevLoginButton extends StatelessWidget {
+  const _DevLoginButton({required this.isLoading, required this.onPressed});
+
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isLoading ? null : onPressed,
+      child: Container(
+        height: 44,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColor.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColor.border),
+        ),
+        child: const Center(
+          child: Text(
+            'Continue with Dev Login',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColor.fg,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

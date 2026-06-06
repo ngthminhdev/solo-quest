@@ -11,7 +11,8 @@ class MockQuestData {
       status: QuestStatus.completed,
       exp: 5,
       estimatedMinutes: 5,
-      scheduledAt: _todayAt(6, 50),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(6, 50),
       completedAt: _todayAt(6, 52),
       reason: 'Cơ thể mất nước sau 8 tiếng ngủ. Uống nước ngay giúp khởi động trao đổi chất.',
       instruction: 'Đổ đầy bình nước 250ml. Uống chậm rãi, không vội.',
@@ -25,7 +26,8 @@ class MockQuestData {
       status: QuestStatus.completed,
       exp: 10,
       estimatedMinutes: 10,
-      scheduledAt: _todayAt(7, 15),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(7, 15),
       completedAt: _todayAt(7, 18),
       reason: 'Vận động nhẹ buổi sáng giúp tăng nhịp tim và đánh thức cơ bắp.',
       instruction: 'Uống một ly nước. Thực hiện 5 cái chống đẩy hoặc plank 30 giây.',
@@ -39,7 +41,8 @@ class MockQuestData {
       status: QuestStatus.completed,
       exp: 5,
       estimatedMinutes: 3,
-      scheduledAt: _todayAt(8, 0),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(8, 0),
       completedAt: _todayAt(8, 2),
       reason: 'Duy trì hydration đều đặn mỗi 1-2 giờ giúp cơ thể hoạt động tối ưu.',
       instruction: 'Rót 250ml nước và uống hết trong một lần.',
@@ -53,7 +56,8 @@ class MockQuestData {
       status: QuestStatus.completed,
       exp: 10,
       estimatedMinutes: 5,
-      scheduledAt: _todayAt(8, 30),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(8, 30),
       completedAt: _todayAt(8, 35),
       reason: 'Quy tắc 20-20-20: cứ 20 phút nhìn màn hình, nhìn xa 20 feet trong 20 giây.',
       instruction: 'Đứng dậy, rời khỏi màn hình. Nhìn ra ngoài cửa sổ hoặc đi lại nhẹ.',
@@ -67,7 +71,8 @@ class MockQuestData {
       status: QuestStatus.active,
       exp: 5,
       estimatedMinutes: 5,
-      scheduledAt: _todayAt(9, 30),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(9, 30),
       reason: 'Duy trì hydration đều đặn giúp tập trung tốt hơn.',
       instruction: 'Đổ đầy bình nước 250ml. Uống chậm rãi.',
       tags: ['sức khoẻ', 'nước'],
@@ -81,7 +86,8 @@ class MockQuestData {
       status: QuestStatus.pending,
       exp: 10,
       estimatedMinutes: 5,
-      scheduledAt: _todayAt(10, 0),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(10, 0),
       reason: 'Mắt cần nghỉ ngơi sau thời gian dài nhìn màn hình.',
       instruction: 'Đứng dậy, rời khỏi màn hình. Nhìn ra ngoài cửa sổ.',
       tags: ['mắt', 'nghỉ'],
@@ -94,7 +100,8 @@ class MockQuestData {
       status: QuestStatus.pending,
       exp: 5,
       estimatedMinutes: 3,
-      scheduledAt: _todayAt(11, 15),
+      dueDate: _todayDateOnly(),
+      // No reminderTime - testing null case
       instruction: 'Rót 250ml nước và uống hết.',
       tags: ['sức khoẻ', 'nước'],
     ),
@@ -106,7 +113,8 @@ class MockQuestData {
       status: QuestStatus.pending,
       exp: 35,
       estimatedMinutes: 25,
-      scheduledAt: _todayAt(14, 0),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(14, 0),
       reason: 'Bạn đang học Docker. Mỗi ngày 15 phút giúp kiến thức không bị quên.',
       instruction: 'Mở tài liệu Docker. Đọc phần container vs image. Ghi lại 3 điều mới học.',
       tags: ['học', 'docker', 'lộ trình'],
@@ -119,7 +127,8 @@ class MockQuestData {
       status: QuestStatus.pending,
       exp: 30,
       estimatedMinutes: 15,
-      scheduledAt: _todayAt(18, 30),
+      dueDate: _todayDateOnly(),
+      reminderTime: _todayAt(18, 30),
       reason: 'Vận động nhẹ cuối ngày giúp giảm căng cơ và ngủ ngon hơn.',
       instruction: 'Đi bộ quanh nhà hoặc văn phòng 15 phút. Có thể nghe nhạc hoặc podcast.',
       tags: ['vận động', 'chiều'],
@@ -129,5 +138,10 @@ class MockQuestData {
   static DateTime _todayAt(int hour, int minute) {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+
+  static DateTime _todayDateOnly() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
   }
 }

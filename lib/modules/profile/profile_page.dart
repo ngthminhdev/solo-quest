@@ -4,16 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
+import '../../constants/app_color.dart';
 import '../../constants/app_spacing.dart';
 import '../../extensions/localization_extension.dart';
 import '../../routes/routes_config.dart';
-import '../../widgets/app_state/app_loading.dart';
+import '../../widgets/skeleton/skeleton_profile_page.dart';
 import '../../widgets/app_dialog/app_confirm_dialog.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
+import '../main/main_page_model.dart';
 import 'profile_page_model.dart';
 import 'widgets/profile_header_card.dart';
 import 'widgets/profile_stats_grid.dart';
-import 'widgets/profile_goal_section.dart';
 import 'widgets/profile_quick_actions_section.dart';
 import 'widgets/profile_account_card.dart';
 import 'widgets/profile_settings_section.dart';
@@ -27,13 +28,38 @@ class ProfilePage extends BasePage<ProfilePageModel, ProfilePageState> {
 }
 
 class _ProfilePageState
-    extends BasePageConsumerState<ProfilePage, ProfilePageModel, ProfilePageState> {
+    extends
+        BasePageConsumerState<ProfilePage, ProfilePageModel, ProfilePageState> {
+  static const _tabIndex = 4;
+  bool _settleListenerSet = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      pageModel.loadProfile();
+      _tryLoadIfSettled();
     });
+  }
+
+  void _tryLoadIfSettled() {
+    final settled = ref.read(mainPageProvider.select((s) => s.settledIndex));
+    if (settled == _tabIndex) {
+      pageModel.loadProfile();
+    }
+  }
+
+  @override
+  void onBuild() {
+    if (!_settleListenerSet) {
+      _settleListenerSet = true;
+      ref.listen(mainPageProvider.select((s) => s.settledIndex), (prev, next) {
+        if (next == _tabIndex && prev != _tabIndex) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            pageModel.loadProfile();
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -41,7 +67,7 @@ class _ProfilePageState
     final state = read;
 
     if (state.loadState == AppLoadState.loading && !state.hasProfile) {
-      return AppLoading(message: context.l10n.profileLoading);
+      return const SkeletonProfilePage();
     }
 
     if (state.loadState == AppLoadState.error || !state.hasProfile) {
@@ -63,7 +89,7 @@ class _ProfilePageState
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(
         top: AppSpacing.s16,
-        bottom: 100, // Space for bottom nav
+        bottom: AppSpacing.s16,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,14 +114,11 @@ class _ProfilePageState
             level: state.level,
           ),
 
-          const SizedBox(height: AppSpacing.s20),
-
           // Main Goals
-          ProfileGoalSection(
-            goals: profile.mainGoals,
-            onSetupGoals: _goToLearningGoals,
-          ),
-
+          // ProfileGoalSection(
+          //   goals: profile.mainGoals,
+          //   onSetupGoals: _goToLearningGoals,
+          // ),
           const SizedBox(height: AppSpacing.s20),
 
           // Quick Actions
@@ -109,15 +132,6 @@ class _ProfilePageState
 
           const SizedBox(height: AppSpacing.s20),
 
-          // Account
-          ProfileAccountCard(
-            user: state.authUser,
-            isLoading: state.isLockedPage,
-            onSignOut: _handleSignOut,
-          ),
-
-          const SizedBox(height: AppSpacing.s20),
-
           // Settings
           ProfileSettingsSection(
             onScheduleTap: _goToScheduleEditor,
@@ -125,6 +139,15 @@ class _ProfilePageState
             onLearningRoadmapTap: _goToLearningRoadmap,
             onReminderSettingsTap: _goToReminderSettings,
             onQuestRulesTap: _goToQuestRules,
+          ),
+
+          const SizedBox(height: AppSpacing.s20),
+
+          // Account
+          ProfileAccountCard(
+            user: state.authUser,
+            isLoading: state.isLockedPage,
+            onSignOut: _handleSignOut,
           ),
         ],
       ),
@@ -147,20 +170,20 @@ class _ProfilePageState
     Navigator.pushNamed(context, RoutesConfig.scheduleEditor);
   }
 
-  void _goToLearningGoals() {
-    Navigator.pushNamed(context, RoutesConfig.learningGoals);
-  }
-
-  void _goToLearningRoadmap() {
-    Navigator.pushNamed(context, RoutesConfig.learningRoadmap);
-  }
-
   void _goToReminderSettings() {
     Navigator.pushNamed(context, RoutesConfig.reminderSettings);
   }
 
   void _goToQuestRules() {
     Navigator.pushNamed(context, RoutesConfig.questRules);
+  }
+
+  void _goToLearningGoals() {
+    Navigator.pushNamed(context, RoutesConfig.learningGoals);
+  }
+
+  void _goToLearningRoadmap() {
+    Navigator.pushNamed(context, RoutesConfig.learningRoadmap);
   }
 
   Future<void> _handleSignOut() async {
@@ -172,7 +195,7 @@ class _ProfilePageState
       message: l10n.profileSignOutMessage,
       confirmText: l10n.profileSignOut,
       cancelText: l10n.commonCancel,
-      confirmColor: const Color(0xFFEF4444),
+      confirmColor: AppColor.danger,
     );
 
     if (confirmed != true) return;

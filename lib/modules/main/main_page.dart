@@ -5,6 +5,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../extensions/localization_extension.dart';
+import '../../constants/app_color.dart';
 import '../../widgets/app_bottom_nav/app_bottom_nav.dart';
 import '../../widgets/page_header/page_header.dart';
 import 'main_page_model.dart';
@@ -82,8 +83,8 @@ class _MainPageState
         title = l10n.headerProgress;
         break;
       case 3:
-        icon = RemixIcons.star_line;
-        title = l10n.headerRewards;
+        icon = RemixIcons.route_line;
+        title = l10n.headerLearning;
         break;
       case 4:
         icon = RemixIcons.user_3_line;
@@ -102,7 +103,7 @@ class _MainPageState
               fontFamily: 'Roboto',
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: AppColor.white,
             )
           : null,
     );

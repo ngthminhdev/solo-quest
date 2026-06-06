@@ -1,3 +1,5 @@
+import '../core/api/dto/schedule_block_dto.dart';
+
 class TimeRangeModel {
   final String start;
   final String end;
@@ -36,14 +38,26 @@ class ScheduleBlockModel {
   final List<int> weekdays;
   final String type;
   final bool isFlexible;
+  final bool isBusy;
+  final bool enabled;
+  final String? location;
+  final String? note;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const ScheduleBlockModel({
     required this.id,
     required this.title,
     required this.timeRange,
     this.weekdays = const [1, 2, 3, 4, 5, 6, 7],
-    this.type = 'activity',
+    this.type = 'other',
     this.isFlexible = false,
+    this.isBusy = false,
+    this.enabled = true,
+    this.location,
+    this.note,
+    this.createdAt,
+    this.updatedAt,
   });
 
   ScheduleBlockModel copyWith({
@@ -53,6 +67,14 @@ class ScheduleBlockModel {
     List<int>? weekdays,
     String? type,
     bool? isFlexible,
+    bool? isBusy,
+    bool? enabled,
+    String? location,
+    bool clearLocation = false,
+    String? note,
+    bool clearNote = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return ScheduleBlockModel(
       id: id ?? this.id,
@@ -61,6 +83,49 @@ class ScheduleBlockModel {
       weekdays: weekdays ?? this.weekdays,
       type: type ?? this.type,
       isFlexible: isFlexible ?? this.isFlexible,
+      isBusy: isBusy ?? this.isBusy,
+      enabled: enabled ?? this.enabled,
+      location: clearLocation ? null : (location ?? this.location),
+      note: clearNote ? null : (note ?? this.note),
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  /// Create from API DTO
+  factory ScheduleBlockModel.fromDto(ScheduleBlockDto dto) {
+    return ScheduleBlockModel(
+      id: dto.id,
+      title: dto.title,
+      timeRange: TimeRangeModel(start: dto.startTime, end: dto.endTime),
+      weekdays: dto.daysOfWeek,
+      type: dto.type,
+      isFlexible: dto.isFlexible,
+      isBusy: dto.isBusy,
+      enabled: dto.enabled,
+      location: dto.location,
+      note: dto.note,
+      createdAt: dto.createdAt,
+      updatedAt: dto.updatedAt,
+    );
+  }
+
+  /// Convert to DTO for API calls
+  ScheduleBlockDto toDto() {
+    return ScheduleBlockDto(
+      id: id,
+      title: title,
+      type: type,
+      daysOfWeek: weekdays,
+      startTime: timeRange.start,
+      endTime: timeRange.end,
+      isBusy: isBusy,
+      isFlexible: isFlexible,
+      enabled: enabled,
+      location: location,
+      note: note,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -70,8 +135,12 @@ class ScheduleBlockModel {
       title: json['title'] as String,
       timeRange: TimeRangeModel.fromJson(json['time_range'] as Map<String, dynamic>),
       weekdays: (json['weekdays'] as List<dynamic>?)?.cast<int>() ?? [1, 2, 3, 4, 5, 6, 7],
-      type: json['type'] as String? ?? 'activity',
+      type: json['type'] as String? ?? 'other',
       isFlexible: json['is_flexible'] as bool? ?? false,
+      isBusy: json['is_busy'] as bool? ?? false,
+      enabled: json['enabled'] as bool? ?? true,
+      location: json['location'] as String?,
+      note: json['note'] as String?,
     );
   }
 
@@ -83,6 +152,10 @@ class ScheduleBlockModel {
       'weekdays': weekdays,
       'type': type,
       'is_flexible': isFlexible,
+      'is_busy': isBusy,
+      'enabled': enabled,
+      'location': location,
+      'note': note,
     };
   }
 }

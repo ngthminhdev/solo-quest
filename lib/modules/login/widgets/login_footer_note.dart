@@ -44,7 +44,6 @@ class LoginFooterNote extends StatelessWidget {
           child: Text(
             context.l10n.loginPrototypeNote,
             style: const TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 11,
               color: AppColor.violet,
               fontWeight: FontWeight.w600,

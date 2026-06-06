@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
@@ -9,6 +8,7 @@ import '../../../models/log_entry_model.dart';
 import '../../../models/enums/log_enums.dart';
 import '../../../widgets/app_badge/quest_type_chip.dart';
 import '../../../widgets/app_badge/exp_badge.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogTimelineItem extends StatelessWidget {
   final LogEntryModel log;
@@ -166,34 +166,8 @@ class LogTimelineItem extends StatelessWidget {
       (log.pointsChanged != null && log.pointsChanged != 0) ||
       log.mood != null;
 
-  IconData get _typeIconData {
-    switch (log.type) {
-      case LogEntryType.questCompleted:
-        return RemixIcons.checkbox_circle_line;
-      case LogEntryType.questSkipped:
-        return RemixIcons.skip_forward_line;
-      case LogEntryType.questSnoozed:
-        return RemixIcons.time_line;
-      case LogEntryType.questStarted:
-        return RemixIcons.play_line;
-      case LogEntryType.questCreated:
-        return RemixIcons.add_line;
-      case LogEntryType.morningCheckin:
-        return RemixIcons.sun_line;
-      case LogEntryType.dailyReview:
-        return RemixIcons.file_text_line;
-      case LogEntryType.rewardClaimed:
-        return RemixIcons.gift_line;
-      case LogEntryType.levelUp:
-        return RemixIcons.star_line;
-      case LogEntryType.streakChanged:
-        return RemixIcons.fire_line;
-      case LogEntryType.profileUpdated:
-        return RemixIcons.user_3_line;
-      case LogEntryType.ruleUpdated:
-        return RemixIcons.settings_3_line;
-    }
-  }
+  IconData get _typeIconData => log.type.icon;
+  Color get _typeColor => log.type.color;
 
   Color get _dotColor {
     switch (log.type) {
@@ -221,35 +195,28 @@ class LogTimelineItem extends StatelessWidget {
         return AppColor.fgSecondary;
       case LogEntryType.ruleUpdated:
         return AppColor.fgSecondary;
-    }
-  }
-
-  Color get _typeColor {
-    switch (log.type) {
-      case LogEntryType.questCompleted:
-        return AppColor.success;
-      case LogEntryType.questSkipped:
-        return AppColor.warn;
-      case LogEntryType.questSnoozed:
+      case LogEntryType.learningRoadmapCreated:
+        return AppColor.cyan;
+      case LogEntryType.learningRoadmapFollowed:
         return AppColor.info;
-      case LogEntryType.questStarted:
-        return AppColor.cyan;
-      case LogEntryType.questCreated:
-        return AppColor.fgSecondary;
-      case LogEntryType.morningCheckin:
-        return AppColor.cyan;
-      case LogEntryType.dailyReview:
-        return AppColor.violet;
-      case LogEntryType.rewardClaimed:
-        return AppColor.cyan;
-      case LogEntryType.levelUp:
-        return AppColor.expGold;
-      case LogEntryType.streakChanged:
+      case LogEntryType.learningRoadmapStepCompleted:
+        return AppColor.success;
+      case LogEntryType.learningRoadmapStepUncompleted:
         return AppColor.warn;
-      case LogEntryType.profileUpdated:
+      case LogEntryType.learningRoadmapCompleted:
+        return AppColor.expGold;
+      case LogEntryType.onboardingCompleted:
+        return AppColor.success;
+      case LogEntryType.weeklySummaryGenerated:
+        return AppColor.violet;
+      case LogEntryType.questSettingsUpdated:
         return AppColor.fgSecondary;
-      case LogEntryType.ruleUpdated:
+      case LogEntryType.xpGained:
+        return AppColor.expGold;
+      case LogEntryType.system:
         return AppColor.fgSecondary;
+      case LogEntryType.unknown:
+        return AppColor.fgMuted;
     }
   }
 
@@ -258,15 +225,22 @@ class LogTimelineItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: AppColor.violetDim,
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
-      child: Text(
-        '${mood.iconText} ${mood.label}',
-        style: const TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: AppColor.violet,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(mood.icon, size: 12, color: AppColor.violet),
+          const SizedBox(width: 4),
+          Text(
+            mood.label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColor.violet,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -287,10 +261,12 @@ class _PointsBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
-        '${isNegative ? '' : '+'}$points điểm',
+        context.l10n.logsDetailPointsValue(
+          isNegative ? '$points' : '+$points',
+        ),
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,

@@ -4,6 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../extensions/localization_extension.dart';
 
 class DailyReviewSummaryCard extends StatelessWidget {
   final int completedCount;
@@ -33,7 +34,7 @@ class DailyReviewSummaryCard extends StatelessWidget {
         children: [
           _StatCell(
             value: '$completedCount',
-            label: 'Hoàn thành',
+            label: context.l10n.dailyReviewSummaryCompleted,
             color: AppColor.cyan,
             icon: RemixIcons.checkbox_circle_line,
           ),
@@ -45,13 +46,13 @@ class DailyReviewSummaryCard extends StatelessWidget {
           ),
           _StatCell(
             value: '${(completionRate * 100).round()}%',
-            label: 'Tỷ lệ',
+            label: context.l10n.dailyReviewSummaryRate,
             color: AppColor.success,
             icon: RemixIcons.pie_chart_line,
           ),
           _StatCell(
             value: '$skippedCount',
-            label: 'Bỏ qua',
+            label: context.l10n.dailyReviewSummarySkipped,
             color: AppColor.warn,
             icon: RemixIcons.skip_forward_line,
           ),

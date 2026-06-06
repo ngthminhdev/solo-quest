@@ -48,7 +48,7 @@ class AppConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -88,7 +88,7 @@ class AppConfirmDialog extends StatelessWidget {
                     child: Container(
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
+                        color: AppColor.transparent,
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: AppColor.border),
                       ),
@@ -122,7 +122,7 @@ class AppConfirmDialog extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: confirmColor != null
-                                ? Colors.white
+                                ? AppColor.white
                                 : AppColor.bgDeep,
                           ),
                         ),

@@ -4,12 +4,15 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../extensions/localization_extension.dart';
 
 class WelcomeFeatureList extends StatelessWidget {
   const WelcomeFeatureList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -22,26 +25,26 @@ class WelcomeFeatureList extends StatelessWidget {
         children: [
           _buildFeature(
             RemixIcons.gamepad_line,
-            'Quest cá nhân hóa',
-            'Nhiệm vụ nhỏ phù hợp thói quen',
+            l10n.welcomeFeature1Title,
+            l10n.welcomeFeature1Desc,
           ),
           const SizedBox(height: AppSpacing.sm),
           _buildFeature(
             RemixIcons.file_text_line,
-            'Logs để hiểu bản thân',
-            'Theo dõi và phát hiện pattern',
+            l10n.welcomeFeature2Title,
+            l10n.welcomeFeature2Desc,
           ),
           const SizedBox(height: AppSpacing.sm),
           _buildFeature(
             RemixIcons.bar_chart_2_line,
-            'EXP, Level, Streak',
-            'Gamification duy trì động lực',
+            l10n.welcomeFeature3Title,
+            l10n.welcomeFeature3Desc,
           ),
           const SizedBox(height: AppSpacing.sm),
           _buildFeature(
             RemixIcons.notification_3_line,
-            'Reminder thông minh',
-            'Nhắc đúng lúc, không làm phiền',
+            l10n.welcomeFeature4Title,
+            l10n.welcomeFeature4Desc,
           ),
         ],
       ),

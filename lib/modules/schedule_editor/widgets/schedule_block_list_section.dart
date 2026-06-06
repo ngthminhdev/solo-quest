@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/schedule_model.dart';
 import '../../../widgets/app_section_header/app_section_header.dart';
-import '../constants/schedule_editor_constants.dart';
 import 'schedule_block_card.dart';
 import 'schedule_empty_view.dart';
 
@@ -28,9 +28,9 @@ class ScheduleBlockListSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-          child: AppSectionHeader(title: ScheduleEditorConstants.sectionTitle),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+          child: AppSectionHeader(title: context.l10n.scheduleEditorSectionTitle),
         ),
         const SizedBox(height: AppSpacing.s12),
         ListView.separated(

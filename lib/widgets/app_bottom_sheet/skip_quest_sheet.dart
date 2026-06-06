@@ -37,9 +37,9 @@ class SkipQuestSheet {
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppColor.violet.withOpacity(0.12)
+                            ? AppColor.secondarySubtleOverlay
                             : AppColor.surface,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                         border: Border.all(
                           color: isSelected ? AppColor.violet : AppColor.border,
                         ),
@@ -72,7 +72,7 @@ class SkipQuestSheet {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColor.white,
                       ),
                     ),
                   ),
@@ -84,7 +84,7 @@ class SkipQuestSheet {
                 child: Container(
                   width: double.infinity,
                   height: 44,
-                  color: Colors.transparent,
+                  color: AppColor.transparent,
                   child: const Center(
                     child: Text(
                       'Huỷ',

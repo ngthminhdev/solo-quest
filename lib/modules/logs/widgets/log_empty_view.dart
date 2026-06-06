@@ -4,7 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../routes/routes_config.dart';
-import '../constants/logs_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogEmptyView extends StatelessWidget {
   const LogEmptyView({super.key});
@@ -35,9 +35,9 @@ class LogEmptyView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.s20),
-            const Text(
-              LogsConstants.emptyTitle,
-              style: TextStyle(
+            Text(
+              context.l10n.logsEmptyTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fgSecondary,
@@ -45,9 +45,9 @@ class LogEmptyView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.s8),
-            const Text(
-              LogsConstants.emptyMessage,
-              style: TextStyle(
+            Text(
+              context.l10n.logsEmptyMessage,
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColor.fgMuted,
                 height: 1.5,
@@ -69,9 +69,9 @@ class LogEmptyView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColor.border),
                 ),
-                child: const Text(
-                  LogsConstants.homeButtonLabel,
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.logsHomeButton,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColor.cyan,

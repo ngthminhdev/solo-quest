@@ -40,9 +40,9 @@ class _AppButtonState extends State<AppButton> {
       case AppButtonVariant.primary:
         return AppColor.cyan;
       case AppButtonVariant.secondary:
-        return Colors.transparent;
+        return AppColor.transparent;
       case AppButtonVariant.ghost:
-        return Colors.transparent;
+        return AppColor.transparent;
       case AppButtonVariant.success:
         return AppColor.successDim;
       case AppButtonVariant.warning:
@@ -66,7 +66,7 @@ class _AppButtonState extends State<AppButton> {
       case AppButtonVariant.warning:
         return AppColor.warn;
       case AppButtonVariant.danger:
-        return Colors.white;
+        return AppColor.white;
     }
   }
 
@@ -75,15 +75,15 @@ class _AppButtonState extends State<AppButton> {
       case AppButtonVariant.primary:
         return AppColor.surface;
       case AppButtonVariant.secondary:
-        return Colors.transparent;
+        return AppColor.transparent;
       case AppButtonVariant.ghost:
-        return Colors.transparent;
+        return AppColor.transparent;
       case AppButtonVariant.success:
-        return AppColor.successDim.withOpacity(0.3);
+        return AppColor.successDisabledBackground;
       case AppButtonVariant.warning:
-        return AppColor.warnDim.withOpacity(0.3);
+        return AppColor.warningDisabledBackground;
       case AppButtonVariant.danger:
-        return AppColor.danger.withOpacity(0.3);
+        return AppColor.errorStrongBorder;
     }
   }
 
@@ -93,7 +93,7 @@ class _AppButtonState extends State<AppButton> {
       case AppButtonVariant.secondary:
         return Border.all(color: AppColor.border);
       case AppButtonVariant.warning:
-        return Border.all(color: AppColor.warn.withOpacity(0.2));
+        return Border.all(color: AppColor.warningSoftBorder);
       default:
         return null;
     }

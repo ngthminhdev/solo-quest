@@ -6,6 +6,7 @@ import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
 import '../../../helpers/time_helper.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/onboarding_constants.dart';
 import '../models/onboarding_data.dart';
 
@@ -27,11 +28,13 @@ class OnboardingRemindersStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step6Title,
+          l10n.onboardingStep6Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -40,7 +43,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step6Subtitle,
+          l10n.onboardingStep6Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -49,18 +52,17 @@ class OnboardingRemindersStep extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
-        _buildBreakQuestSection(),
+        _buildBreakQuestSection(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildBreakDurationSection(),
+        _buildBreakDurationSection(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildWaterQuestSection(),
+        _buildWaterQuestSection(context),
         const SizedBox(height: AppSpacing.lg),
         _buildQuietAfterSection(context),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step6SystemNote,
+          l10n.onboardingStep6SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -71,12 +73,15 @@ class OnboardingRemindersStep extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakQuestSection() {
+  Widget _buildBreakQuestSection(BuildContext context) {
+    final l10n = context.l10n;
+    const breakIntervalOptions = ['60', '90', '120'];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.breakQuestLabel,
+          l10n.onboardingStep6BreakQuestLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -86,17 +91,14 @@ class OnboardingRemindersStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.breakQuestDesc,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColor.fgSecondary,
-          ),
+          l10n.onboardingStep6BreakQuestDesc,
+          style: const TextStyle(fontSize: 12, color: AppColor.fgSecondary),
         ),
         const SizedBox(height: AppSpacing.sm),
         Wrap(
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.breakIntervalOptions.map((option) {
+          children: breakIntervalOptions.map((option) {
             final isSelected = data.breakReminderInterval == int.parse(option);
             return GestureDetector(
               onTap: () => onBreakIntervalChanged(int.parse(option)),
@@ -113,7 +115,7 @@ class OnboardingRemindersStep extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Mỗi $option phút',
+                  l10n.onboardingStep6BreakIntervalOpt(option),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -128,12 +130,15 @@ class OnboardingRemindersStep extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakDurationSection() {
+  Widget _buildBreakDurationSection(BuildContext context) {
+    final l10n = context.l10n;
+    const breakDurationOptions = ['3', '5', '10'];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.breakDurationLabel,
+          l10n.onboardingStep6BreakDurationLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -145,7 +150,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.xs,
           runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.breakDurationOptions.map((option) {
+          children: breakDurationOptions.map((option) {
             final isSelected = data.breakDuration == option;
             return GestureDetector(
               onTap: () => onBreakDurationChanged(option),
@@ -162,7 +167,7 @@ class OnboardingRemindersStep extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '$option phút',
+                  l10n.onboardingStep6DurationOpt(option),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -177,12 +182,18 @@ class OnboardingRemindersStep extends StatelessWidget {
     );
   }
 
-  Widget _buildWaterQuestSection() {
+  Widget _buildWaterQuestSection(BuildContext context) {
+    final l10n = context.l10n;
+    final waterReminderModes = [
+      OnboardingStepOption('fixed', l10n.onboardingStep6WaterModeFixed),
+      OnboardingStepOption('random', l10n.onboardingStep6WaterModeRandom),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.waterQuestLabel,
+          l10n.onboardingStep6WaterQuestLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -192,27 +203,20 @@ class OnboardingRemindersStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.waterQuestDesc,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColor.fgSecondary,
-          ),
+          l10n.onboardingStep6WaterQuestDesc,
+          style: const TextStyle(fontSize: 12, color: AppColor.fgSecondary),
         ),
         const SizedBox(height: AppSpacing.sm),
         Row(
-          children: OnboardingConstants.waterReminderModes.map((mode) {
-            final isSelected = data.waterReminderMode == mode;
+          children: waterReminderModes.map((mode) {
+            final isSelected = data.waterReminderMode == mode.key;
             return Expanded(
               child: GestureDetector(
-                onTap: () => onWaterModeChanged(mode),
+                onTap: () => onWaterModeChanged(mode.key),
                 child: Container(
                   margin: EdgeInsets.only(
-                    right: mode == OnboardingConstants.waterReminderModes.first
-                        ? AppSpacing.xs
-                        : 0,
-                    left: mode == OnboardingConstants.waterReminderModes.last
-                        ? AppSpacing.xs
-                        : 0,
+                    right: mode == waterReminderModes.first ? AppSpacing.xs : 0,
+                    left: mode == waterReminderModes.last ? AppSpacing.xs : 0,
                   ),
                   height: 48,
                   decoration: BoxDecoration(
@@ -224,11 +228,13 @@ class OnboardingRemindersStep extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      mode,
+                      mode.label,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
+                        color: isSelected
+                            ? AppColor.cyan
+                            : AppColor.fgSecondary,
                       ),
                     ),
                   ),
@@ -237,15 +243,12 @@ class OnboardingRemindersStep extends StatelessWidget {
             );
           }).toList(),
         ),
-        if (data.waterReminderMode == 'Ngẫu nhiên')
+        if (data.waterReminderMode == 'random')
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              OnboardingConstants.waterQuestNote,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColor.fgMuted,
-              ),
+              l10n.onboardingStep6WaterQuestNote,
+              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
           ),
       ],
@@ -253,11 +256,12 @@ class OnboardingRemindersStep extends StatelessWidget {
   }
 
   Widget _buildQuietAfterSection(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.quietAfterLabel,
+          l10n.onboardingStep6QuietAfterLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -303,7 +307,6 @@ class OnboardingRemindersStep extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
-                    fontFamily: 'Exo2',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -313,11 +316,8 @@ class OnboardingRemindersStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.quietAfterNote,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColor.fgMuted,
-          ),
+          l10n.onboardingStep6QuietAfterNote,
+          style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
         ),
       ],
     );

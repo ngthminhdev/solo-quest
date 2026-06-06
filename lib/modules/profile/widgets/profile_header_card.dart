@@ -26,6 +26,19 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.streakDays,
   });
 
+  Widget _buildFallbackAvatar() {
+    return Center(
+      child: Text(
+        profile.name.isNotEmpty ? profile.name[0].toUpperCase() : 'U',
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: AppColor.cyan,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppGlowCard(
@@ -44,15 +57,30 @@ class ProfileHeaderCard extends StatelessWidget {
                   color: AppColor.cyanDim,
                   border: Border.all(color: AppColor.cyan, width: 2),
                 ),
-                child: Center(
-                  child: Text(
-                    profile.name.isNotEmpty ? profile.name[0].toUpperCase() : 'U',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.cyan,
-                    ),
-                  ),
+                child: ClipOval(
+                  child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                      ? Image.network(
+                          profile.avatarUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildFallbackAvatar(),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColor.cyan,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : _buildFallbackAvatar(),
                 ),
               ),
 
@@ -86,8 +114,8 @@ class ProfileHeaderCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColor.warnDim,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
-                    border: Border.all(color: AppColor.warn.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    border: Border.all(color: AppColor.warningBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -141,7 +169,7 @@ class ProfileHeaderCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.s8),
               ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.full),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
                 child: LinearProgressIndicator(
                   value: levelProgress,
                   minHeight: 8,

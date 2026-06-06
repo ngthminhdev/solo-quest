@@ -16,14 +16,7 @@ class WeeklyProtectionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.s14),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0x0A00F0FF),
-              Color(0x0AA855F7),
-            ],
-          ),
+          gradient: AppColor.insightCardGradient,
           border: Border.all(color: AppColor.border),
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),

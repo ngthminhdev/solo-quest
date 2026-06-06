@@ -4,7 +4,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_style.dart';
-import '../constants/logs_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogsSummaryCard extends StatelessWidget {
   final int totalLogs;
@@ -37,7 +37,7 @@ class LogsSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            LogsConstants.summaryTitle,
+            context.l10n.logsSummaryTitle,
             style: AppTextStyle.sectionLabel.copyWith(
               color: AppColor.fgSecondary,
             ),
@@ -47,19 +47,19 @@ class LogsSummaryCard extends StatelessWidget {
             children: [
               _buildStat(
                 value: totalLogs.toString(),
-                label: 'Hoạt động',
+                label: context.l10n.logsSummaryActivities,
                 color: AppColor.cyan,
               ),
               _buildDivider(),
               _buildStat(
                 value: completedQuests.toString(),
-                label: 'Hoàn thành',
+                label: context.l10n.logsSummaryCompleted,
                 color: AppColor.success,
               ),
               _buildDivider(),
               _buildStat(
                 value: skippedQuests.toString(),
-                label: 'Bỏ qua',
+                label: context.l10n.logsSummarySkipped,
                 color: AppColor.warn,
               ),
               _buildDivider(),

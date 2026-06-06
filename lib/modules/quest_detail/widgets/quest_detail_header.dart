@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../core/utils/app_time_formatter.dart';
 import '../../../models/quest_model.dart';
 import '../../../models/enums/quest_enums.dart';
+import '../../quests/ui/quest_ui_extensions.dart';
 
 class QuestDetailHeader extends StatelessWidget {
   final QuestModel quest;
@@ -13,44 +15,6 @@ class QuestDetailHeader extends StatelessWidget {
     super.key,
     required this.quest,
   });
-
-  Color get _typeColor {
-    switch (quest.type) {
-      case QuestType.water:
-        return AppColor.chipWaterText;
-      case QuestType.breakTime:
-        return AppColor.chipBreakText;
-      case QuestType.movement:
-        return AppColor.chipMovementText;
-      case QuestType.learning:
-        return AppColor.chipLearningText;
-      case QuestType.sleep:
-        return AppColor.chipSleepText;
-      case QuestType.fitness:
-        return AppColor.chipFitnessText;
-      default:
-        return AppColor.cyan;
-    }
-  }
-
-  Color get _typeBgColor {
-    switch (quest.type) {
-      case QuestType.water:
-        return AppColor.chipWaterBg;
-      case QuestType.breakTime:
-        return AppColor.chipBreakBg;
-      case QuestType.movement:
-        return AppColor.chipMovementBg;
-      case QuestType.learning:
-        return AppColor.chipLearningBg;
-      case QuestType.sleep:
-        return AppColor.chipSleepBg;
-      case QuestType.fitness:
-        return AppColor.chipFitnessBg;
-      default:
-        return AppColor.cyanDim;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,20 +30,17 @@ class QuestDetailHeader extends StatelessWidget {
               height: 52,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _typeBgColor,
-                border: Border.all(color: _typeColor, width: 2),
+                color: quest.type.chipBackgroundColor,
+                border: Border.all(color: quest.type.chipTextColor, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: _typeColor.withValues(alpha: 0.3),
+                    color: quest.type.chipTextColor.withValues(alpha: 0.3),
                     blurRadius: 20,
                   ),
                 ],
               ),
               child: Center(
-                child: Text(
-                  quest.type.iconText,
-                  style: const TextStyle(fontSize: 22),
-                ),
+                child: Icon(quest.type.icon, size: 22, color: quest.type.chipTextColor),
               ),
             ),
             const SizedBox(height: AppSpacing.s12),
@@ -88,7 +49,6 @@ class QuestDetailHeader extends StatelessWidget {
             Text(
               quest.title,
               style: const TextStyle(
-                fontFamily: 'Exo2',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fg,
@@ -116,8 +76,14 @@ class QuestDetailHeader extends StatelessWidget {
   }
 
   String _getTimeOfDay() {
-    if (quest.scheduledAt == null) return '';
-    final hour = quest.scheduledAt!.hour;
+    // Use reminderTime if available, otherwise no time context
+    final timeToCheck = quest.reminderTime;
+    if (timeToCheck == null) return '';
+
+    final local = AppTimeFormatter.toLocalDisplay(timeToCheck);
+    if (local == null) return '';
+
+    final hour = local.hour;
     String period;
     if (hour < 12) {
       period = 'Buổi sáng';
@@ -126,40 +92,15 @@ class QuestDetailHeader extends StatelessWidget {
     } else {
       period = 'Buổi tối';
     }
-    return '$period · ${quest.displayTime}';
+    final time = quest.displayTime;
+    if (time == null) return period;
+    return '$period · $time';
   }
 
   Widget _buildStatusBadge() {
-    Color bgColor;
-    Color textColor;
-    String text;
-
-    switch (quest.status) {
-      case QuestStatus.pending:
-        bgColor = AppColor.cyanDim;
-        textColor = AppColor.cyan;
-        text = '● Cần làm';
-      case QuestStatus.active:
-        bgColor = AppColor.cyanDim;
-        textColor = AppColor.cyan;
-        text = '● Đang làm';
-      case QuestStatus.completed:
-        bgColor = AppColor.successDim;
-        textColor = AppColor.success;
-        text = '✓ Đã xong';
-      case QuestStatus.skipped:
-        bgColor = AppColor.surface;
-        textColor = AppColor.fgMuted;
-        text = '— Đã bỏ qua';
-      case QuestStatus.snoozed:
-        bgColor = AppColor.warnDim;
-        textColor = AppColor.warn;
-        text = '◷ Đã hoãn';
-      case QuestStatus.expired:
-        bgColor = AppColor.surface;
-        textColor = AppColor.fgMuted;
-        text = '○ Hết hạn';
-    }
+    final bgColor = quest.status.backgroundColor;
+    final textColor = quest.status.color;
+    final text = _statusText(quest.status);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -168,7 +109,7 @@ class QuestDetailHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
         border: Border.all(color: textColor.withValues(alpha: 0.3)),
       ),
       child: Text(
@@ -180,5 +121,22 @@ class QuestDetailHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _statusText(QuestStatus status) {
+    switch (status) {
+      case QuestStatus.pending:
+        return '● Cần làm';
+      case QuestStatus.active:
+        return '● Đang làm';
+      case QuestStatus.completed:
+        return '✓ Đã xong';
+      case QuestStatus.skipped:
+        return '— Đã bỏ qua';
+      case QuestStatus.snoozed:
+        return '◷ Đã hoãn';
+      case QuestStatus.expired:
+        return '○ Hết hạn';
+    }
   }
 }

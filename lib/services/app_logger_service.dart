@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 void log(
   String message, {
   String? name,
@@ -7,13 +9,13 @@ void log(
 }) {
   final logName = name ?? 'app';
   final prefix = _levelPrefix(level);
-  print('$prefix[$logName] $message');
+  developer.log('$prefix[$logName] $message');
 
   if (error != null) {
-    print('$prefix[$logName] Error: $error');
+    developer.log('$prefix[$logName] Error: $error');
   }
   if (stackTrace != null) {
-    print('$prefix[$logName] StackTrace: $stackTrace');
+    developer.log('$prefix[$logName] StackTrace: $stackTrace');
   }
 }
 

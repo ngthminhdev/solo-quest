@@ -10,7 +10,7 @@ import '../../widgets/app_scaffold/app_scaffold.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
-import 'constants/reminder_settings_constants.dart';
+import '../../extensions/localization_extension.dart';
 import 'reminder_settings_page_model.dart';
 import 'widgets/reminder_list_section.dart';
 import 'widgets/reminder_setting_form_sheet.dart';
@@ -52,8 +52,8 @@ class _ReminderSettingsPageState
         body: Column(
           children: [
             ReminderSettingsHeader(onBack: () => Navigator.of(context).pop()),
-            const Expanded(
-              child: AppLoading(message: 'Đang tải cài đặt nhắc nhở...'),
+            Expanded(
+              child: AppLoading(message: context.l10n.reminderSettingsLoading),
             ),
           ],
         ),
@@ -68,7 +68,7 @@ class _ReminderSettingsPageState
             ReminderSettingsHeader(onBack: () => Navigator.of(context).pop()),
             Expanded(
               child: AppErrorState(
-                message: state.errorMessage ?? 'Không thể tải cài đặt nhắc nhở',
+                message: state.errorMessage ?? context.l10n.reminderSettingsError,
                 onRetry: pageModel.loadSettings,
               ),
             ),
@@ -132,12 +132,12 @@ class _ReminderSettingsPageState
     if (success) {
       AppToastService.success(
         context,
-        ReminderSettingsConstants.toastUpdateSuccess,
+        context.l10n.reminderSettingsToastUpdateSuccess,
       );
     } else {
       AppToastService.error(
         context,
-        ReminderSettingsConstants.toastUpdateFailed,
+        context.l10n.reminderSettingsToastUpdateFailed,
       );
     }
   }
@@ -156,13 +156,13 @@ class _ReminderSettingsPageState
       AppToastService.success(
         context,
         enabled
-            ? ReminderSettingsConstants.toastToggleOn
-            : ReminderSettingsConstants.toastToggleOff,
+            ? context.l10n.reminderSettingsToastToggleOn
+            : context.l10n.reminderSettingsToastToggleOff,
       );
     } else {
       AppToastService.error(
         context,
-        ReminderSettingsConstants.toastToggleFailed,
+        context.l10n.reminderSettingsToastToggleFailed,
       );
     }
   }

@@ -24,7 +24,7 @@ class GoogleSignInButton extends StatelessWidget {
         height: 50,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: isLoading ? AppColor.surface : Colors.white,
+          color: isLoading ? AppColor.surface : AppColor.white,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: isLoading
               ? Border.all(color: AppColor.border)
@@ -47,7 +47,6 @@ class GoogleSignInButton extends StatelessWidget {
                     Text(
                       context.l10n.loginGoogleLoading,
                       style: const TextStyle(
-                        fontFamily: 'Exo2',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fgSecondary,
@@ -67,10 +66,9 @@ class GoogleSignInButton extends StatelessWidget {
                     Text(
                       context.l10n.loginGoogleButton,
                       style: const TextStyle(
-                        fontFamily: 'Exo2',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F2937),
+                        color: AppColor.darkSlate,
                       ),
                     ),
                   ],

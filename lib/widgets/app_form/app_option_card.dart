@@ -58,7 +58,7 @@ class AppOptionCard extends StatelessWidget {
                       subtitle!,
                       style: TextStyle(
                         fontSize: 12,
-                        color: selected ? AppColor.cyan.withOpacity(0.7) : AppColor.fgSecondary,
+                        color: selected ? AppColor.primaryStrongBorder : AppColor.fgSecondary,
                       ),
                     ),
                   ],

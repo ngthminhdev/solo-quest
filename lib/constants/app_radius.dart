@@ -8,7 +8,6 @@ class AppRadius {
   static const double xl = 24;
   static const double xxl = 32;
   static const double pill = 9999;
-  static const double full = 9999;
 
   static BorderRadius get xsAll => BorderRadius.circular(xs);
   static BorderRadius get smAll => BorderRadius.circular(sm);
@@ -17,7 +16,6 @@ class AppRadius {
   static BorderRadius get xlAll => BorderRadius.circular(xl);
   static BorderRadius get xxlAll => BorderRadius.circular(xxl);
   static BorderRadius get pillAll => BorderRadius.circular(pill);
-  static BorderRadius get fullAll => BorderRadius.circular(full);
 
   static const BorderRadius sheet = BorderRadius.vertical(top: Radius.circular(lg));
 }

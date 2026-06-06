@@ -31,7 +31,7 @@ class AppChipSelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: isSelected ? AppColor.cyanDim : AppColor.surface,
-              borderRadius: BorderRadius.circular(AppRadius.full),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
               border: Border.all(
                 color: isSelected ? AppColor.borderGlowCyan : AppColor.border,
               ),

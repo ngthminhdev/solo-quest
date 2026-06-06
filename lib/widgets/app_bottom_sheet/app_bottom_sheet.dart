@@ -16,7 +16,7 @@ class AppBottomSheet {
   }) {
     return showModalBottomSheet<T>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
       isScrollControlled: true,
       builder: (ctx) => Container(
         constraints: BoxConstraints(

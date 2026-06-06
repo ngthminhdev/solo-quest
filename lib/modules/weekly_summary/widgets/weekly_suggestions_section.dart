@@ -20,28 +20,11 @@ class WeeklySuggestionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final suggestions = [
-      _SuggestionData(
-        title: 'Chuyển Learning Quest sang 20:00–21:30',
-        reason: 'Tuần này bạn hoàn thành tốt hơn vào buổi tối.',
-        hasLink: true,
-      ),
-      _SuggestionData(
-        title: 'Giảm Movement Quest còn 3 lần/tuần',
-        reason: 'Quest này bị bỏ qua 4 lần trong tuần.',
-        hasLink: false,
-      ),
-      _SuggestionData(
-        title: 'Đổi Break Quest buổi sáng: mỗi 90 phút → 120 phút',
-        reason: 'Bạn thường hoãn Break Quest vào buổi sáng.',
-        hasLink: true,
-      ),
-      _SuggestionData(
-        title: 'Tăng Learning Quest từ 15 phút lên 25 phút',
-        reason: 'Tỷ lệ hoàn thành học tập đang tốt, nhưng vẫn có 2 ngày mệt.',
-        hasLink: false,
-      ),
-    ];
+    final suggestions = summary.suggestions;
+
+    if (suggestions.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -58,11 +41,21 @@ class WeeklySuggestionsSection extends StatelessWidget {
                 : true;
 
             return _SuggestionCard(
-              data: data,
+              title: data.title,
+              reason: data.description,
               isEnabled: isEnabled,
               onToggle: () => onToggle(index),
             );
           }),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Tính năng áp dụng tự động sẽ được thêm sau.',
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColor.fgMuted,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );
@@ -88,25 +81,15 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _SuggestionData {
+class _SuggestionCard extends StatelessWidget {
   final String title;
   final String reason;
-  final bool hasLink;
-
-  const _SuggestionData({
-    required this.title,
-    required this.reason,
-    required this.hasLink,
-  });
-}
-
-class _SuggestionCard extends StatelessWidget {
-  final _SuggestionData data;
   final bool isEnabled;
   final VoidCallback onToggle;
 
   const _SuggestionCard({
-    required this.data,
+    required this.title,
+    required this.reason,
     required this.isEnabled,
     required this.onToggle,
   });
@@ -125,58 +108,39 @@ class _SuggestionCard extends StatelessWidget {
       ),
       child: Opacity(
         opacity: isEnabled ? 1.0 : 0.5,
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        data.title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColor.fg,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        data.reason,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColor.fgSecondary,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.fg,
+                      height: 1.3,
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.s12),
-                _ToggleSwitch(
-                  isOn: isEnabled,
-                  onTap: onToggle,
-                ),
-              ],
-            ),
-            if (data.hasLink) ...[
-              const SizedBox(height: AppSpacing.s8),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Chỉnh nhắc nhở →',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.cyan,
+                  const SizedBox(height: 4),
+                  Text(
+                    reason,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColor.fgSecondary,
+                      height: 1.4,
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
+            const SizedBox(width: AppSpacing.s12),
+            _ToggleSwitch(
+              isOn: isEnabled,
+              onTap: onToggle,
+            ),
           ],
         ),
       ),

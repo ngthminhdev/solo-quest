@@ -4,8 +4,8 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_style.dart';
-import '../../../helpers/date_helper.dart';
-import '../constants/logs_constants.dart';
+import '../../../core/utils/app_time_formatter.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogsHeader extends StatelessWidget {
   final DateTime selectedDate;
@@ -14,24 +14,7 @@ class LogsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final isToday = selectedDate.year == now.year &&
-        selectedDate.month == now.month &&
-        selectedDate.day == now.day;
-
-    final yesterday = now.subtract(const Duration(days: 1));
-    final isYesterday = selectedDate.year == yesterday.year &&
-        selectedDate.month == yesterday.month &&
-        selectedDate.day == yesterday.day;
-
-    String dateLabel;
-    if (isToday) {
-      dateLabel = LogsConstants.todayLabel;
-    } else if (isYesterday) {
-      dateLabel = LogsConstants.yesterdayLabel;
-    } else {
-      dateLabel = DateHelper.formatDateTime(selectedDate);
-    }
+    final dateLabel = AppTimeFormatter.formatRelativeDay(selectedDate) ?? '';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -44,12 +27,12 @@ class LogsHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Nhật ký cá nhân',
+            context.l10n.logsHeaderTitle,
             style: AppTextStyle.heading.copyWith(color: AppColor.fg),
           ),
           const SizedBox(height: AppSpacing.s4),
           Text(
-            'Theo dõi hành vi, quest và cảm xúc của bạn',
+            context.l10n.logsHeaderSubtitle,
             style: AppTextStyle.caption.copyWith(color: AppColor.fgSecondary),
           ),
           const SizedBox(height: AppSpacing.s8),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:remixicon/remixicon.dart';
+import 'dart:developer' as developer;
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
-import '../constants/morning_checkin_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class CheckinSubmitBar extends StatelessWidget {
   final bool canSubmit;
@@ -23,6 +24,7 @@ class CheckinSubmitBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = canSubmit && !isLoading;
+    developer.log('[SUBMIT BAR] canSubmit: $canSubmit, isLoading: $isLoading, enabled: $enabled, hasCheckedIn: $hasCheckedIn');
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -36,7 +38,15 @@ class CheckinSubmitBar extends StatelessWidget {
         border: Border(top: BorderSide(color: AppColor.border)),
       ),
       child: GestureDetector(
-        onTap: enabled ? onSubmit : null,
+        onTap: () {
+          developer.log('[SUBMIT BAR] GestureDetector tapped! enabled: $enabled');
+          if (enabled) {
+            developer.log('[SUBMIT BAR] Calling onSubmit');
+            onSubmit();
+          } else {
+            developer.log('[SUBMIT BAR] Button disabled, ignoring tap');
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           height: 48,
@@ -68,10 +78,9 @@ class CheckinSubmitBar extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s8),
                     Text(
                       hasCheckedIn
-                          ? MorningCheckinConstants.updateText
-                          : MorningCheckinConstants.submitText,
+                          ? context.l10n.morningCheckinUpdateText
+                          : context.l10n.morningCheckinSubmitText,
                       style: TextStyle(
-                        fontFamily: 'Exo2',
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: enabled

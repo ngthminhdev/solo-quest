@@ -35,9 +35,7 @@ class QuestDetailActionBar extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColor.bgRaised,
-        border: Border(
-          top: BorderSide(color: AppColor.border),
-        ),
+        border: Border(top: BorderSide(color: AppColor.border)),
       ),
       child: _buildActions(),
     );
@@ -148,53 +146,64 @@ class QuestDetailActionBar extends StatelessWidget {
   }
 
   Widget _buildCompletedActions() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
-      decoration: BoxDecoration(
-        color: AppColor.successDim,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColor.success.withValues(alpha: 0.2)),
-      ),
-      child: const Center(
-        child: Text(
-          '✓ Đã hoàn thành',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: AppColor.success,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          // width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
+          decoration: BoxDecoration(
+            color: AppColor.successDim,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: AppColor.success.withValues(alpha: 0.2)),
+          ),
+          child: const Center(
+            child: Text(
+              '✓ Đã hoàn thành',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColor.success,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildSkippedActions() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
-      decoration: BoxDecoration(
-        color: AppColor.surface,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: const Center(
-        child: Text(
-          '— Đã bỏ qua',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColor.fgMuted,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
+          decoration: BoxDecoration(
+            color: AppColor.surface,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: const Center(
+            child: Text(
+              '— Đã bỏ qua',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColor.fgMuted,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildSnoozedActions() {
-    return Row(
+    return Column(
+    mainAxisSize: MainAxisSize.min,
       children: [
-        // Start button
-        Expanded(
+        SizedBox(
+          width: double.infinity,
           child: _buildButton(
             label: 'Bắt Đầu',
             onTap: isLoading ? null : onStart,
@@ -240,7 +249,9 @@ class QuestDetailActionBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: onTap == null ? textColor.withValues(alpha: 0.5) : textColor,
+                    color: onTap == null
+                        ? textColor.withValues(alpha: 0.5)
+                        : textColor,
                   ),
                 ),
         ),

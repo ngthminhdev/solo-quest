@@ -3,7 +3,7 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../constants/app_color.dart';
 import '../../constants/app_radius.dart';
-import '../../constants/app_shadow.dart';
+import '../../models/enums/quest_enums.dart';
 import '../../models/quest_model.dart';
 import '../app_badge/quest_type_chip.dart';
 import '../app_badge/exp_badge.dart';
@@ -17,6 +17,7 @@ class QuestCard extends StatelessWidget {
   final VoidCallback? onSnooze;
   final VoidCallback? onSkip;
   final VoidCallback? onViewReason;
+  final bool isActionPending;
 
   const QuestCard({
     super.key,
@@ -28,6 +29,7 @@ class QuestCard extends StatelessWidget {
     this.onSnooze,
     this.onSkip,
     this.onViewReason,
+    this.isActionPending = false,
   });
 
   @override
@@ -36,21 +38,56 @@ class QuestCard extends StatelessWidget {
     return _buildCompactCard();
   }
 
+  String _getPriorityLabel() {
+    if (quest.isImportant) return 'Ưu tiên cao';
+    switch (quest.difficulty) {
+      case QuestDifficulty.hard:
+        return 'Ưu tiên cao';
+      case QuestDifficulty.medium:
+        return 'Ưu tiên vừa';
+      case QuestDifficulty.easy:
+        return 'Ưu tiên thấp';
+    }
+  }
+
+  Color _getPriorityColor() {
+    if (quest.isImportant || quest.difficulty == QuestDifficulty.hard) {
+      return AppColor.cyan;
+    }
+    if (quest.difficulty == QuestDifficulty.medium) {
+      return AppColor.warn;
+    }
+    return AppColor.textSecondary;
+  }
+
+  Color _getPriorityBgColor() {
+    if (quest.isImportant || quest.difficulty == QuestDifficulty.hard) {
+      return AppColor.cyanDim;
+    }
+    if (quest.difficulty == QuestDifficulty.medium) {
+      return AppColor.warnDim;
+    }
+    return AppColor.surfaceHover;
+  }
+
   Widget _buildActiveCard() {
+    final isQuestActive = quest.isActive;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 14),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0x1000F0FF), AppColor.surface],
-          ),
+          gradient: AppColor.activeQuestReadableGradient,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColor.borderGlowCyan),
-          boxShadow: AppShadow.glowCyan,
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.primarySubtleOverlay,
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,21 +97,20 @@ class QuestCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColor.cyanDim,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    color: _getPriorityBgColor(),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(RemixIcons.star_fill, size: 10, color: AppColor.cyan),
+                      Icon(RemixIcons.star_fill, size: 10, color: _getPriorityColor()),
                       const SizedBox(width: 4),
                       Text(
-                        'Ưu tiên cao',
+                        _getPriorityLabel(),
                         style: TextStyle(
-                          fontFamily: 'Exo2',
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: AppColor.cyan,
+                          color: _getPriorityColor(),
                           letterSpacing: 0.04,
                         ),
                       ),
@@ -84,16 +120,17 @@ class QuestCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              quest.displayTime,
-              style: const TextStyle(
-                fontFamily: 'Exo2',
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: AppColor.cyan,
+            if (quest.displayTime != null) ...[
+              Text(
+                quest.displayTime!,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColor.cyan,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
+              const SizedBox(height: 4),
+            ],
             Text(
               quest.title,
               style: const TextStyle(
@@ -107,7 +144,7 @@ class QuestCard extends StatelessWidget {
               quest.description,
               style: const TextStyle(
                 fontSize: 14,
-                color: AppColor.fgSecondary,
+                color: AppColor.textSecondary,
                 height: 1.4,
               ),
               maxLines: 2,
@@ -118,12 +155,14 @@ class QuestCard extends StatelessWidget {
               children: [
                 QuestTypeChip(type: quest.type),
                 const SizedBox(width: 12),
-                const Icon(RemixIcons.time_line, size: 16, color: AppColor.fgMuted),
-                const SizedBox(width: 5),
-                Text(
-                  '${quest.estimatedMinutes} phút',
-                  style: const TextStyle(fontSize: 13, color: AppColor.fgSecondary),
-                ),
+                if (quest.estimatedMinutes > 0) ...[
+                  const Icon(RemixIcons.time_line, size: 16, color: AppColor.textSecondary),
+                  const SizedBox(width: 5),
+                  Text(
+                    '${quest.estimatedMinutes} phút',
+                    style: const TextStyle(fontSize: 13, color: AppColor.textSecondary),
+                  ),
+                ],
                 const Spacer(),
                 ExpBadge(exp: quest.exp),
               ],
@@ -134,30 +173,31 @@ class QuestCard extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: _actionButton(
-                    label: 'Bắt Đầu',
+                    label: isQuestActive ? 'Hoàn Thành' : 'Bắt Đầu',
                     color: AppColor.cyan,
                     textColor: AppColor.bgDeep,
-                    onTap: onStart,
+                    onTap: isQuestActive ? onComplete : onStart,
+                    isLoading: isActionPending,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _actionButton(
                     label: 'Hoãn',
-                    color: AppColor.warnDim,
+                    color: AppColor.warningBackground,
                     textColor: AppColor.warn,
-                    border: Border.all(color: const Color(0x33F59E0B)),
-                    onTap: onSnooze,
+                    border: Border.all(color: AppColor.warnGlow),
+                    onTap: isActionPending ? null : onSnooze,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _actionButton(
                     label: 'Bỏ Qua',
-                    color: Colors.transparent,
-                    textColor: AppColor.fgMuted,
-                    border: Border.all(color: AppColor.border),
-                    onTap: onSkip,
+                    color: AppColor.surface.withValues(alpha: 0.75),
+                    textColor: AppColor.textSecondary,
+                    border: Border.all(color: AppColor.borderGlowCyan),
+                    onTap: isActionPending ? null : onSkip,
                   ),
                 ),
               ],
@@ -184,34 +224,34 @@ class QuestCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: isSnoozed
-                ? const Color(0x26F59E0B)
+                ? AppColor.warnDim
                 : AppColor.border,
           ),
         ),
         child: Row(
           children: [
-            if (!isCompleted) ...[
-              Text(
-                quest.displayTime,
-                style: const TextStyle(
-                  fontFamily: 'Exo2',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColor.fg,
+            if (quest.displayTime != null) ...[
+              if (!isCompleted) ...[
+                Text(
+                  quest.displayTime!,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColor.fg,
+                  ),
                 ),
-              ),
-            ] else ...[
-              Text(
-                quest.displayTime,
-                style: const TextStyle(
-                  fontFamily: 'Exo2',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColor.fgSecondary,
+              ] else ...[
+                Text(
+                  quest.displayTime!,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColor.fgSecondary,
+                  ),
                 ),
-              ),
+              ],
+              const SizedBox(width: 12),
             ],
-            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,15 +282,17 @@ class QuestCard extends StatelessWidget {
             const SizedBox(width: 8),
             if (isCompleted) ...[
               const Icon(RemixIcons.checkbox_circle_line, size: 16, color: AppColor.success),
-              const SizedBox(width: 4),
-              Text(
-                quest.displayTime,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.success,
+              if (quest.displayTime != null) ...[
+                const SizedBox(width: 4),
+                Text(
+                  quest.displayTime!,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.success,
+                  ),
                 ),
-              ),
+              ],
               const SizedBox(width: 6),
               ExpBadge(exp: quest.exp),
             ] else if (isSnoozed) ...[
@@ -268,16 +310,30 @@ class QuestCard extends StatelessWidget {
               ExpBadge(exp: quest.exp),
               const SizedBox(width: 6),
               GestureDetector(
-                onTap: onComplete,
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                    border: Border.all(color: AppColor.borderGlowCyan),
-                    color: AppColor.bgRaised,
+                onTap: isActionPending ? null : onComplete,
+                child: Opacity(
+                  opacity: isActionPending ? 0.6 : 1.0,
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: AppColor.borderGlowCyan),
+                      color: AppColor.bgRaised,
+                    ),
+                    child: Center(
+                      child: isActionPending
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(AppColor.cyan),
+                              ),
+                            )
+                          : const Icon(RemixIcons.check_line, size: 16, color: AppColor.cyan),
+                    ),
                   ),
-                  child: const Icon(RemixIcons.check_line, size: 16, color: AppColor.cyan),
                 ),
               ),
             ],
@@ -294,24 +350,37 @@ class QuestCard extends StatelessWidget {
     required Color textColor,
     Border? border,
     VoidCallback? onTap,
+    bool isLoading = false,
   }) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: border,
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
+      onTap: isLoading ? null : onTap,
+      child: Opacity(
+        opacity: isLoading ? 0.6 : 1.0,
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: border,
+          ),
+          child: Center(
+            child: isLoading
+                ? SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(textColor),
+                    ),
+                  )
+                : Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                  ),
           ),
         ),
       ),

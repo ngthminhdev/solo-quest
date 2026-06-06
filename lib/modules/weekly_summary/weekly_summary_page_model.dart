@@ -52,7 +52,7 @@ class WeeklySummaryPageState extends BasePageState {
 
   bool get hasSummary => summary != null;
 
-  int get streakDays => progress?.streakDays ?? 0;
+  int get streakDays => summary?.streakDays ?? progress?.streakDays ?? 0;
 
   int get enabledSuggestionCount =>
       enabledSuggestions.where((e) => e).length;

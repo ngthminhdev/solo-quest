@@ -1,42 +1,40 @@
 class WeeklySummaryConstants {
   WeeklySummaryConstants._();
 
-  static const String pageTitle = 'Tổng Kết Tuần';
-  static const String headerLabel = '◆ BÁO CÁO TUẦN';
-  static const String headerTitle = 'Tổng Kết Tuần';
-  static const String headerDesc =
-      'Xem lại dữ liệu tuần này và chọn những điều chỉnh bạn muốn áp dụng cho tuần sau.';
+  static const String pageTitle = 'weeklySummaryPageTitle';
+  static const String headerLabel = 'weeklySummaryHeaderLabel';
+  static const String headerTitle = 'weeklySummaryHeaderTitle';
+  static const String headerDesc = 'weeklySummaryHeaderDesc';
 
-  static const String statsCompletion = 'Hoàn thành';
-  static const String statsExp = 'EXP tuần';
-  static const String statsStreak = 'Streak';
-  static const String statsSnoozed = 'Đã hoãn';
-  static const String statsSkipped = 'Bỏ qua';
-  static const String statsDailyReview = 'Daily Review';
+  static const String statsCompletion = 'weeklySummaryStatsCompletion';
+  static const String statsExp = 'weeklySummaryStatsExp';
+  static const String statsStreak = 'weeklySummaryStatsStreak';
+  static const String statsSnoozed = 'weeklySummaryStatsSnoozed';
+  static const String statsSkipped = 'weeklySummaryStatsSkipped';
+  static const String statsDailyReview = 'weeklySummaryStatsDailyReview';
 
-  static const String chartTitle = 'Tỷ lệ hoàn thành theo ngày';
+  static const String chartTitle = 'weeklySummaryChartTitle';
 
-  static const String sectionCompare = 'So sánh tuần trước';
-  static const String sectionInsights = 'Điểm nổi bật tuần này';
-  static const String sectionTopQuests = 'Quest hiệu quả nhất';
-  static const String sectionAdjust = 'Quest cần điều chỉnh';
-  static const String sectionSuggestions = 'Đề xuất cho tuần sau';
-  static const String sectionSchedule = 'Mẫu tuần sau';
+  static const String sectionCompare = 'weeklySummarySectionCompare';
+  static const String sectionInsights = 'weeklySummarySectionInsights';
+  static const String sectionTopQuests = 'weeklySummarySectionTopQuests';
+  static const String sectionAdjust = 'weeklySummarySectionAdjust';
+  static const String sectionSuggestions = 'weeklySummarySectionSuggestions';
+  static const String sectionSchedule = 'weeklySummarySectionSchedule';
 
-  static const String scheduleTitle = 'Nếu áp dụng đề xuất, SoloQuest sẽ ưu tiên:';
-  static const String scheduleWeekday = 'Thứ 2 – Thứ 6';
-  static const String scheduleWeekend = 'Cuối tuần';
+  static const String scheduleTitle = 'weeklySummaryScheduleTitle';
+  static const String scheduleWeekday = 'weeklySummaryScheduleWeekday';
+  static const String scheduleWeekend = 'weeklySummaryScheduleWeekend';
 
-  static const String protectionText =
-      'SoloQuest chỉ đề xuất điều chỉnh. Bạn luôn có thể bật/tắt, chỉnh thủ công hoặc không áp dụng đề xuất nào.';
+  static const String protectionText = 'weeklySummaryProtectionText';
 
-  static const String ctaApply = 'Áp dụng đề xuất đã chọn';
-  static const String ctaManual = 'Chỉnh thủ công';
-  static const String ctaApplied = '✓ Đã áp dụng';
+  static const String ctaApply = 'weeklySummaryCtaApply';
+  static const String ctaManual = 'weeklySummaryCtaManual';
+  static const String ctaApplied = 'weeklySummaryCtaApplied';
 
-  static const String linkLogs = 'Xem Nhật ký chi tiết';
-  static const String linkRules = 'Luật điều chỉnh';
-  static const String linkReminders = 'Chỉnh nhắc nhở';
+  static const String linkLogs = 'weeklySummaryLinkLogs';
+  static const String linkRules = 'weeklySummaryLinkRules';
+  static const String linkReminders = 'weeklySummaryLinkReminders';
 
-  static const String toastApplied = 'Đã áp dụng đề xuất thành công.';
+  static const String toastApplied = 'weeklySummaryToastApplied';
 }

@@ -4,7 +4,9 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../helpers/time_helper.dart';
+import '../constants/schedule_editor_constants.dart';
 
 class TimeRangePickerRow extends StatelessWidget {
   final String start;
@@ -22,11 +24,16 @@ class TimeRangePickerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Row(
       children: [
         Expanded(
           child: _TimePickerField(
-            label: 'Bắt đầu',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelStartTime,
+            ),
             value: start,
             onChanged: onStartChanged,
           ),
@@ -40,7 +47,10 @@ class TimeRangePickerRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.s12),
         Expanded(
           child: _TimePickerField(
-            label: 'Kết thúc',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelEndTime,
+            ),
             value: end,
             onChanged: onEndChanged,
           ),
@@ -80,14 +90,11 @@ class _TimePickerField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColor.fgMuted,
-              ),
+              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
             const SizedBox(height: AppSpacing.s4),
             Text(
-              value.isEmpty ? '--:--' : TimeHelper.formatOrFallback(value),
+              value.isEmpty ? '' : value,
               style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 15,
@@ -102,10 +109,7 @@ class _TimePickerField extends StatelessWidget {
   }
 
   Future<void> _pickTime(BuildContext context) async {
-    final picked = await TimeHelper.pickTime(
-      context,
-      currentTime: value,
-    );
+    final picked = await TimeHelper.pickTime(context, currentTime: value);
 
     if (picked != null) {
       onChanged(picked);

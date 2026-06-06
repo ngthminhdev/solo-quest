@@ -58,11 +58,11 @@ class ReminderSettingModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'type': type.name,
+      'type': type.toApiValue(),
       'title': title,
       'description': description,
-      'frequency': frequency.name,
-      'status': status.name,
+      'frequency': frequency.toApiValue(),
+      'status': status.toApiValue(),
       'start_time': startTime,
       'end_time': endTime,
       'interval_minutes': intervalMinutes,
@@ -74,11 +74,11 @@ class ReminderSettingModel {
   factory ReminderSettingModel.fromJson(Map<String, dynamic> json) {
     return ReminderSettingModel(
       id: json['id'] as String,
-      type: ReminderType.values.byName(json['type'] as String),
-      title: json['title'] as String,
-      description: json['description'] as String,
-      frequency: ReminderFrequency.values.byName(json['frequency'] as String),
-      status: ReminderStatus.values.byName(json['status'] as String),
+      type: ReminderTypeApi.fromApiValue(json['type'] as String),
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      frequency: ReminderFrequencyApi.fromApiValue(json['frequency'] as String),
+      status: ReminderStatusApi.fromApiValue(json['status'] as String),
       startTime: json['start_time'] as String?,
       endTime: json['end_time'] as String?,
       intervalMinutes: json['interval_minutes'] as int?,

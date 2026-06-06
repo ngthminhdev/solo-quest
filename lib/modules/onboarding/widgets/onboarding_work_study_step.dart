@@ -6,8 +6,10 @@ import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
 import '../../../helpers/time_helper.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/onboarding_constants.dart';
 import '../models/onboarding_data.dart';
+import 'onboarding_chip_selector.dart';
 
 class OnboardingWorkStudyStep extends StatelessWidget {
   final OnboardingData data;
@@ -15,7 +17,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
   final ValueChanged<String> onWorkScheduleChanged;
   final ValueChanged<String> onWorkStartTimeChanged;
   final ValueChanged<String> onWorkEndTimeChanged;
-  final ValueChanged<String> onFreeTimeChanged;
+  final ValueChanged<String> onFreeTimeToggled;
 
   const OnboardingWorkStudyStep({
     super.key,
@@ -24,16 +26,18 @@ class OnboardingWorkStudyStep extends StatelessWidget {
     required this.onWorkScheduleChanged,
     required this.onWorkStartTimeChanged,
     required this.onWorkEndTimeChanged,
-    required this.onFreeTimeChanged,
+    required this.onFreeTimeToggled,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step2Title,
+          l10n.onboardingStep2Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -42,7 +46,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step2Subtitle,
+          l10n.onboardingStep2Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -51,16 +55,15 @@ class OnboardingWorkStudyStep extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
-        _buildMainActivitySection(),
+        _buildMainActivitySection(context),
         const SizedBox(height: AppSpacing.lg),
         _buildWorkScheduleSection(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildFreeTimeSection(),
+        _buildFreeTimeSection(context),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step2SystemNote,
+          l10n.onboardingStep2SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -71,12 +74,21 @@ class OnboardingWorkStudyStep extends StatelessWidget {
     );
   }
 
-  Widget _buildMainActivitySection() {
+  Widget _buildMainActivitySection(BuildContext context) {
+    final l10n = context.l10n;
+    final mainActivityOptions = [
+      OnboardingStepOption('software_engineer', l10n.onboardingStep2ActivityDeveloper),
+      OnboardingStepOption('student', l10n.onboardingStep2ActivityStudent),
+      OnboardingStepOption('office_worker', l10n.onboardingStep2ActivityOffice),
+      OnboardingStepOption('freelancer', l10n.onboardingStep2ActivityFreelancer),
+      OnboardingStepOption('other', l10n.onboardingStep2ActivityOther),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.mainActivityLabel,
+          l10n.onboardingStep2MainActivityLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -85,10 +97,10 @@ class OnboardingWorkStudyStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        ...OnboardingConstants.mainActivityOptions.map((option) {
-          final isSelected = data.mainActivity == option;
+        ...mainActivityOptions.map((option) {
+          final isSelected = data.mainActivity == option.key;
           return GestureDetector(
-            onTap: () => onMainActivityChanged(option),
+            onTap: () => onMainActivityChanged(option.key),
             child: Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.xs),
               padding: const EdgeInsets.symmetric(
@@ -109,7 +121,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          option,
+                          option.label,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -126,7 +138,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color:
-                          isSelected ? AppColor.cyan : Colors.transparent,
+                          isSelected ? AppColor.cyan : AppColor.transparent,
                       border: Border.all(
                         color:
                             isSelected ? AppColor.cyan : AppColor.border,
@@ -151,11 +163,19 @@ class OnboardingWorkStudyStep extends StatelessWidget {
   }
 
   Widget _buildWorkScheduleSection(BuildContext context) {
+    final l10n = context.l10n;
+    final workScheduleOptions = [
+      OnboardingStepOption('weekdays', l10n.onboardingStep2ScheduleWeekday),
+      OnboardingStepOption('full_week', l10n.onboardingStep2ScheduleMonSat),
+      OnboardingStepOption('flexible', l10n.onboardingStep2ScheduleFlexible),
+      OnboardingStepOption('night_shift', l10n.onboardingStep2ScheduleNight),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.workScheduleLabel,
+          l10n.onboardingStep2WorkScheduleLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -169,7 +189,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
             Expanded(
               child: _buildTimeField(
                 context: context,
-                label: OnboardingConstants.workStartTimeLabel,
+                label: l10n.onboardingStep2WorkStartTimeLabel,
                 value: data.workStartTime,
                 onChanged: onWorkStartTimeChanged,
               ),
@@ -178,7 +198,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
             Expanded(
               child: _buildTimeField(
                 context: context,
-                label: OnboardingConstants.workEndTimeLabel,
+                label: l10n.onboardingStep2WorkEndTimeLabel,
                 value: data.workEndTime,
                 onChanged: onWorkEndTimeChanged,
               ),
@@ -186,47 +206,38 @@ class OnboardingWorkStudyStep extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.workScheduleOptions.map((option) {
-            final isSelected = data.workScheduleType == option;
-            return GestureDetector(
-              onTap: () => onWorkScheduleChanged(option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColor.cyanDim : AppColor.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(
-                    color: isSelected ? AppColor.cyan : AppColor.border,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        OnboardingChipSelector(
+          options: workScheduleOptions,
+          selected: data.workScheduleType,
+          onChanged: onWorkScheduleChanged,
+          layoutMode: ChipLayoutMode.equalWidthGrid,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          l10n.onboardingStep2ScheduleHelper,
+          style: AppTextStyle.caption.copyWith(
+            color: AppColor.fgMuted,
+            fontSize: 11,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildFreeTimeSection() {
+  Widget _buildFreeTimeSection(BuildContext context) {
+    final l10n = context.l10n;
+    final freeTimeOptions = [
+      OnboardingStepOption('early_morning', l10n.onboardingStep2FreeTimeEarlyMorning),
+      OnboardingStepOption('lunch', l10n.onboardingStep2FreeTimeNoon),
+      OnboardingStepOption('after_work', l10n.onboardingStep2FreeTimeAfterWork),
+      OnboardingStepOption('evening', l10n.onboardingStep2FreeTimeEvening),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.freeTimeLabel,
+          l10n.onboardingStep2FreeTimeLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -235,36 +246,11 @@ class OnboardingWorkStudyStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.freeTimeOptions.map((option) {
-            final isSelected = data.freeTimePreference == option;
-            return GestureDetector(
-              onTap: () => onFreeTimeChanged(option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColor.cyanDim : AppColor.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(
-                    color: isSelected ? AppColor.cyan : AppColor.border,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        OnboardingChipSelector(
+          options: freeTimeOptions,
+          selected: data.preferredFreeTimes,
+          onChanged: onFreeTimeToggled,
+          layoutMode: ChipLayoutMode.equalWidthGrid,
         ),
       ],
     );
@@ -317,7 +303,6 @@ class OnboardingWorkStudyStep extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
-                    fontFamily: 'Exo2',
                     fontWeight: FontWeight.w600,
                   ),
                 ),

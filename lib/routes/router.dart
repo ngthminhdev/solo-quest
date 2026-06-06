@@ -26,7 +26,6 @@ class AppRouter {
       case RoutesConfig.home:
       case RoutesConfig.logs:
       case RoutesConfig.progress:
-      case RoutesConfig.rewards:
       case RoutesConfig.profile:
         return MaterialPageRoute(builder: (_) => MainPage());
       case RoutesConfig.questDetail:

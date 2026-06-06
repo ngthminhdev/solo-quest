@@ -4,18 +4,19 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../widgets/app_state/app_empty_state.dart';
 
+import '../../../extensions/localization_extension.dart';
+
 class ReminderSettingsEmptyView extends StatelessWidget {
   const ReminderSettingsEmptyView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: AppEmptyState(
         icon: RemixIcons.notification_3_line,
-        title: 'Chưa có nhắc nhở',
-        message:
-            'SoloQuest sẽ dùng cài đặt nhắc nhở để giúp bạn duy trì nhịp sinh hoạt.',
+        title: context.l10n.reminderEmptyTitle,
+        message: context.l10n.reminderEmptyMessage,
       ),
     );
   }

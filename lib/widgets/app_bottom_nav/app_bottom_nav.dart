@@ -5,7 +5,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../constants/app_color.dart';
 import '../../extensions/localization_extension.dart';
 
-enum AppTab { home, logs, progress, rewards, profile }
+enum AppTab { home, logs, progress, learningRoadmap, profile }
 
 class AppBottomNav extends StatelessWidget {
   final AppTab currentTab;
@@ -58,8 +58,8 @@ class AppBottomNav extends StatelessWidget {
         return currentTab == tab ? RemixIcons.file_text_fill : RemixIcons.file_text_line;
       case AppTab.progress:
         return currentTab == tab ? RemixIcons.bar_chart_2_fill : RemixIcons.bar_chart_2_line;
-      case AppTab.rewards:
-        return currentTab == tab ? RemixIcons.star_fill : RemixIcons.star_line;
+      case AppTab.learningRoadmap:
+        return currentTab == tab ? RemixIcons.route_fill : RemixIcons.route_line;
       case AppTab.profile:
         return currentTab == tab ? RemixIcons.user_3_fill : RemixIcons.user_3_line;
     }
@@ -74,8 +74,8 @@ class AppBottomNav extends StatelessWidget {
         return l10n.bottomNavLogs;
       case AppTab.progress:
         return l10n.bottomNavProgress;
-      case AppTab.rewards:
-        return l10n.bottomNavRewards;
+      case AppTab.learningRoadmap:
+        return l10n.bottomNavLearning;
       case AppTab.profile:
         return l10n.bottomNavProfile;
     }
@@ -232,7 +232,7 @@ class _NavItemState extends State<_NavItem> with TickerProviderStateMixin {
       height: size,
       child: CustomPaint(
         painter: _RipplePainter(
-          color: AppColor.cyan.withOpacity(0.3),
+          color: AppColor.primaryBorder,
           strokeWidth: strokeWidth,
         ),
       ),

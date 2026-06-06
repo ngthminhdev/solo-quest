@@ -5,8 +5,10 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/onboarding_constants.dart';
 import '../models/onboarding_data.dart';
+import 'onboarding_chip_selector.dart';
 
 class OnboardingHealthActivityStep extends StatelessWidget {
   final OnboardingData data;
@@ -24,11 +26,13 @@ class OnboardingHealthActivityStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step3Title,
+          l10n.onboardingStep3Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -37,7 +41,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step3Subtitle,
+          l10n.onboardingStep3Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -46,16 +50,15 @@ class OnboardingHealthActivityStep extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xl),
-        _buildActivityLevelSection(),
+        _buildActivityLevelSection(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildLastWorkoutSection(),
+        _buildLastWorkoutSection(context),
         const SizedBox(height: AppSpacing.lg),
-        _buildLimitationsSection(),
+        _buildLimitationsSection(context),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step3SystemNote,
+          l10n.onboardingStep3SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -66,24 +69,25 @@ class OnboardingHealthActivityStep extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityLevelSection() {
+  Widget _buildActivityLevelSection(BuildContext context) {
+    final l10n = context.l10n;
     final options = [
       _ActivityOption(
-        value: 'Rất ít',
-        name: 'Rất ít',
-        desc: 'Hầu như không vận động, ngồi nhiều',
+        value: 'very_little',
+        name: l10n.onboardingStep3ActivityLevelLittle,
+        desc: l10n.onboardingStep3ActivityLevelLittleDesc,
         icon: RemixIcons.rest_time_line,
       ),
       _ActivityOption(
-        value: 'Thỉnh thoảng',
-        name: 'Thỉnh thoảng',
-        desc: 'Đi bộ nhẹ, vận động 1–2 lần/tuần',
+        value: 'occasional',
+        name: l10n.onboardingStep3ActivityLevelOccasional,
+        desc: l10n.onboardingStep3ActivityLevelOccasionalDesc,
         icon: RemixIcons.walk_line,
       ),
       _ActivityOption(
-        value: 'Đều đặn',
-        name: 'Đều đặn',
-        desc: 'Tập luyện 3–5 lần/tuần',
+        value: 'regular',
+        name: l10n.onboardingStep3ActivityLevelRegular,
+        desc: l10n.onboardingStep3ActivityLevelRegularDesc,
         icon: RemixIcons.run_line,
       ),
     ];
@@ -92,7 +96,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.activityLevelLabel,
+          l10n.onboardingStep3ActivityLevelLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -127,7 +131,11 @@ class OnboardingHealthActivityStep extends StatelessWidget {
                       color: AppColor.surfaceHover,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
-                    child: Icon(opt.icon, size: 20, color: AppColor.fgSecondary),
+                    child: Icon(
+                      opt.icon,
+                      size: 20,
+                      color: AppColor.fgSecondary,
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
@@ -157,7 +165,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected ? AppColor.cyan : Colors.transparent,
+                      color: isSelected ? AppColor.cyan : AppColor.transparent,
                       border: Border.all(
                         color: isSelected ? AppColor.cyan : AppColor.border,
                         width: 2,
@@ -180,12 +188,19 @@ class OnboardingHealthActivityStep extends StatelessWidget {
     );
   }
 
-  Widget _buildLastWorkoutSection() {
+  Widget _buildLastWorkoutSection(BuildContext context) {
+    final l10n = context.l10n;
+    final lastWorkoutOptions = [
+      OnboardingStepOption('today', l10n.onboardingStep3LastWorkoutToday),
+      OnboardingStepOption('this_week', l10n.onboardingStep3LastWorkoutWeek),
+      OnboardingStepOption('longer_ago', l10n.onboardingStep3LastWorkoutLonger),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.lastWorkoutLabel,
+          l10n.onboardingStep3LastWorkoutLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -194,47 +209,37 @@ class OnboardingHealthActivityStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.lastWorkoutOptions.map((option) {
-            final isSelected = data.lastWorkout == option;
-            return GestureDetector(
-              onTap: () => onLastWorkoutChanged(option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColor.cyanDim : AppColor.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(
-                    color: isSelected ? AppColor.cyan : AppColor.border,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        OnboardingChipSelector(
+          options: lastWorkoutOptions,
+          selected: data.lastWorkout,
+          onChanged: onLastWorkoutChanged,
+          layoutMode: ChipLayoutMode.equalWidthRow,
         ),
       ],
     );
   }
 
-  Widget _buildLimitationsSection() {
+  Widget _buildLimitationsSection(BuildContext context) {
+    final l10n = context.l10n;
+    final limitationOptions = [
+      OnboardingStepOption('back_pain', l10n.onboardingStep3LimitationBackPain),
+      OnboardingStepOption(
+        'eye_strain',
+        l10n.onboardingStep3LimitationEyeStrain,
+      ),
+      OnboardingStepOption(
+        'low_energy',
+        l10n.onboardingStep3LimitationLowEnergy,
+      ),
+      OnboardingStepOption('busy', l10n.onboardingStep3LimitationBusy),
+      OnboardingStepOption('none', l10n.onboardingStep3LimitationNone),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.healthLimitationsLabel,
+          l10n.onboardingStep3HealthLimitationsLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -243,36 +248,11 @@ class OnboardingHealthActivityStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: OnboardingConstants.healthLimitationOptions.map((option) {
-            final isSelected = data.healthLimitations.contains(option);
-            return GestureDetector(
-              onTap: () => onLimitationToggled(option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColor.cyanDim : AppColor.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(
-                    color: isSelected ? AppColor.cyan : AppColor.border,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        OnboardingChipSelector(
+          options: limitationOptions,
+          selected: data.healthLimitations,
+          onChanged: onLimitationToggled,
+          layoutMode: ChipLayoutMode.wrap,
         ),
       ],
     );

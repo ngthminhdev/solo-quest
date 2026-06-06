@@ -5,6 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../helpers/time_helper.dart';
+import '../../../extensions/localization_extension.dart';
 
 class ReminderTimeRangeRow extends StatelessWidget {
   final String? startTime;
@@ -26,7 +27,7 @@ class ReminderTimeRangeRow extends StatelessWidget {
       children: [
         Expanded(
           child: _TimePickerField(
-            label: 'Bắt đầu',
+            label: context.l10n.reminderSettingsTimeStart,
             value: startTime,
             onChanged: onStartChanged,
           ),
@@ -41,7 +42,7 @@ class ReminderTimeRangeRow extends StatelessWidget {
         ),
         Expanded(
           child: _TimePickerField(
-            label: 'Kết thúc',
+            label: context.l10n.reminderSettingsTimeEnd,
             value: endTime,
             onChanged: onEndChanged,
           ),
@@ -87,9 +88,8 @@ class _TimePickerField extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.s4),
             Text(
-              hasValue ? TimeHelper.formatOrFallback(value!) : '--:--',
+              hasValue ? value! : '',
               style: TextStyle(
-                fontFamily: 'Exo2',
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: hasValue ? AppColor.fg : AppColor.fgMuted,

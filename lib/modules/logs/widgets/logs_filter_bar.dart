@@ -5,7 +5,7 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../models/enums/log_enums.dart';
-import '../constants/logs_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogsFilterBar extends StatelessWidget {
   final DateTime selectedDate;
@@ -39,12 +39,12 @@ class LogsFilterBar extends StatelessWidget {
           child: Row(
             children: [
               _buildDateButton(
-                label: LogsConstants.yesterdayLabel,
+                label: context.l10n.logsYesterday,
                 date: now.subtract(const Duration(days: 1)),
               ),
               const SizedBox(width: AppSpacing.s8),
               _buildDateButton(
-                label: LogsConstants.todayLabel,
+                label: context.l10n.logsToday,
                 date: now,
               ),
               const SizedBox(width: AppSpacing.s8),
@@ -60,18 +60,18 @@ class LogsFilterBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: AppColor.border),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         RemixIcons.calendar_line,
                         size: 16,
                         color: AppColor.fgSecondary,
                       ),
-                      SizedBox(width: AppSpacing.s4),
+                      const SizedBox(width: AppSpacing.s4),
                       Text(
-                        'Chọn ngày',
-                        style: TextStyle(
+                        context.l10n.logsSelectDate,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: AppColor.fgSecondary,
@@ -94,9 +94,9 @@ class LogsFilterBar extends StatelessWidget {
                       color: AppColor.cyanDim,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
-                      'Xóa lọc',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.logsClearFilter,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColor.cyan,
@@ -114,34 +114,46 @@ class LogsFilterBar extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
             children: [
-              _buildTypeChip(label: LogsConstants.filterAll, type: null),
+              _buildTypeChip(label: context.l10n.logsFilterAll, type: null),
               _buildTypeChip(
-                label: LogsConstants.filterCompleted,
+                label: context.l10n.logsFilterCompleted,
                 type: LogEntryType.questCompleted,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterSkipped,
+                label: context.l10n.logsFilterSkipped,
                 type: LogEntryType.questSkipped,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterSnoozed,
+                label: context.l10n.logsFilterSnoozed,
                 type: LogEntryType.questSnoozed,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterCheckin,
+                label: context.l10n.logsFilterCheckin,
                 type: LogEntryType.morningCheckin,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterReview,
+                label: context.l10n.logsFilterReview,
                 type: LogEntryType.dailyReview,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterReward,
+                label: context.l10n.logsFilterReward,
                 type: LogEntryType.rewardClaimed,
               ),
               _buildTypeChip(
-                label: LogsConstants.filterLevelUp,
+                label: context.l10n.logsFilterLevelUp,
                 type: LogEntryType.levelUp,
+              ),
+              _buildTypeChip(
+                label: context.l10n.logsFilterRoadmap,
+                type: LogEntryType.learningRoadmapCreated,
+              ),
+              _buildTypeChip(
+                label: context.l10n.logsFilterRoadmapStep,
+                type: LogEntryType.learningRoadmapStepCompleted,
+              ),
+              _buildTypeChip(
+                label: context.l10n.logsFilterRoadmapCompleted,
+                type: LogEntryType.learningRoadmapCompleted,
               ),
             ],
           ),
@@ -156,7 +168,7 @@ class LogsFilterBar extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
       builder: (_) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.55,
@@ -171,10 +183,9 @@ class LogsFilterBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Chọn ngày',
-                      style: TextStyle(
-                        fontFamily: 'Exo2',
+                    Text(
+                      context.l10n.logsSelectDate,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColor.fg,
@@ -202,7 +213,6 @@ class LogsFilterBar extends StatelessWidget {
                   headerStyle: const DateRangePickerHeaderStyle(
                     backgroundColor: AppColor.bgRaised,
                     textStyle: TextStyle(
-                      fontFamily: 'Exo2',
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,
@@ -211,7 +221,6 @@ class LogsFilterBar extends StatelessWidget {
                   monthViewSettings: const DateRangePickerMonthViewSettings(
                     viewHeaderStyle: DateRangePickerViewHeaderStyle(
                       textStyle: TextStyle(
-                        fontFamily: 'Exo2',
                         fontSize: 12,
                         color: AppColor.fgMuted,
                       ),
@@ -219,12 +228,10 @@ class LogsFilterBar extends StatelessWidget {
                   ),
                   monthCellStyle: const DateRangePickerMonthCellStyle(
                     textStyle: TextStyle(
-                      fontFamily: 'Exo2',
                       fontSize: 13,
                       color: AppColor.fg,
                     ),
                     todayTextStyle: TextStyle(
-                      fontFamily: 'Exo2',
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColor.cyan,
@@ -237,7 +244,6 @@ class LogsFilterBar extends StatelessWidget {
                     ),
                   ),
                   selectionTextStyle: const TextStyle(
-                    fontFamily: 'Exo2',
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColor.bgDeep,
@@ -266,10 +272,9 @@ class LogsFilterBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       alignment: Alignment.center,
-                      child: const Text(
-                        'Xác nhận',
-                        style: TextStyle(
-                          fontFamily: 'Exo2',
+                      child: Text(
+                        context.l10n.commonConfirm,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColor.bgDeep,

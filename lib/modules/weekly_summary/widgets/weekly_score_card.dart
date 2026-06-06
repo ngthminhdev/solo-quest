@@ -23,11 +23,11 @@ class WeeklyScoreCard extends StatelessWidget {
           color: AppColor.surface,
           border: Border.all(color: AppColor.borderGlowCyan),
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x1A00F0FF),
+              color: AppColor.cyan.withValues(alpha: 0.10),
               blurRadius: 16,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),

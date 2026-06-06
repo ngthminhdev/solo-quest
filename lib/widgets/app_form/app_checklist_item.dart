@@ -29,7 +29,7 @@ class AppChecklistItem extends StatelessWidget {
               width: 22,
               height: 22,
               decoration: BoxDecoration(
-                color: checked ? AppColor.cyan : Colors.transparent,
+                color: checked ? AppColor.cyan : AppColor.transparent,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: checked ? AppColor.cyan : AppColor.border,

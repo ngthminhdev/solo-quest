@@ -3,13 +3,15 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/learning_roadmap_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LearningRoadmapHeader extends StatelessWidget {
   const LearningRoadmapHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Column(
@@ -30,9 +32,8 @@ class LearningRoadmapHeader extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s12),
           Text(
-            LearningRoadmapConstants.pageTitle,
+            l10n.lrPageTitle,
             style: const TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -40,7 +41,7 @@ class LearningRoadmapHeader extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s6),
           Text(
-            LearningRoadmapConstants.pageSubtitle,
+            l10n.lrPageSubtitle,
             style: const TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,

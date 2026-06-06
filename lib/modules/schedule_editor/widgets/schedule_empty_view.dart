@@ -3,13 +3,15 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/schedule_editor_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class ScheduleEmptyView extends StatelessWidget {
   const ScheduleEmptyView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.s16,
@@ -34,7 +36,7 @@ class ScheduleEmptyView extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s16),
           Text(
-            ScheduleEditorConstants.emptyTitle,
+            l10n.scheduleEditorEmptyTitle,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -44,7 +46,7 @@ class ScheduleEmptyView extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
           Text(
-            ScheduleEditorConstants.emptyMessage,
+            l10n.scheduleEditorEmptyMessage,
             style: TextStyle(
               fontSize: 13,
               color: AppColor.fgMuted,

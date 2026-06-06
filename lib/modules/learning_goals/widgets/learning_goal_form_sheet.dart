@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/learning_goal_model.dart';
 import '../../../widgets/app_bottom_sheet/app_bottom_sheet.dart';
 import '../../../widgets/app_button/app_button.dart';
 import '../../../widgets/app_text_field/app_text_field.dart';
 import '../../../widgets/app_toast/app_toast_service.dart';
-import '../constants/learning_goals_constants.dart';
 
 class LearningGoalFormResult {
   final String title;
@@ -28,16 +28,25 @@ class LearningGoalFormResult {
   });
 }
 
+const _suggestedCategories = [
+  'Flutter',
+  'Dart',
+  'English',
+  'Design',
+  'Project',
+  'Research',
+  'Other',
+];
+
 class LearningGoalFormSheet {
   static Future<LearningGoalFormResult?> show(
     BuildContext context, {
     LearningGoalModel? initialGoal,
   }) async {
+    final l10n = context.l10n;
     return await AppBottomSheet.show<LearningGoalFormResult>(
       context: context,
-      title: initialGoal == null
-          ? LearningGoalsConstants.formTitleAdd
-          : LearningGoalsConstants.formTitleEdit,
+      title: initialGoal == null ? l10n.lgFormTitleAdd : l10n.lgFormTitleEdit,
       body: _LearningGoalForm(initialGoal: initialGoal),
     );
   }
@@ -85,6 +94,8 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.s16,
@@ -95,8 +106,8 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
           // Title field
           AppTextField(
             controller: _titleController,
-            label: LearningGoalsConstants.labelTitle,
-            placeholder: 'Ví dụ: Học Flutter Architecture',
+            label: l10n.lgLabelTitle,
+            placeholder: l10n.lgCardFormTitlePlaceholder,
           ),
 
           const SizedBox(height: AppSpacing.s16),
@@ -104,8 +115,8 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
           // Description field
           AppTextField(
             controller: _descriptionController,
-            label: LearningGoalsConstants.labelDescription,
-            placeholder: 'Mô tả chi tiết mục tiêu...',
+            label: l10n.lgLabelDescription,
+            placeholder: l10n.lgCardFormDescPlaceholder,
             maxLines: 3,
           ),
 
@@ -114,8 +125,8 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
           // Category field
           AppTextField(
             controller: _categoryController,
-            label: LearningGoalsConstants.labelCategory,
-            placeholder: 'Ví dụ: Flutter, Dart, English...',
+            label: l10n.lgLabelCategory,
+            placeholder: l10n.lgCardFormCategoryPlaceholder,
           ),
 
           const SizedBox(height: AppSpacing.s8),
@@ -124,7 +135,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
           Wrap(
             spacing: AppSpacing.s8,
             runSpacing: AppSpacing.s8,
-            children: LearningGoalsConstants.suggestedCategories.map((cat) {
+            children: _suggestedCategories.map((cat) {
               return GestureDetector(
                 onTap: () {
                   _categoryController.text = cat;
@@ -156,7 +167,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
           // Target minutes field
           AppTextField(
             controller: _targetMinutesController,
-            label: LearningGoalsConstants.labelTargetMinutes,
+            label: l10n.lgLabelTargetMinutes,
             placeholder: '30',
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -181,7 +192,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          LearningGoalsConstants.labelDeadline,
+                          l10n.lgLabelDeadline,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -192,7 +203,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
                         Text(
                           _deadline != null
                               ? '${_deadline!.day}/${_deadline!.month}/${_deadline!.year}'
-                              : 'Không có deadline',
+                              : l10n.lgCardFormNoDeadline,
                           style: TextStyle(
                             fontSize: 14,
                             color: _deadline != null
@@ -234,7 +245,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
                 children: [
                   Expanded(
                     child: Text(
-                      LearningGoalsConstants.labelActive,
+                      l10n.lgLabelActive,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -256,7 +267,9 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
 
           // Submit button
           AppButton(
-            label: widget.initialGoal == null ? 'Thêm' : 'Cập nhật',
+            label: widget.initialGoal == null
+                ? l10n.lgCardFormSubmitAdd
+                : l10n.lgCardFormSubmitUpdate,
             onPressed: _handleSubmit,
             variant: AppButtonVariant.primary,
             fullWidth: true,
@@ -296,11 +309,13 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
   }
 
   void _handleSubmit() {
+    final l10n = context.l10n;
+
     // Validate
     if (_titleController.text.trim().isEmpty) {
       AppToastService.error(
         context,
-        LearningGoalsConstants.errorTitleRequired,
+        l10n.lgErrorTitleRequired,
       );
       return;
     }
@@ -308,7 +323,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
     if (_categoryController.text.trim().isEmpty) {
       AppToastService.error(
         context,
-        LearningGoalsConstants.errorCategoryRequired,
+        l10n.lgErrorCategoryRequired,
       );
       return;
     }
@@ -317,7 +332,7 @@ class _LearningGoalFormState extends State<_LearningGoalForm> {
     if (targetMinutes <= 0) {
       AppToastService.error(
         context,
-        LearningGoalsConstants.errorTargetMinutesInvalid,
+        l10n.lgErrorTargetMinutesInvalid,
       );
       return;
     }

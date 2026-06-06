@@ -5,6 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/onboarding_constants.dart';
 import '../models/onboarding_data.dart';
 
@@ -28,11 +29,22 @@ class OnboardingBasicInfoStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    final genderOptions = [
+      OnboardingStepOption('male', l10n.onboardingStep1GenderMale),
+      OnboardingStepOption('female', l10n.onboardingStep1GenderFemale),
+      OnboardingStepOption('other', l10n.onboardingStep1GenderOther),
+    ];
+    final genderValue = genderOptions.any((option) => option.key == data.gender)
+        ? data.gender
+        : 'male';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step1Title,
+          l10n.onboardingStep1Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -41,7 +53,7 @@ class OnboardingBasicInfoStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step1Subtitle,
+          l10n.onboardingStep1Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -53,19 +65,20 @@ class OnboardingBasicInfoStep extends StatelessWidget {
 
         _buildField(
           icon: RemixIcons.user_3_line,
-          label: OnboardingConstants.displayNameLabel,
+          label: l10n.onboardingStep1NameLabel,
           child: _InputField(
-            hint: OnboardingConstants.displayNameHint,
+            hint: l10n.onboardingStep1NameHint,
+            initialValue: data.displayName,
             onChanged: onDisplayNameChanged,
           ),
         ),
 
         _buildField(
           icon: RemixIcons.calendar_line,
-          label: OnboardingConstants.ageLabel,
+          label: l10n.onboardingStep1AgeLabel,
           child: _InputField(
-            hint: OnboardingConstants.ageHint,
-            suffix: OnboardingConstants.ageSuffix,
+            hint: l10n.onboardingStep1AgeHint,
+            suffix: l10n.onboardingStep1AgeSuffix,
             keyboardType: TextInputType.number,
             onChanged: onAgeChanged,
           ),
@@ -73,20 +86,20 @@ class OnboardingBasicInfoStep extends StatelessWidget {
 
         _buildField(
           icon: RemixIcons.user_3_line,
-          label: OnboardingConstants.genderLabel,
+          label: l10n.onboardingStep1GenderLabel,
           child: _DropdownField(
-            value: data.gender.isEmpty ? null : data.gender,
-            options: OnboardingConstants.genderOptions,
+            value: genderValue,
+            options: genderOptions,
             onChanged: onGenderChanged,
           ),
         ),
 
         _buildField(
           icon: RemixIcons.ruler_line,
-          label: OnboardingConstants.heightLabel,
+          label: l10n.onboardingStep1HeightLabel,
           child: _InputField(
-            hint: OnboardingConstants.heightHint,
-            suffix: OnboardingConstants.heightSuffix,
+            hint: l10n.onboardingStep1HeightHint,
+            suffix: l10n.onboardingStep1HeightSuffix,
             keyboardType: TextInputType.number,
             onChanged: onHeightChanged,
           ),
@@ -94,10 +107,10 @@ class OnboardingBasicInfoStep extends StatelessWidget {
 
         _buildField(
           icon: RemixIcons.scales_line,
-          label: OnboardingConstants.weightLabel,
+          label: l10n.onboardingStep1WeightLabel,
           child: _InputField(
-            hint: OnboardingConstants.weightHint,
-            suffix: OnboardingConstants.weightSuffix,
+            hint: l10n.onboardingStep1WeightHint,
+            suffix: l10n.onboardingStep1WeightSuffix,
             keyboardType: TextInputType.number,
             onChanged: onWeightChanged,
           ),
@@ -105,9 +118,8 @@ class OnboardingBasicInfoStep extends StatelessWidget {
 
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step1SystemNote,
+          l10n.onboardingStep1SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -151,9 +163,10 @@ class OnboardingBasicInfoStep extends StatelessWidget {
   }
 }
 
-class _InputField extends StatelessWidget {
+class _InputField extends StatefulWidget {
   final String hint;
   final String? suffix;
+  final String? initialValue;
   final TextInputType? keyboardType;
   final ValueChanged<String> onChanged;
 
@@ -161,8 +174,28 @@ class _InputField extends StatelessWidget {
     required this.hint,
     required this.onChanged,
     this.suffix,
+    this.initialValue,
     this.keyboardType,
   });
+
+  @override
+  State<_InputField> createState() => _InputFieldState();
+}
+
+class _InputFieldState extends State<_InputField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,15 +209,12 @@ class _InputField extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              onChanged: onChanged,
-              keyboardType: keyboardType,
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppColor.fg,
-                fontFamily: 'Exo2',
-              ),
+              controller: _controller,
+              onChanged: widget.onChanged,
+              keyboardType: widget.keyboardType,
+              style: const TextStyle(fontSize: 15, color: AppColor.fg),
               decoration: InputDecoration(
-                hintText: hint,
+                hintText: widget.hint,
                 hintStyle: const TextStyle(color: AppColor.fgMuted),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -194,15 +224,12 @@ class _InputField extends StatelessWidget {
               ),
             ),
           ),
-          if (suffix != null)
+          if (widget.suffix != null)
             Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Text(
-                suffix!,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColor.fgMuted,
-                ),
+                widget.suffix!,
+                style: const TextStyle(fontSize: 13, color: AppColor.fgMuted),
               ),
             ),
         ],
@@ -213,7 +240,7 @@ class _InputField extends StatelessWidget {
 
 class _DropdownField extends StatelessWidget {
   final String? value;
-  final List<String> options;
+  final List<OnboardingStepOption> options;
   final ValueChanged<String> onChanged;
 
   const _DropdownField({
@@ -236,28 +263,22 @@ class _DropdownField extends StatelessWidget {
           value: value,
           isExpanded: true,
           dropdownColor: AppColor.surface,
-          style: const TextStyle(
-            fontSize: 15,
-            color: AppColor.fg,
-            fontFamily: 'Exo2',
-          ),
+          style: const TextStyle(fontSize: 15, color: AppColor.fg),
           icon: const Icon(
             RemixIcons.arrow_down_s_line,
             size: 18,
             color: AppColor.fgMuted,
           ),
-          hint: Text(
-            options.first,
-            style: const TextStyle(
-              fontSize: 15,
-              color: AppColor.fgMuted,
-              fontFamily: 'Exo2',
-            ),
-          ),
-          items: options.map((String option) {
+          hint: options.isNotEmpty
+              ? Text(
+                  options.first.label,
+                  style: const TextStyle(fontSize: 15, color: AppColor.fgMuted),
+                )
+              : null,
+          items: options.map((OnboardingStepOption option) {
             return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
+              value: option.key,
+              child: Text(option.label),
             );
           }).toList(),
           onChanged: (String? newValue) {

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../widgets/app_progress_bar/app_progress_bar.dart';
-import '../constants/learning_roadmap_constants.dart';
 
 class RoadmapSummaryCard extends StatelessWidget {
   final int totalRoadmaps;
@@ -24,17 +24,12 @@ class RoadmapSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.s16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColor.violet.withOpacity(0.08),
-            AppColor.cyan.withOpacity(0.06),
-          ],
-        ),
+        gradient: AppColor.roadmapOverviewGradient,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColor.borderGlowViolet),
       ),
@@ -42,7 +37,7 @@ class RoadmapSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            LearningRoadmapConstants.summaryTitle,
+            l10n.lrSummaryTitle,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -54,17 +49,17 @@ class RoadmapSummaryCard extends StatelessWidget {
             children: [
               _StatItem(
                 value: '$totalRoadmaps',
-                label: LearningRoadmapConstants.summaryTotalRoadmaps,
+                label: l10n.lrSummaryTotalRoadmaps,
                 color: AppColor.cyan,
               ),
               _StatItem(
                 value: '$completedRoadmaps',
-                label: LearningRoadmapConstants.summaryCompleted,
+                label: l10n.lrSummaryCompleted,
                 color: AppColor.success,
               ),
               _StatItem(
                 value: '$completedSteps/$totalSteps',
-                label: LearningRoadmapConstants.summarySteps,
+                label: l10n.lrSummarySteps,
                 color: AppColor.violet,
               ),
             ],
@@ -74,16 +69,12 @@ class RoadmapSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                LearningRoadmapConstants.summaryAvgProgress,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColor.fgMuted,
-                ),
+                l10n.lrSummaryAvgProgress,
+                style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
               ),
               Text(
                 '${(averageProgress * 100).round()}%',
                 style: const TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 11,
                   color: AppColor.violet,
                   fontWeight: FontWeight.w700,
@@ -96,6 +87,15 @@ class RoadmapSummaryCard extends StatelessWidget {
             progress: averageProgress,
             height: 6,
             progressColor: AppColor.violet,
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            l10n.lrLocalProgressHint,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColor.fgMuted,
+              height: 1.35,
+            ),
           ),
         ],
       ),
@@ -122,7 +122,6 @@ class _StatItem extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: color,

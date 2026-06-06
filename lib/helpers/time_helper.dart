@@ -33,7 +33,7 @@ class TimeHelper {
   }
 
   /// Safe format: returns fallback if time is empty.
-  static String formatOrFallback(String? time, {String fallback = '--:--'}) {
+  static String formatOrFallback(String? time, {String fallback = ''}) {
     if (time == null || time.isEmpty) return fallback;
     return time;
   }

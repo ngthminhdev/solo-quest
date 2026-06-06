@@ -43,7 +43,7 @@ class AppThemeRegistry {
 
       // AppBar theme
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColor.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
@@ -53,7 +53,7 @@ class AppThemeRegistry {
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarBrightness: Brightness.dark,
           statusBarIconBrightness: Brightness.light,
-          statusBarColor: Colors.transparent,
+          statusBarColor: AppColor.transparent,
         ),
       ),
 
@@ -61,7 +61,7 @@ class AppThemeRegistry {
       cardTheme: CardThemeData(
         color: AppColor.surface,
         elevation: 0,
-        shadowColor: Colors.transparent,
+        shadowColor: AppColor.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
           side: const BorderSide(color: AppColor.border, width: 1),
@@ -133,7 +133,7 @@ class AppThemeRegistry {
       chipTheme: ChipThemeData(
         backgroundColor: AppColor.surface,
         selectedColor: AppColor.cyanDim,
-        disabledColor: AppColor.surface.withOpacity(0.5),
+        disabledColor: AppColor.surface.withValues(alpha:0.5),
         labelStyle: AppTextStyle.caption,
         secondaryLabelStyle: AppTextStyle.caption,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -43,18 +43,21 @@ class DailyProgressCard extends StatelessWidget {
                 color: AppColor.cyan,
                 icon: RemixIcons.medal_line,
               ),
+              SizedBox(width: 12),
               _statCell(
                 value: '${p?.totalExp ?? 0}',
                 label: 'EXP',
                 color: AppColor.expGold,
                 icon: RemixIcons.flashlight_line,
               ),
+              SizedBox(width: 12),
               _statCell(
                 value: '${p?.streakDays ?? 0}',
                 label: 'Chuỗi',
                 color: AppColor.warn,
                 icon: RemixIcons.fire_line,
               ),
+              SizedBox(width: 12),
               _statCell(
                 value: '${(completionRate * 100).toInt()}%',
                 label: 'Hoàn Thành',

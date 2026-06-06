@@ -4,13 +4,15 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
-import '../constants/progress_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class ExpExplainCard extends StatelessWidget {
   const ExpExplainCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(
         AppSpacing.s16,
@@ -27,17 +29,17 @@ class ExpExplainCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 RemixIcons.information_line,
                 size: 16,
                 color: AppColor.expGold,
               ),
-              SizedBox(width: AppSpacing.s6),
+              const SizedBox(width: AppSpacing.s6),
               Text(
-                ProgressConstants.expExplainTitle,
-                style: TextStyle(
+                l10n.progressExpExplainTitle,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fg,
@@ -47,7 +49,7 @@ class ExpExplainCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.s8),
           Text(
-            ProgressConstants.expExplainText,
+            l10n.progressExpExplainText,
             style: const TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,

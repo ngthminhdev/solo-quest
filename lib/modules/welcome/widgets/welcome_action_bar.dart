@@ -5,6 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
+import '../../../extensions/localization_extension.dart';
 
 class WelcomeActionBar extends StatelessWidget {
   final VoidCallback onStart;
@@ -18,6 +19,8 @@ class WelcomeActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       children: [
         GestureDetector(
@@ -30,7 +33,7 @@ class WelcomeActionBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.md),
               boxShadow: [
                 BoxShadow(
-                  color: AppColor.cyan.withOpacity(0.3),
+                  color: AppColor.cyan.withValues(alpha:0.3),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -46,7 +49,7 @@ class WelcomeActionBar extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
-                  'Bắt đầu thiết lập',
+                  l10n.welcomeStartButton,
                   style: AppTextStyle.button.copyWith(
                     color: AppColor.bgDeep,
                     fontSize: 15,
@@ -61,7 +64,7 @@ class WelcomeActionBar extends StatelessWidget {
           GestureDetector(
             onTap: onSkip,
             child: Text(
-              'Đã thiết lập? Bỏ qua',
+              l10n.welcomeSkipLink,
               style: AppTextStyle.bodySmall.copyWith(
                 color: AppColor.fgSecondary,
               ),

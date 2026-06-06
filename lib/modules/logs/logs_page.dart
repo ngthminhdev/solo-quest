@@ -6,8 +6,10 @@ import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../constants/app_color.dart';
 import '../../widgets/app_scaffold/app_scaffold.dart';
-import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
+import '../../widgets/skeleton/skeleton_logs_page.dart';
+import '../../extensions/localization_extension.dart';
+import '../main/main_page_model.dart';
 import 'logs_page_model.dart';
 import 'widgets/logs_summary_card.dart';
 import 'widgets/logs_filter_bar.dart';
@@ -23,16 +25,37 @@ class LogsPage extends BasePage<LogsPageModel, LogsPageState> {
 
 class _LogsPageState
     extends BasePageConsumerState<LogsPage, LogsPageModel, LogsPageState> {
+  static const _tabIndex = 1;
+  bool _settleListenerSet = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      pageModel.loadLogs();
+      _tryLoadIfSettled();
     });
+  }
+
+  void _tryLoadIfSettled() {
+    final settled = ref.read(mainPageProvider.select((s) => s.settledIndex));
+    if (settled == _tabIndex) {
+      pageModel.loadLogs();
+    }
   }
 
   @override
   void onBuild() {
+    if (!_settleListenerSet) {
+      _settleListenerSet = true;
+      ref.listen(mainPageProvider.select((s) => s.settledIndex), (prev, next) {
+        if (next == _tabIndex && prev != _tabIndex) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            pageModel.loadLogs();
+          });
+        }
+      });
+    }
+
     listen((previous, next) {
       if (previous?.loadState == AppLoadState.loading &&
           next.loadState == AppLoadState.error &&
@@ -40,7 +63,7 @@ class _LogsPageState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColor.danger,
           ),
         );
       }
@@ -54,7 +77,7 @@ class _LogsPageState
     if (state.loadState == AppLoadState.loading && !state.hasLogs) {
       return AppScaffold(
         showBottomNav: false,
-        body: const AppLoading(message: 'Đang tải nhật ký...'),
+        body: const SkeletonLogsPage(),
       );
     }
 
@@ -62,7 +85,7 @@ class _LogsPageState
       return AppScaffold(
         showBottomNav: false,
         body: AppErrorState(
-          message: state.errorMessage ?? 'Không thể tải nhật ký',
+          message: state.errorMessage ?? context.l10n.logsError,
           onRetry: pageModel.loadLogs,
         ),
       );

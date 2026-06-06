@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
+import '../../generated/l10n/app_localizations.dart';
 
 enum QuestType {
   water,
@@ -28,6 +27,8 @@ enum QuestSource {
 
 enum QuestActionType { start, complete, snooze, skip, viewReason }
 
+enum QuestPriority { highest, high, medium, low, lowest }
+
 extension QuestTypeX on QuestType {
   String get label {
     switch (this) {
@@ -52,49 +53,26 @@ extension QuestTypeX on QuestType {
     }
   }
 
-  IconData get icon {
+  String getLocalizedLabel(AppLocalizations l10n) {
     switch (this) {
       case QuestType.water:
-        return RemixIcons.drop_line;
+        return l10n.questTypeWater;
       case QuestType.breakTime:
-        return RemixIcons.eye_line;
+        return l10n.questTypeBreak;
       case QuestType.movement:
-        return RemixIcons.walk_line;
+        return l10n.questTypeMovement;
       case QuestType.learning:
-        return RemixIcons.book_open_line;
+        return l10n.questTypeLearning;
       case QuestType.sleep:
-        return RemixIcons.moon_line;
+        return l10n.questTypeSleep;
       case QuestType.fitness:
-        return RemixIcons.heart_pulse_line;
+        return l10n.questTypeFitness;
       case QuestType.mindfulness:
-        return RemixIcons.mental_health_line;
+        return l10n.questTypeMindfulness;
       case QuestType.review:
-        return RemixIcons.file_list_3_line;
+        return l10n.questTypeReview;
       case QuestType.custom:
-        return RemixIcons.star_line;
-    }
-  }
-
-  String get iconText {
-    switch (this) {
-      case QuestType.water:
-        return '💧';
-      case QuestType.breakTime:
-        return '☕';
-      case QuestType.movement:
-        return '🚶';
-      case QuestType.learning:
-        return '📚';
-      case QuestType.sleep:
-        return '😴';
-      case QuestType.fitness:
-        return '💪';
-      case QuestType.mindfulness:
-        return '🧘';
-      case QuestType.review:
-        return '📝';
-      case QuestType.custom:
-        return '⭐';
+        return l10n.questTypeCustom;
     }
   }
 }
@@ -116,6 +94,23 @@ extension QuestStatusX on QuestStatus {
         return 'Hết hạn';
     }
   }
+
+  String getLocalizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case QuestStatus.pending:
+        return l10n.statusPending;
+      case QuestStatus.active:
+        return l10n.statusActive;
+      case QuestStatus.completed:
+        return l10n.statusCompleted;
+      case QuestStatus.skipped:
+        return l10n.statusSkipped;
+      case QuestStatus.snoozed:
+        return l10n.statusSnoozed;
+      case QuestStatus.expired:
+        return l10n.statusExpired;
+    }
+  }
 }
 
 extension QuestDifficultyX on QuestDifficulty {
@@ -130,6 +125,17 @@ extension QuestDifficultyX on QuestDifficulty {
     }
   }
 
+  String getLocalizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case QuestDifficulty.easy:
+        return l10n.difficultyEasy;
+      case QuestDifficulty.medium:
+        return l10n.difficultyMedium;
+      case QuestDifficulty.hard:
+        return l10n.difficultyHard;
+    }
+  }
+
   String get description {
     switch (this) {
       case QuestDifficulty.easy:
@@ -138,6 +144,80 @@ extension QuestDifficultyX on QuestDifficulty {
         return 'Cần tập trung hoặc vận động nhẹ.';
       case QuestDifficulty.hard:
         return 'Cần nhiều năng lượng/thời gian hơn.';
+    }
+  }
+
+  String getLocalizedDescription(AppLocalizations l10n) {
+    switch (this) {
+      case QuestDifficulty.easy:
+        return l10n.difficultyEasyDesc;
+      case QuestDifficulty.medium:
+        return l10n.difficultyMediumDesc;
+      case QuestDifficulty.hard:
+        return l10n.difficultyHardDesc;
+    }
+  }
+}
+
+extension QuestPriorityX on QuestPriority {
+  String get label {
+    switch (this) {
+      case QuestPriority.highest:
+        return 'Cao nhất';
+      case QuestPriority.high:
+        return 'Cao';
+      case QuestPriority.medium:
+        return 'Vừa';
+      case QuestPriority.low:
+        return 'Thấp';
+      case QuestPriority.lowest:
+        return 'Thấp nhất';
+    }
+  }
+
+  String getLocalizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case QuestPriority.highest:
+        return l10n.priorityHighest;
+      case QuestPriority.high:
+        return l10n.priorityHigh;
+      case QuestPriority.medium:
+        return l10n.priorityMedium;
+      case QuestPriority.low:
+        return l10n.priorityLow;
+      case QuestPriority.lowest:
+        return l10n.priorityLowest;
+    }
+  }
+
+  int get value {
+    switch (this) {
+      case QuestPriority.highest:
+        return 5;
+      case QuestPriority.high:
+        return 4;
+      case QuestPriority.medium:
+        return 3;
+      case QuestPriority.low:
+        return 2;
+      case QuestPriority.lowest:
+        return 1;
+    }
+  }
+
+  static QuestPriority fromValue(int value) {
+    switch (value) {
+      case 5:
+        return QuestPriority.highest;
+      case 4:
+        return QuestPriority.high;
+      case 3:
+        return QuestPriority.medium;
+      case 2:
+        return QuestPriority.low;
+      case 1:
+      default:
+        return QuestPriority.lowest;
     }
   }
 }

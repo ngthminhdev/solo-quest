@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/progress_model.dart';
 
 class WeeklyChartCard extends StatelessWidget {
@@ -21,6 +22,7 @@ class WeeklyChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final maxPlanned = dailyData.fold<int>(
       0,
       (max, d) => d.planned > max ? d.planned : max,
@@ -54,9 +56,9 @@ class WeeklyChartCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.s6),
-              const Text(
-                'HOÀN THÀNH THEO TUẦN',
-                style: TextStyle(
+              Text(
+                l10n.progressWeeklyChartSection,
+                style: const TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -67,9 +69,9 @@ class WeeklyChartCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.s12),
-          const Text(
-            'Tuần này',
-            style: TextStyle(
+          Text(
+            l10n.progressWeeklyChartTitle,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -149,14 +151,14 @@ class WeeklyChartCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tỷ lệ trung bình: ${(avgRate * 100).toInt()}%',
+                  l10n.progressWeeklyChartAverage((avgRate * 100).toInt()),
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppColor.fgMuted,
                   ),
                 ),
                 Text(
-                  'Tổng: $weeklyTotal/$weeklyPlanned',
+                  l10n.progressWeeklyChartTotal(weeklyTotal, weeklyPlanned),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,

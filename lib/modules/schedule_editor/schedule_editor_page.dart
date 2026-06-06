@@ -11,11 +11,11 @@ import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
 import '../../widgets/app_dialog/app_confirm_dialog.dart';
+import '../../extensions/localization_extension.dart';
 import 'schedule_editor_page_model.dart';
 import 'widgets/schedule_summary_card.dart';
 import 'widgets/schedule_block_list_section.dart';
 import 'widgets/schedule_block_form_sheet.dart';
-import 'constants/schedule_editor_constants.dart';
 
 class ScheduleEditorPage
     extends BasePage<ScheduleEditorPageModel, ScheduleEditorPageState> {
@@ -43,47 +43,17 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
     if (state.loadState == AppLoadState.loading && !state.hasBlocks) {
       return Scaffold(
         backgroundColor: AppColor.bg,
-        appBar: AppBar(
-          backgroundColor: AppColor.bgRaised,
-          elevation: 0,
-          title: Text(
-            ScheduleEditorConstants.pageTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColor.fg,
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColor.fg),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: const AppLoading(message: 'Đang tải lịch sinh hoạt...'),
+        appBar: _buildAppBar(),
+        body: AppLoading(message: context.l10n.scheduleEditorLoading),
       );
     }
 
     if (state.loadState == AppLoadState.error && !state.hasBlocks) {
       return Scaffold(
         backgroundColor: AppColor.bg,
-        appBar: AppBar(
-          backgroundColor: AppColor.bgRaised,
-          elevation: 0,
-          title: Text(
-            ScheduleEditorConstants.pageTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColor.fg,
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColor.fg),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
+        appBar: _buildAppBar(),
         body: AppErrorState(
-          message: state.errorMessage ?? 'Không thể tải lịch sinh hoạt',
+          message: state.errorMessage ?? context.l10n.scheduleEditorError,
           onRetry: pageModel.loadSchedule,
         ),
       );
@@ -91,22 +61,7 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
 
     return Scaffold(
       backgroundColor: AppColor.bg,
-      appBar: AppBar(
-        backgroundColor: AppColor.bgRaised,
-        elevation: 0,
-        title: Text(
-          ScheduleEditorConstants.pageTitle,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColor.fg,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColor.fg),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: RefreshIndicator(
         color: AppColor.cyan,
         backgroundColor: AppColor.bgRaised,
@@ -121,9 +76,10 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
 
               // Subtitle
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                 child: Text(
-                  ScheduleEditorConstants.pageSubtitle,
+                  context.l10n.scheduleEditorPageSubtitle,
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColor.fgMuted,
@@ -137,7 +93,8 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
               // Summary card
               if (state.hasBlocks)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                   child: ScheduleSummaryCard(
                     totalBlocks: state.totalBlocks,
                     fixedBlockCount: state.fixedBlockCount,
@@ -165,12 +122,31 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         foregroundColor: AppColor.bgDeep,
         icon: const Icon(Icons.add),
         label: Text(
-          ScheduleEditorConstants.addBlockButton,
+          context.l10n.scheduleEditorAddBlockButton,
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: AppColor.bgRaised,
+      elevation: 0,
+      title: Text(
+        context.l10n.scheduleEditorPageTitle,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: AppColor.fg,
+        ),
+      ),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: AppColor.fg),
+        onPressed: () => Navigator.of(context).pop(),
       ),
     );
   }
@@ -189,6 +165,7 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         ),
         weekdays: result.weekdays,
         isFlexible: result.isFlexible,
+        isBusy: result.isBusy,
       );
 
       final success = await pageModel.addBlock(block);
@@ -197,12 +174,12 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         if (success) {
           AppToastService.success(
             context,
-            ScheduleEditorConstants.toastAddSuccess,
+            context.l10n.scheduleEditorToastAddSuccess,
           );
         } else {
           AppToastService.error(
             context,
-            ScheduleEditorConstants.toastAddFailed,
+            read.errorMessage ?? context.l10n.scheduleEditorToastAddFailed,
           );
         }
       }
@@ -225,6 +202,7 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         ),
         weekdays: result.weekdays,
         isFlexible: result.isFlexible,
+        isBusy: result.isBusy,
       );
 
       final success = await pageModel.updateBlock(updatedBlock);
@@ -233,12 +211,12 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         if (success) {
           AppToastService.success(
             context,
-            ScheduleEditorConstants.toastUpdateSuccess,
+            context.l10n.scheduleEditorToastUpdateSuccess,
           );
         } else {
           AppToastService.error(
             context,
-            ScheduleEditorConstants.toastUpdateFailed,
+            read.errorMessage ?? context.l10n.scheduleEditorToastUpdateFailed,
           );
         }
       }
@@ -248,8 +226,8 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
   Future<void> _handleDeleteBlock(ScheduleBlockModel block) async {
     final confirmed = await AppConfirmDialog.show(
       context: context,
-      title: ScheduleEditorConstants.deleteConfirmTitle,
-      message: ScheduleEditorConstants.deleteConfirmMessage,
+      title: context.l10n.scheduleEditorDeleteTitle,
+      message: context.l10n.scheduleEditorDeleteMsg,
     );
 
     if (confirmed == true && mounted) {
@@ -259,12 +237,12 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
         if (success) {
           AppToastService.success(
             context,
-            ScheduleEditorConstants.toastDeleteSuccess,
+            context.l10n.scheduleEditorToastDeleteSuccess,
           );
         } else {
           AppToastService.error(
             context,
-            ScheduleEditorConstants.toastDeleteFailed,
+            read.errorMessage ?? context.l10n.scheduleEditorToastDeleteFailed,
           );
         }
       }

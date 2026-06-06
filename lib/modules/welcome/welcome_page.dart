@@ -6,12 +6,12 @@ import '../../base/base_page_consumer_state.dart';
 import '../../constants/app_color.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_style.dart';
+import '../../extensions/localization_extension.dart';
 import '../../routes/routes_config.dart';
 import 'welcome_page_model.dart';
 import 'widgets/welcome_hero_card.dart';
 import 'widgets/welcome_feature_list.dart';
 import 'widgets/welcome_action_bar.dart';
-import 'constants/welcome_constants.dart';
 
 class WelcomePage extends BasePage<WelcomePageModel, WelcomePageState> {
   WelcomePage({super.key}) : super(provider: welcomePageProvider);
@@ -24,6 +24,8 @@ class _WelcomePageState
     extends BasePageConsumerState<WelcomePage, WelcomePageModel, WelcomePageState> {
   @override
   Widget renderPage(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       backgroundColor: AppColor.bgDeep,
       body: SafeArea(
@@ -43,7 +45,7 @@ class _WelcomePageState
 
               // Subtitle
               Text(
-                WelcomeConstants.subtitle,
+                l10n.welcomeSubtitle,
                 style: AppTextStyle.body.copyWith(
                   color: AppColor.fgSecondary,
                   height: 1.6,
@@ -63,9 +65,8 @@ class _WelcomePageState
                   border: Border.all(color: AppColor.borderGlowCyan),
                 ),
                 child: Text(
-                  WelcomeConstants.systemMessage,
+                  l10n.welcomeSystemMessage,
                   style: const TextStyle(
-                    fontFamily: 'Exo2',
                     fontSize: 12,
                     color: AppColor.cyan,
                     height: 1.6,
@@ -98,7 +99,7 @@ class _WelcomePageState
 
               // Version
               Text(
-                WelcomeConstants.versionTag,
+                l10n.welcomeVersionTag,
                 style: AppTextStyle.monoLabel.copyWith(
                   color: AppColor.fgMuted,
                 ),

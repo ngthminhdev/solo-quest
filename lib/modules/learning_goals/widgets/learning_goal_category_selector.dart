@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/learning_goals_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LearningGoalCategorySelector extends StatelessWidget {
   final List<String> categories;
@@ -19,13 +19,15 @@ class LearningGoalCategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Row(
         children: [
           _CategoryChip(
-            label: LearningGoalsConstants.filterAll,
+            label: l10n.lgFilterAll,
             isSelected: selectedCategory == null,
             onTap: () => onChanged(null),
           ),
@@ -68,7 +70,7 @@ class _CategoryChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColor.cyanDim : AppColor.surface,
-          borderRadius: BorderRadius.circular(AppRadius.full),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(
             color: isSelected ? AppColor.cyan : AppColor.border,
             width: isSelected ? 2 : 1,

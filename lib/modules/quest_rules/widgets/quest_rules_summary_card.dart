@@ -4,8 +4,8 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../widgets/app_card/app_glow_card.dart';
-import '../constants/quest_rules_constants.dart';
 
 class QuestRulesSummaryCard extends StatelessWidget {
   final int totalRules;
@@ -23,18 +23,20 @@ class QuestRulesSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return AppGlowCard(
       padding: const EdgeInsets.all(AppSpacing.s16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(RemixIcons.settings_4_line, size: 18, color: AppColor.cyan),
-              SizedBox(width: AppSpacing.s8),
+            children: [
+              const Icon(RemixIcons.settings_4_line, size: 18, color: AppColor.cyan),
+              const SizedBox(width: AppSpacing.s8),
               Text(
-                QuestRulesConstants.summaryTitle,
-                style: TextStyle(
+                l10n.questRulesSummaryTitle,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: AppColor.fg,
@@ -48,7 +50,7 @@ class QuestRulesSummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   icon: RemixIcons.settings_4_line,
-                  label: 'Tổng luật',
+                  label: l10n.questRulesMetricTotal,
                   value: '$totalRules',
                   color: AppColor.cyan,
                 ),
@@ -56,7 +58,7 @@ class QuestRulesSummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   icon: RemixIcons.checkbox_circle_line,
-                  label: 'Đang bật',
+                  label: l10n.questRulesMetricEnabled,
                   value: '$enabledCount',
                   color: AppColor.success,
                 ),
@@ -69,7 +71,7 @@ class QuestRulesSummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   icon: RemixIcons.close_circle_line,
-                  label: 'Đang tắt',
+                  label: l10n.questRulesMetricDisabled,
                   value: '$disabledCount',
                   color: AppColor.fgSecondary,
                 ),
@@ -77,7 +79,7 @@ class QuestRulesSummaryCard extends StatelessWidget {
               Expanded(
                 child: _SummaryMetric(
                   icon: RemixIcons.calendar_check_line,
-                  label: 'Giới hạn/ngày',
+                  label: l10n.questRulesMetricDailyLimit,
                   value: '$dailyQuestLimit quest',
                   color: AppColor.warn,
                 ),

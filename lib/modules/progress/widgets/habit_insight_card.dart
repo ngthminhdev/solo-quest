@@ -76,7 +76,7 @@ class HabitInsightCard extends StatelessWidget {
                   height: 5,
                   decoration: BoxDecoration(
                     color: AppColor.bgRaised,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: FractionallySizedBox(
@@ -85,7 +85,7 @@ class HabitInsightCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: insight.color,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                     ),
                   ),

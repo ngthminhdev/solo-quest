@@ -18,14 +18,56 @@ class QuestRulesPageState extends BasePageState {
   final int dailyQuestLimit;
   final String? errorMessage;
 
+  // Global settings from backend API
+  final String globalDifficulty;
+  final bool autoAdjustEnabled;
+  final List<String> enabledCategories;
+  final String preferredDuration;
+  final bool restDayEnabled;
+
   QuestRulesPageState({
     this.loadState = AppLoadState.idle,
     this.rules = const [],
     this.selectedType,
     this.dailyQuestLimit = 8,
     this.errorMessage,
-    super.isLockedPage,
-  });
+    this.globalDifficulty = 'medium',
+    this.autoAdjustEnabled = true,
+    this.enabledCategories = const [],
+    this.preferredDuration = 'medium',
+    this.restDayEnabled = false,
+    bool isLockedPage = false,
+  }) : super(isLockedPage: isLockedPage);
+
+  QuestRulesPageState copyWith({
+    AppLoadState? loadState,
+    List<QuestRuleModel>? rules,
+    QuestType? selectedType,
+    bool clearSelectedType = false,
+    int? dailyQuestLimit,
+    String? errorMessage,
+    bool? isLockedPage,
+    String? globalDifficulty,
+    bool? autoAdjustEnabled,
+    List<String>? enabledCategories,
+    String? preferredDuration,
+    bool? restDayEnabled,
+  }) {
+    return QuestRulesPageState(
+      loadState: loadState ?? this.loadState,
+      rules: rules ?? this.rules,
+      selectedType:
+          clearSelectedType ? null : selectedType ?? this.selectedType,
+      dailyQuestLimit: dailyQuestLimit ?? this.dailyQuestLimit,
+      errorMessage: errorMessage ?? this.errorMessage,
+      isLockedPage: isLockedPage ?? this.isLockedPage,
+      globalDifficulty: globalDifficulty ?? this.globalDifficulty,
+      autoAdjustEnabled: autoAdjustEnabled ?? this.autoAdjustEnabled,
+      enabledCategories: enabledCategories ?? this.enabledCategories,
+      preferredDuration: preferredDuration ?? this.preferredDuration,
+      restDayEnabled: restDayEnabled ?? this.restDayEnabled,
+    );
+  }
 
   @override
   QuestRulesPageState updateState({
@@ -36,16 +78,25 @@ class QuestRulesPageState extends BasePageState {
     int? dailyQuestLimit,
     String? errorMessage,
     bool? isLockedPage,
+    String? globalDifficulty,
+    bool? autoAdjustEnabled,
+    List<String>? enabledCategories,
+    String? preferredDuration,
+    bool? restDayEnabled,
   }) {
-    return QuestRulesPageState(
-      loadState: loadState ?? this.loadState,
-      rules: rules ?? this.rules,
-      selectedType: clearSelectedType
-          ? null
-          : selectedType ?? this.selectedType,
-      dailyQuestLimit: dailyQuestLimit ?? this.dailyQuestLimit,
-      errorMessage: errorMessage ?? this.errorMessage,
-      isLockedPage: isLockedPage ?? this.isLockedPage,
+    return copyWith(
+      loadState: loadState,
+      rules: rules,
+      selectedType: selectedType,
+      clearSelectedType: clearSelectedType,
+      dailyQuestLimit: dailyQuestLimit,
+      errorMessage: errorMessage,
+      isLockedPage: isLockedPage,
+      globalDifficulty: globalDifficulty,
+      autoAdjustEnabled: autoAdjustEnabled,
+      enabledCategories: enabledCategories,
+      preferredDuration: preferredDuration,
+      restDayEnabled: restDayEnabled,
     );
   }
 
@@ -61,6 +112,30 @@ class QuestRulesPageState extends BasePageState {
   int get disabledCount => rules.where((rule) => !rule.enabled).length;
 
   bool get hasRules => rules.isNotEmpty;
+
+  String get globalDifficultyLabel {
+    switch (globalDifficulty) {
+      case 'easy':
+        return QuestDifficulty.easy.label;
+      case 'hard':
+        return QuestDifficulty.hard.label;
+      case 'medium':
+      default:
+        return QuestDifficulty.medium.label;
+    }
+  }
+
+  String get preferredDurationLabel {
+    switch (preferredDuration) {
+      case 'short':
+        return 'Ngắn';
+      case 'long':
+        return 'Dài';
+      case 'medium':
+      default:
+        return 'Vừa';
+    }
+  }
 }
 
 class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
@@ -72,42 +147,54 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
   final QuestRuleService questRuleService;
   final LogService logService;
 
-  Future<void> loadRules() async {
+  Future<void> loadSettings() async {
     try {
       state = state.updateState(loadState: AppLoadState.loading);
 
-      final rules = await questRuleService.getQuestRules();
-      final dailyLimit = await questRuleService.getDailyQuestLimit();
+      final data = await questRuleService.loadSettings();
 
       state = state.updateState(
         loadState: AppLoadState.ready,
-        rules: _sortRules(rules),
-        dailyQuestLimit: dailyLimit,
+        rules: _sortRules(data.rules),
+        dailyQuestLimit: data.dailyQuestCount,
+        globalDifficulty: data.difficulty,
+        autoAdjustEnabled: data.autoAdjustEnabled,
+        enabledCategories: data.enabledCategories,
+        preferredDuration: data.preferredDuration,
+        restDayEnabled: data.restDayEnabled,
         errorMessage: null,
+        isLockedPage: false,
       );
     } catch (e) {
       state = state.updateState(
         loadState: AppLoadState.error,
         errorMessage: e.toString(),
+        isLockedPage: false,
       );
     }
   }
 
-  Future<void> refreshRules() async {
+  Future<void> refreshSettings() async {
     try {
-      final rules = await questRuleService.getQuestRules();
-      final dailyLimit = await questRuleService.getDailyQuestLimit();
+      final data = await questRuleService.loadSettings();
 
       state = state.updateState(
         loadState: AppLoadState.ready,
-        rules: _sortRules(rules),
-        dailyQuestLimit: dailyLimit,
+        rules: _sortRules(data.rules),
+        dailyQuestLimit: data.dailyQuestCount,
+        globalDifficulty: data.difficulty,
+        autoAdjustEnabled: data.autoAdjustEnabled,
+        enabledCategories: data.enabledCategories,
+        preferredDuration: data.preferredDuration,
+        restDayEnabled: data.restDayEnabled,
         errorMessage: null,
+        isLockedPage: false,
       );
     } catch (e) {
       state = state.updateState(
         loadState: AppLoadState.error,
         errorMessage: e.toString(),
+        isLockedPage: false,
       );
     }
   }
@@ -119,9 +206,11 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
     try {
       state = state.updateState(isLockedPage: true);
 
-      final updated = await questRuleService.toggleQuestRule(
-        ruleId: ruleId,
-        enabled: enabled,
+      final rule = state.rules.firstWhere((r) => r.id == ruleId);
+      final updated = rule.copyWith(enabled: enabled);
+
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(ruleUpdate: updated),
       );
 
       await _addLog(
@@ -130,7 +219,7 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
         questType: updated.type,
       );
 
-      await loadRules();
+      await loadSettings();
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
@@ -146,15 +235,17 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
     try {
       state = state.updateState(isLockedPage: true);
 
-      final updated = await questRuleService.updateQuestRule(rule);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(ruleUpdate: rule),
+      );
 
       await _addLog(
         title: 'Cập nhật luật quest',
-        description: updated.title,
-        questType: updated.type,
+        description: rule.title,
+        questType: rule.type,
       );
 
-      await loadRules();
+      await loadSettings();
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
@@ -172,13 +263,88 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
     try {
       state = state.updateState(isLockedPage: true);
 
-      await questRuleService.updateDailyQuestLimit(limit);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(dailyQuestCount: limit),
+      );
+
       await _addLog(
         title: 'Cập nhật giới hạn quest/ngày',
         description: '$limit quest',
       );
 
-      await loadRules();
+      await loadSettings();
+      state = state.updateState(isLockedPage: false);
+      return true;
+    } catch (e) {
+      state = state.updateState(
+        isLockedPage: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> updateGlobalDifficulty(String difficulty) async {
+    try {
+      state = state.updateState(isLockedPage: true);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(difficulty: difficulty),
+      );
+      await loadSettings();
+      state = state.updateState(isLockedPage: false);
+      return true;
+    } catch (e) {
+      state = state.updateState(
+        isLockedPage: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> toggleAutoAdjust(bool enabled) async {
+    try {
+      state = state.updateState(isLockedPage: true);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(autoAdjustEnabled: enabled),
+      );
+      await loadSettings();
+      state = state.updateState(isLockedPage: false);
+      return true;
+    } catch (e) {
+      state = state.updateState(
+        isLockedPage: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> toggleRestDay(bool enabled) async {
+    try {
+      state = state.updateState(isLockedPage: true);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(restDayEnabled: enabled),
+      );
+      await loadSettings();
+      state = state.updateState(isLockedPage: false);
+      return true;
+    } catch (e) {
+      state = state.updateState(
+        isLockedPage: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  Future<bool> updatePreferredDuration(String duration) async {
+    try {
+      state = state.updateState(isLockedPage: true);
+      await questRuleService.updateSettings(
+        QuestSettingsDataUpdate(preferredDuration: duration),
+      );
+      await loadSettings();
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
@@ -194,13 +360,14 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
     try {
       state = state.updateState(isLockedPage: true);
 
-      await questRuleService.resetToDefaultRules();
+      await questRuleService.resetToDefaultSettings();
+
       await _addLog(
         title: 'Khôi phục luật mặc định',
         description: 'Bộ luật tạo quest',
       );
 
-      await loadRules();
+      await loadSettings();
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
@@ -213,7 +380,11 @@ class QuestRulesPageModel extends BasePageModel<QuestRulesPageState> {
   }
 
   void selectType(QuestType? type) {
-    state = state.updateState(selectedType: type);
+    if (type == null) {
+      state = state.updateState(clearSelectedType: true);
+    } else {
+      state = state.updateState(selectedType: type);
+    }
   }
 
   void clearTypeFilter() {

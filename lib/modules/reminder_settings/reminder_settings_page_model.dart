@@ -123,7 +123,7 @@ class ReminderSettingsPageModel
         LogEntryModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           type: LogEntryType.ruleUpdated,
-          title: enabled ? 'Bật nhắc nhở' : 'Tắt nhắc nhở',
+          title: enabled ? 'reminderSettingsLogToggleOn' : 'reminderSettingsLogToggleOff',
           description: updated.title,
           createdAt: DateTime.now(),
         ),
@@ -151,7 +151,7 @@ class ReminderSettingsPageModel
         LogEntryModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           type: LogEntryType.ruleUpdated,
-          title: 'Cập nhật nhắc nhở',
+          title: 'reminderSettingsLogUpdate',
           description: updated.title,
           createdAt: DateTime.now(),
         ),

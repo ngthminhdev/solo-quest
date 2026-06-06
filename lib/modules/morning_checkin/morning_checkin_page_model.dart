@@ -1,28 +1,24 @@
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
+import '../../core/utils/app_time_formatter.dart';
 import '../../models/daily_checkin_model.dart';
-import '../../models/log_entry_model.dart';
 import '../../models/enums/user_enums.dart';
-import '../../models/enums/log_enums.dart';
 import '../../services/daily_checkin_service.dart';
-import '../../services/log_service.dart';
-import '../../services/quest_service.dart';
 import '../../services/service_providers.dart';
 
 class MorningCheckinPageState extends BasePageState {
   final AppLoadState loadState;
   final DailyCheckinModel? todayCheckin;
 
+  final CheckinMood? mood;
   final EnergyLevel? energyLevel;
-  final StressLevel? stressLevel;
-  final FocusLevel? focusLevel;
-  final DayIntensity? dayIntensity;
-  final String mainFocusToday;
-  final String note;
-  final List<String> availableTimeBlocks;
+  final Availability? availability;
+  final CheckinPriority? priority;
 
   final String? errorMessage;
   final bool hasSubmitted;
@@ -30,13 +26,10 @@ class MorningCheckinPageState extends BasePageState {
   MorningCheckinPageState({
     this.loadState = AppLoadState.idle,
     this.todayCheckin,
-    this.energyLevel,
-    this.stressLevel,
-    this.focusLevel,
-    this.dayIntensity,
-    this.mainFocusToday = '',
-    this.note = '',
-    this.availableTimeBlocks = const [],
+    this.mood = CheckinMood.normal,
+    this.energyLevel = EnergyLevel.medium,
+    this.availability = Availability.normal,
+    this.priority,
     this.errorMessage,
     this.hasSubmitted = false,
     super.isLockedPage,
@@ -46,13 +39,10 @@ class MorningCheckinPageState extends BasePageState {
   MorningCheckinPageState updateState({
     AppLoadState? loadState,
     DailyCheckinModel? todayCheckin,
+    CheckinMood? mood,
     EnergyLevel? energyLevel,
-    StressLevel? stressLevel,
-    FocusLevel? focusLevel,
-    DayIntensity? dayIntensity,
-    String? mainFocusToday,
-    String? note,
-    List<String>? availableTimeBlocks,
+    Availability? availability,
+    CheckinPriority? priority,
     String? errorMessage,
     bool? hasSubmitted,
     bool? isLockedPage,
@@ -60,13 +50,10 @@ class MorningCheckinPageState extends BasePageState {
     return MorningCheckinPageState(
       loadState: loadState ?? this.loadState,
       todayCheckin: todayCheckin ?? this.todayCheckin,
+      mood: mood ?? this.mood,
       energyLevel: energyLevel ?? this.energyLevel,
-      stressLevel: stressLevel ?? this.stressLevel,
-      focusLevel: focusLevel ?? this.focusLevel,
-      dayIntensity: dayIntensity ?? this.dayIntensity,
-      mainFocusToday: mainFocusToday ?? this.mainFocusToday,
-      note: note ?? this.note,
-      availableTimeBlocks: availableTimeBlocks ?? this.availableTimeBlocks,
+      availability: availability ?? this.availability,
+      priority: priority ?? this.priority,
       errorMessage: errorMessage ?? this.errorMessage,
       hasSubmitted: hasSubmitted ?? this.hasSubmitted,
       isLockedPage: isLockedPage ?? this.isLockedPage,
@@ -74,20 +61,20 @@ class MorningCheckinPageState extends BasePageState {
   }
 
   bool get canSubmit {
-    return energyLevel != null &&
-        stressLevel != null &&
-        focusLevel != null &&
-        dayIntensity != null;
+    return mood != null &&
+        energyLevel != null &&
+        availability != null &&
+        priority != null;
   }
 
   bool get hasCheckedInToday => todayCheckin != null || hasSubmitted;
 
   int get completedRequiredFieldCount {
     int count = 0;
+    if (mood != null) count++;
     if (energyLevel != null) count++;
-    if (stressLevel != null) count++;
-    if (focusLevel != null) count++;
-    if (dayIntensity != null) count++;
+    if (availability != null) count++;
+    if (priority != null) count++;
     return count;
   }
 
@@ -98,80 +85,72 @@ class MorningCheckinPageModel
     extends BasePageModel<MorningCheckinPageState> {
   MorningCheckinPageModel({
     required this.dailyCheckinService,
-    required this.logService,
-    required this.questService,
   }) : super(MorningCheckinPageState());
 
   final DailyCheckinService dailyCheckinService;
-  final LogService logService;
-  final QuestService questService;
 
   Future<void> loadTodayCheckin() async {
+    if (kDebugMode) {
+      developer.log('[CHECKIN] Loading today check-in');
+    }
     state = state.updateState(loadState: AppLoadState.loading);
 
     try {
       final checkin = await dailyCheckinService.getTodayCheckin();
 
       if (checkin != null) {
+        if (kDebugMode) {
+          developer.log('[CHECKIN] Today check-in found: id=${checkin.id}, date=${checkin.date}');
+        }
         state = state.updateState(
           loadState: AppLoadState.ready,
           todayCheckin: checkin,
+          mood: checkin.mood,
           energyLevel: checkin.energyLevel,
-          stressLevel: checkin.stressLevel,
-          focusLevel: checkin.focusLevel,
-          dayIntensity: checkin.dayIntensity,
-          mainFocusToday: checkin.mainFocusToday ?? '',
-          note: checkin.note ?? '',
-          availableTimeBlocks: List.from(checkin.availableTimeBlocks),
+          availability: checkin.availability,
+          priority: checkin.priority,
+          hasSubmitted: true,
         );
       } else {
+        if (kDebugMode) {
+          developer.log('[CHECKIN] No check-in today');
+        }
         state = state.updateState(loadState: AppLoadState.ready);
       }
     } catch (e) {
+      if (kDebugMode) {
+        developer.log('[CHECKIN] Failed to load today check-in: $e');
+      }
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: 'Không thể tải check-in: ${e.toString()}',
       );
     }
+  }
+
+  void setMood(CheckinMood value) {
+    state = state.updateState(mood: value);
   }
 
   void setEnergyLevel(EnergyLevel value) {
     state = state.updateState(energyLevel: value);
   }
 
-  void setStressLevel(StressLevel value) {
-    state = state.updateState(stressLevel: value);
+  void setAvailability(Availability value) {
+    state = state.updateState(availability: value);
   }
 
-  void setFocusLevel(FocusLevel value) {
-    state = state.updateState(focusLevel: value);
-  }
-
-  void setDayIntensity(DayIntensity value) {
-    state = state.updateState(dayIntensity: value);
-  }
-
-  void setMainFocusToday(String value) {
-    state = state.updateState(mainFocusToday: value);
-  }
-
-  void setNote(String value) {
-    state = state.updateState(note: value);
-  }
-
-  void toggleAvailableTimeBlock(String value) {
-    final current = List<String>.from(state.availableTimeBlocks);
-    if (current.contains(value)) {
-      current.remove(value);
-    } else {
-      current.add(value);
-    }
-    state = state.updateState(availableTimeBlocks: current);
+  void setPriority(CheckinPriority value) {
+    state = state.updateState(priority: value);
   }
 
   Future<bool> submitCheckin() async {
     if (!state.canSubmit) return false;
     if (state.isLockedPage) return false;
+
+    if (kDebugMode) {
+      final localDate = AppTimeFormatter.todayLocalDateQuery();
+      developer.log('[CHECKIN] Submit tapped — local date: $localDate');
+    }
 
     state = state.updateState(isLockedPage: true);
 
@@ -180,36 +159,18 @@ class MorningCheckinPageModel
       final checkin = DailyCheckinModel(
         id: 'checkin_${now.millisecondsSinceEpoch}',
         date: now,
+        mood: state.mood!,
         energyLevel: state.energyLevel!,
-        stressLevel: state.stressLevel!,
-        focusLevel: state.focusLevel!,
-        dayIntensity: state.dayIntensity!,
-        mainFocusToday: state.mainFocusToday.isEmpty ? null : state.mainFocusToday,
-        note: state.note.isEmpty ? null : state.note,
-        availableTimeBlocks: state.availableTimeBlocks,
+        availability: state.availability!,
+        priority: state.priority!,
         createdAt: now,
       );
 
       final saved = await dailyCheckinService.saveCheckin(checkin);
 
-      await logService.addLog(LogEntryModel(
-        id: 'log_checkin_${now.millisecondsSinceEpoch}',
-        type: LogEntryType.morningCheckin,
-        title: 'Check-in buổi sáng',
-        description:
-            'Năng lượng: ${state.energyLevel!.label}, '
-            'Stress: ${state.stressLevel!.label}, '
-            'Focus: ${state.focusLevel!.label}',
-        createdAt: now,
-        metadata: {
-          'energyLevel': state.energyLevel!.name,
-          'stressLevel': state.stressLevel!.name,
-          'focusLevel': state.focusLevel!.name,
-          'dayIntensity': state.dayIntensity!.name,
-          'mainFocusToday': state.mainFocusToday,
-          'availableTimeBlocks': state.availableTimeBlocks,
-        },
-      ));
+      if (kDebugMode) {
+        developer.log('[CHECKIN] Save success: id=${saved.id}, date=${saved.date}');
+      }
 
       state = state.updateState(
         isLockedPage: false,
@@ -218,9 +179,11 @@ class MorningCheckinPageModel
       );
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        developer.log('[CHECKIN] Save failed: $e');
+      }
       state = state.updateState(
         isLockedPage: false,
-        errorMessage: 'Không thể lưu check-in: ${e.toString()}',
       );
       return false;
     }
@@ -232,7 +195,5 @@ final morningCheckinPageProvider =
         (ref) {
   return MorningCheckinPageModel(
     dailyCheckinService: ref.read(dailyCheckinServiceProvider),
-    logService: ref.read(logServiceProvider),
-    questService: ref.read(questServiceProvider),
   );
 });

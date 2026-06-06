@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,29 +8,18 @@ import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../constants/app_color.dart';
-import '../../constants/app_constant.dart';
-import '../../routes/routes_config.dart';
-import '../../services/auth_service.dart';
-import '../../services/daily_checkin_service.dart';
-import '../../services/local_storage_service.dart';
+import '../../services/auth_session_resolver.dart';
 import '../../services/service_providers.dart';
 
 class SplashPageState extends BasePageState {
   final AppLoadState loadState;
 
-  SplashPageState({
-    this.loadState = AppLoadState.idle,
-    super.isLockedPage,
-  });
+  SplashPageState({this.loadState = AppLoadState.idle, super.isLockedPage});
 
   @override
-  SplashPageState updateState({
-    AppLoadState? loadState,
-    bool? isLockedPage,
-  }) {
+  SplashPageState updateState({AppLoadState? loadState, bool? isLockedPage}) {
     return SplashPageState(
       loadState: loadState ?? this.loadState,
       isLockedPage: isLockedPage ?? this.isLockedPage,
@@ -37,38 +28,16 @@ class SplashPageState extends BasePageState {
 }
 
 class SplashPageModel extends BasePageModel<SplashPageState> {
-  SplashPageModel({
-    required this.localStorageService,
-    required this.dailyCheckinService,
-    required this.authService,
-  }) : super(SplashPageState());
+  SplashPageModel({required this.sessionResolver}) : super(SplashPageState());
 
-  final LocalStorageService localStorageService;
-  final DailyCheckinService dailyCheckinService;
-  final AuthService authService;
+  final AuthSessionResolver sessionResolver;
 
   Future<String> resolveInitialRoute() async {
-    final authenticated = await authService.isAuthenticated();
-
-    if (!authenticated) {
-      return RoutesConfig.login;
+    if (kDebugMode) {
+      developer.log('[SPLASH] Checking stored session...');
     }
 
-    final completed = await localStorageService.getBool(
-      AppStorageKey.hasCompletedOnboarding,
-    );
-
-    if (completed != true) {
-      return RoutesConfig.onboarding;
-    }
-
-    final checkedIn = await dailyCheckinService.hasCheckedInToday();
-
-    if (!checkedIn) {
-      return RoutesConfig.morningCheckin;
-    }
-
-    return RoutesConfig.home;
+    return sessionResolver.resolveInitialRoute();
   }
 
   Future<void> initialize() async {
@@ -85,12 +54,10 @@ class SplashPageModel extends BasePageModel<SplashPageState> {
 
 final splashPageProvider =
     StateNotifierProvider<SplashPageModel, SplashPageState>((ref) {
-  return SplashPageModel(
-    localStorageService: ref.read(localStorageServiceProvider),
-    dailyCheckinService: ref.read(dailyCheckinServiceProvider),
-    authService: ref.read(authServiceProvider),
-  );
-});
+      return SplashPageModel(
+        sessionResolver: ref.read(authSessionResolverProvider),
+      );
+    });
 
 class SplashPage extends BasePage<SplashPageModel, SplashPageState> {
   SplashPage({super.key}) : super(provider: splashPageProvider);
@@ -100,7 +67,8 @@ class SplashPage extends BasePage<SplashPageModel, SplashPageState> {
 }
 
 class _SplashPageState
-    extends BasePageConsumerState<SplashPage, SplashPageModel, SplashPageState> {
+    extends
+        BasePageConsumerState<SplashPage, SplashPageModel, SplashPageState> {
   @override
   void initState() {
     super.initState();
@@ -132,14 +100,14 @@ class _SplashPageState
             Container(
               width: 64,
               height: 64,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: AppColor.levelGradient,
-              ),
-              child: const Icon(
-                RemixIcons.star_fill,
-                size: 32,
                 color: AppColor.bgDeep,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                'assets/icons/app_icon_foreground.png',
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(height: 24),
@@ -150,10 +118,9 @@ class _SplashPageState
               child: const Text(
                 'SoloQuest',
                 style: TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white,
+                  color: AppColor.white,
                 ),
               ),
             ),

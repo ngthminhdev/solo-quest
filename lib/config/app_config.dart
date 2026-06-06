@@ -9,6 +9,7 @@ class AppConfig {
   final String appVersion;
   final String env;
   final bool isWriteLogToServer;
+  final AuthConfig auth;
 
   String get scheme => env == 'local' ? 'http' : 'https';
   int get versionCode => _parseVersionCode(appVersion);
@@ -18,6 +19,7 @@ class AppConfig {
     required this.appVersion,
     required this.env,
     required this.isWriteLogToServer,
+    required this.auth,
   });
 
   static Future<void> load({String configFile = 'assets/config.yaml'}) async {
@@ -27,14 +29,20 @@ class AppConfig {
       apiHost: yamlMap['apiHost'] as String,
       appVersion: (yamlMap['appVersion'] ?? '1.0.0').toString(),
       env: (yamlMap['env'] ?? 'production').toString(),
-      isWriteLogToServer: _parseBoolFlag(yamlMap['isWriteLogToServer'], defaultValue: true),
+      isWriteLogToServer: _parseBoolFlag(
+        yamlMap['isWriteLogToServer'],
+        defaultValue: true,
+      ),
+      auth: AuthConfig.fromYaml(yamlMap['auth']),
     );
   }
 
   static int _parseVersionCode(String version) {
     final parts = version.split('.');
     if (parts.length >= 3) {
-      return int.tryParse(parts[0])! * 10000 + int.tryParse(parts[1])! * 100 + int.tryParse(parts[2])!;
+      return int.tryParse(parts[0])! * 10000 +
+          int.tryParse(parts[1])! * 100 +
+          int.tryParse(parts[2])!;
     }
     return 0;
   }
@@ -43,5 +51,35 @@ class AppConfig {
     if (value is bool) return value;
     if (value is String) return value.toLowerCase() == 'true';
     return defaultValue;
+  }
+}
+
+class AuthConfig {
+  final String googleWebClientId;
+  final String googleAndroidClientId;
+  final String googleIosClientId;
+
+  const AuthConfig({
+    required this.googleWebClientId,
+    required this.googleAndroidClientId,
+    required this.googleIosClientId,
+  });
+
+  bool get hasGoogleServerClientId => googleWebClientId.trim().isNotEmpty;
+
+  factory AuthConfig.fromYaml(dynamic value) {
+    if (value is! YamlMap) {
+      return const AuthConfig(
+        googleWebClientId: '',
+        googleAndroidClientId: '',
+        googleIosClientId: '',
+      );
+    }
+
+    return AuthConfig(
+      googleWebClientId: (value['googleWebClientId'] ?? '').toString(),
+      googleAndroidClientId: (value['googleAndroidClientId'] ?? '').toString(),
+      googleIosClientId: (value['googleIosClientId'] ?? '').toString(),
+    );
   }
 }

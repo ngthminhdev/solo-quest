@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
@@ -17,7 +16,7 @@ class LoginLogoSection extends StatelessWidget {
           height: 72,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: AppColor.levelGradient,
+            color: AppColor.bgDeep,
             boxShadow: [
               BoxShadow(
                 color: AppColor.cyan.withAlpha(80),
@@ -31,10 +30,10 @@ class LoginLogoSection extends StatelessWidget {
               ),
             ],
           ),
-          child: const Icon(
-            RemixIcons.star_fill,
-            size: 36,
-            color: AppColor.bgDeep,
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/icons/app_icon_foreground.png',
+            fit: BoxFit.contain,
           ),
         ),
         const SizedBox(height: AppSpacing.s20),
@@ -45,10 +44,9 @@ class LoginLogoSection extends StatelessWidget {
           child: const Text(
             'SoloQuest',
             style: TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: AppColor.white,
             ),
           ),
         ),

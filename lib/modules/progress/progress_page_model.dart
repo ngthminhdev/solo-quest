@@ -6,6 +6,7 @@ import '../../base/base_page_state.dart';
 import '../../models/progress_model.dart';
 import '../../models/quest_model.dart';
 import '../../models/log_entry_model.dart';
+import '../../models/xp_transaction_model.dart';
 import '../../services/progress_service.dart';
 import '../../services/quest_service.dart';
 import '../../services/log_service.dart';
@@ -16,13 +17,17 @@ class ProgressPageState extends BasePageState {
   final ProgressModel? progress;
   final List<QuestModel> completedQuests;
   final List<LogEntryModel> recentLogs;
+  final XPHistoryModel? xpHistory;
+  final AppLoadState xpHistoryLoadState;
   final String? errorMessage;
 
   ProgressPageState({
-    this.loadState = AppLoadState.idle,
+    this.loadState = AppLoadState.loading,
     this.progress,
     this.completedQuests = const [],
     this.recentLogs = const [],
+    this.xpHistory,
+    this.xpHistoryLoadState = AppLoadState.idle,
     this.errorMessage,
     super.isLockedPage,
   });
@@ -33,6 +38,8 @@ class ProgressPageState extends BasePageState {
     ProgressModel? progress,
     List<QuestModel>? completedQuests,
     List<LogEntryModel>? recentLogs,
+    XPHistoryModel? xpHistory,
+    AppLoadState? xpHistoryLoadState,
     String? errorMessage,
     bool? isLockedPage,
   }) {
@@ -41,12 +48,15 @@ class ProgressPageState extends BasePageState {
       progress: progress ?? this.progress,
       completedQuests: completedQuests ?? this.completedQuests,
       recentLogs: recentLogs ?? this.recentLogs,
+      xpHistory: xpHistory ?? this.xpHistory,
+      xpHistoryLoadState: xpHistoryLoadState ?? this.xpHistoryLoadState,
       errorMessage: errorMessage ?? this.errorMessage,
       isLockedPage: isLockedPage ?? this.isLockedPage,
     );
   }
 
   bool get hasProgress => progress != null;
+  bool get hasXPHistory => xpHistory != null && xpHistory!.transactions.isNotEmpty;
 
   int get completedTodayCount => completedQuests.length;
 
@@ -86,11 +96,28 @@ class ProgressPageModel extends BasePageModel<ProgressPageState> {
         completedQuests: completed,
         recentLogs: recentLogs,
       );
+
+      // Load XP history in background (non-blocking)
+      _loadXPHistory();
     } catch (e) {
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: 'Không thể tải tiến trình: ${e.toString()}',
       );
+    }
+  }
+
+  Future<void> _loadXPHistory() async {
+    state = state.updateState(xpHistoryLoadState: AppLoadState.loading);
+
+    try {
+      final xpHistory = await progressService.getXPHistory(limit: 20);
+      state = state.updateState(
+        xpHistoryLoadState: AppLoadState.ready,
+        xpHistory: xpHistory,
+      );
+    } catch (e) {
+      // XP history is optional, don't block the page if it fails
+      state = state.updateState(xpHistoryLoadState: AppLoadState.error);
     }
   }
 
@@ -113,6 +140,9 @@ class ProgressPageModel extends BasePageModel<ProgressPageState> {
         completedQuests: completed,
         recentLogs: recentLogs,
       );
+
+      // Refresh XP history too
+      _loadXPHistory();
     } catch (_) {}
   }
 }

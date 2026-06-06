@@ -4,6 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../widgets/app_progress_bar/app_progress_bar.dart';
 
 class LearningGoalSummaryCard extends StatelessWidget {
@@ -22,6 +23,8 @@ class LearningGoalSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.s14),
       decoration: BoxDecoration(
@@ -35,19 +38,19 @@ class LearningGoalSummaryCard extends StatelessWidget {
             children: [
               _StatItem(
                 icon: RemixIcons.target_line,
-                label: 'Tổng',
+                label: l10n.lgSummaryTotal,
                 value: totalGoals.toString(),
               ),
               const SizedBox(width: AppSpacing.s12),
               _StatItem(
                 icon: RemixIcons.play_circle_line,
-                label: 'Hoạt động',
+                label: l10n.lgSummaryActive,
                 value: activeGoals.toString(),
               ),
               const SizedBox(width: AppSpacing.s12),
               _StatItem(
                 icon: RemixIcons.checkbox_circle_line,
-                label: 'Hoàn thành',
+                label: l10n.lgSummaryCompleted,
                 value: completedGoals.toString(),
               ),
             ],
@@ -60,7 +63,7 @@ class LearningGoalSummaryCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tiến độ trung bình',
+                    l10n.lgSummaryAvgProgress,
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgMuted,

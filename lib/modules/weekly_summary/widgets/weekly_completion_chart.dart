@@ -13,9 +13,51 @@ class WeeklyCompletionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mock daily data
-    final dailyRates = [0.85, 0.60, 0.75, 0.90, 0.55, 0.70, 0.65];
     final dayLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+
+    // Use daily breakdown from model if available, otherwise show empty
+    final dailyData = summary.dailyBreakdown;
+
+    if (dailyData.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.s16),
+          decoration: BoxDecoration(
+            color: AppColor.surface,
+            border: Border.all(color: AppColor.border),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                WeeklySummaryConstants.chartTitle,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColor.fgSecondary,
+                  letterSpacing: 0.06,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.s16),
+              SizedBox(
+                height: 140,
+                child: Center(
+                  child: Text(
+                    'Chưa có dữ liệu daily breakdown',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColor.fgMuted,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -43,10 +85,15 @@ class WeeklyCompletionChart extends StatelessWidget {
               height: 140,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: List.generate(7, (index) {
-                  final rate = dailyRates[index];
+                children: List.generate(dailyData.length, (index) {
+                  final day = dailyData[index];
+                  final rate = day.rate;
                   final barHeight = rate * 100;
-                  final isWeekend = index >= 5;
+                  final isWeekend = day.date.weekday >= 6;
+
+                  final labelIndex = index < dayLabels.length
+                      ? index
+                      : index % dayLabels.length;
 
                   return Expanded(
                     child: Padding(
@@ -54,7 +101,6 @@ class WeeklyCompletionChart extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Value
                           Text(
                             '${(rate * 100).round()}%',
                             style: const TextStyle(
@@ -65,7 +111,6 @@ class WeeklyCompletionChart extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          // Bar
                           Container(
                             width: double.infinity,
                             height: barHeight,
@@ -89,9 +134,8 @@ class WeeklyCompletionChart extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          // Label
                           Text(
-                            dayLabels[index],
+                            dayLabels[labelIndex],
                             style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,

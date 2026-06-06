@@ -36,7 +36,7 @@ class AppChip extends StatelessWidget {
           color: selected
               ? (selectedBgColor ?? AppColor.cyanDim)
               : (bgColor ?? AppColor.surface),
-          borderRadius: BorderRadius.circular(AppRadius.full),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(
             color: selected
                 ? (selectedBorderColor ?? AppColor.borderGlowCyan)

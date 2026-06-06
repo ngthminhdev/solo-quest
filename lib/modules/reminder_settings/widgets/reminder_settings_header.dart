@@ -4,7 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/reminder_settings_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class ReminderSettingsHeader extends StatelessWidget {
   final VoidCallback onBack;
@@ -29,7 +29,7 @@ class ReminderSettingsHeader extends StatelessWidget {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: Colors.transparent,
+                color: AppColor.transparent,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(color: AppColor.border),
               ),
@@ -41,22 +41,22 @@ class ReminderSettingsHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.s12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       RemixIcons.notification_3_line,
                       color: AppColor.cyan,
                       size: 18,
                     ),
-                    SizedBox(width: AppSpacing.s8),
+                    const SizedBox(width: AppSpacing.s8),
                     Expanded(
                       child: Text(
-                        ReminderSettingsConstants.pageTitle,
-                        style: TextStyle(
+                        context.l10n.reminderSettingsPageTitle,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -65,10 +65,10 @@ class ReminderSettingsHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: AppSpacing.s4),
+                const SizedBox(height: AppSpacing.s4),
                 Text(
-                  ReminderSettingsConstants.pageSubtitle,
-                  style: TextStyle(
+                  context.l10n.reminderSettingsPageSubtitle,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                     height: 1.4,

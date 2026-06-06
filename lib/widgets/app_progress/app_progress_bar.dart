@@ -56,7 +56,7 @@ class AppProgressBar extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: AppColor.bgRaised,
-            borderRadius: BorderRadius.circular(AppRadius.full),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
@@ -67,7 +67,7 @@ class AppProgressBar extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: AppColor.levelGradient,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                 ),
               ),

@@ -3,6 +3,7 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../routes/routes_config.dart';
 import '../../../widgets/app_state/app_empty_state.dart';
 
@@ -11,11 +12,12 @@ class ProgressEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return AppEmptyState(
       icon: RemixIcons.bar_chart_2_line,
-      title: 'Chưa có tiến trình',
-      message:
-          'Hoàn thành quest đầu tiên để bắt đầu ghi nhận EXP, level và streak.',
+      title: l10n.progressEmptyTitle,
+      message: l10n.progressEmptyMessage,
       action: GestureDetector(
         onTap: () {
           Navigator.of(context).pushReplacementNamed(RoutesConfig.home);
@@ -30,9 +32,9 @@ class ProgressEmptyView extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColor.border),
           ),
-          child: const Text(
-            'Về Home',
-            style: TextStyle(
+          child: Text(
+            l10n.progressEmptyAction,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColor.cyan,

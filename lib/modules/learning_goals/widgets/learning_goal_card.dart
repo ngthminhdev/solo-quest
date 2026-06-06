@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:remixicon/remixicon.dart';
-import 'package:intl/intl.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../core/utils/app_time_formatter.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/learning_goal_model.dart';
 import '../../../widgets/app_progress_bar/app_progress_bar.dart';
-import '../constants/learning_goals_constants.dart';
 
 class LearningGoalCard extends StatelessWidget {
   final LearningGoalModel goal;
@@ -25,6 +25,7 @@ class LearningGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isCompleted = goal.progress >= 1.0;
 
     return Container(
@@ -33,7 +34,7 @@ class LearningGoalCard extends StatelessWidget {
         color: AppColor.surface,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: isCompleted ? AppColor.success.withOpacity(0.3) : AppColor.border,
+          color: isCompleted ? AppColor.successBorder : AppColor.border,
         ),
       ),
       child: Column(
@@ -51,7 +52,7 @@ class LearningGoalCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColor.cyanDim,
                   borderRadius: BorderRadius.circular(AppRadius.xs),
-                  border: Border.all(color: AppColor.cyan.withOpacity(0.3)),
+                  border: Border.all(color: AppColor.primaryBorder),
                 ),
                 child: Text(
                   goal.category,
@@ -108,7 +109,7 @@ class LearningGoalCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.s4),
               Text(
-                '${goal.targetMinutesPerDay} phút/ngày',
+                '${goal.targetMinutesPerDay} ${l10n.lgCardMinutesPerDay}',
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColor.fgSecondary,
@@ -123,7 +124,7 @@ class LearningGoalCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.s4),
                 Text(
-                  DateFormat('dd/MM/yyyy').format(goal.deadline!),
+                  AppTimeFormatter.formatLocalDate(goal.deadline) ?? '',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
@@ -146,7 +147,7 @@ class LearningGoalCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tiến độ',
+                          l10n.lgCardProgress,
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColor.fgMuted,
@@ -180,19 +181,19 @@ class LearningGoalCard extends StatelessWidget {
             children: [
               _ActionButton(
                 icon: RemixIcons.line_chart_line,
-                label: 'Tiến độ',
+                label: l10n.lgCardProgress,
                 onTap: onUpdateProgress,
               ),
               const SizedBox(width: AppSpacing.s8),
               _ActionButton(
                 icon: RemixIcons.edit_2_line,
-                label: 'Sửa',
+                label: l10n.lgCardEdit,
                 onTap: onEdit,
               ),
               const SizedBox(width: AppSpacing.s8),
               _ActionButton(
                 icon: RemixIcons.delete_bin_6_line,
-                label: 'Xóa',
+                label: l10n.lgCardDelete,
                 onTap: onDelete,
               ),
             ],
@@ -210,6 +211,7 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isCompleted = goal.progress >= 1.0;
     final isActive = goal.isActive;
 
@@ -218,15 +220,15 @@ class _StatusBadge extends StatelessWidget {
     Color bgColor;
 
     if (isCompleted) {
-      label = LearningGoalsConstants.statusCompleted;
+      label = l10n.lgStatusCompleted;
       color = AppColor.success;
       bgColor = AppColor.successDim;
     } else if (isActive) {
-      label = LearningGoalsConstants.statusActive;
+      label = l10n.lgStatusActive;
       color = AppColor.cyan;
       bgColor = AppColor.cyanDim;
     } else {
-      label = LearningGoalsConstants.statusInactive;
+      label = l10n.lgStatusInactive;
       color = AppColor.fgMuted;
       bgColor = AppColor.bgRaised;
     }

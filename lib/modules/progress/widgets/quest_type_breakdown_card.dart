@@ -4,8 +4,10 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/enums/quest_enums.dart';
+import '../../../modules/quests/ui/quest_ui_extensions.dart';
 import '../../../widgets/app_card/app_card.dart';
 import '../../../widgets/app_badge/quest_type_chip.dart';
+import '../../../extensions/localization_extension.dart';
 
 class QuestTypeBreakdownCard extends StatelessWidget {
   final Map<QuestType, int> completedByType;
@@ -23,13 +25,13 @@ class QuestTypeBreakdownCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionLabel(
-              title: 'Theo loại quest',
+            _SectionLabel(
+              title: context.l10n.progressQuestTypeTitle,
               color: AppColor.violet,
             ),
             const SizedBox(height: AppSpacing.s8),
-            const Text(
-              'Chưa có dữ liệu phân loại.',
+            Text(
+              context.l10n.progressQuestTypeEmpty,
               style: TextStyle(fontSize: 13, color: AppColor.fgMuted),
             ),
           ],
@@ -52,7 +54,7 @@ class QuestTypeBreakdownCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionLabel(title: 'Theo loại quest', color: AppColor.violet),
+          _SectionLabel(title: context.l10n.progressQuestTypeTitle, color: AppColor.violet),
           const SizedBox(height: AppSpacing.s6),
           ...visibleEntries.map(
             (entry) => _TypeRow(
@@ -98,13 +100,13 @@ class _TypeRow extends StatelessWidget {
                   height: 6,
                   decoration: BoxDecoration(
                     color: AppColor.bgRaised,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: FractionallySizedBox(
                     widthFactor: ratio.clamp(0.0, 1.0),
                     alignment: Alignment.centerLeft,
-                    child: Container(color: _barColor(type)),
+                    child: Container(color: type.chipTextColor),
                   ),
                 ),
               ),
@@ -129,28 +131,6 @@ class _TypeRow extends StatelessWidget {
     );
   }
 
-  Color _barColor(QuestType type) {
-    switch (type) {
-      case QuestType.water:
-        return AppColor.chipWaterText;
-      case QuestType.breakTime:
-        return AppColor.chipBreakText;
-      case QuestType.movement:
-        return AppColor.chipMovementText;
-      case QuestType.learning:
-        return AppColor.chipLearningText;
-      case QuestType.sleep:
-        return AppColor.chipSleepText;
-      case QuestType.fitness:
-        return AppColor.chipFitnessText;
-      case QuestType.mindfulness:
-        return AppColor.violet;
-      case QuestType.review:
-        return AppColor.violet;
-      case QuestType.custom:
-        return AppColor.cyan;
-    }
-  }
 }
 
 class _SectionLabel extends StatelessWidget {

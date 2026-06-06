@@ -34,13 +34,13 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.bgDeep,
+      backgroundColor: AppColor.scaffoldBackground,
       extendBody: extendBody,
       extendBodyBehindAppBar: title != null,
       appBar: title != null
           ? AppBar(
               title: Text(title!),
-              backgroundColor: Colors.transparent,
+              backgroundColor: AppColor.transparent,
               elevation: 0,
               centerTitle: false,
               leading: showBackButton
@@ -55,15 +55,7 @@ class AppScaffold extends StatelessWidget {
       body: Container(
         decoration: useGradientBackground
             ? const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColor.bg,
-                    AppColor.bgDeep,
-                  ],
-                  stops: [0.0, 0.7],
-                ),
+                gradient: AppColor.backgroundGradient,
               )
             : null,
         child: SafeArea(

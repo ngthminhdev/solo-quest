@@ -4,7 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/quest_rules_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class QuestRulesHeader extends StatelessWidget {
   final VoidCallback? onBack;
@@ -13,6 +13,8 @@ class QuestRulesHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.s16,
@@ -44,20 +46,20 @@ class QuestRulesHeader extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  QuestRulesConstants.pageTitle,
-                  style: TextStyle(
+                  l10n.questRulesPageTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     height: 1.12,
                     fontWeight: FontWeight.w800,
                     color: AppColor.fg,
                   ),
                 ),
-                SizedBox(height: AppSpacing.s6),
+                const SizedBox(height: AppSpacing.s6),
                 Text(
-                  QuestRulesConstants.pageSubtitle,
-                  style: TextStyle(
+                  l10n.questRulesPageSubtitle,
+                  style: const TextStyle(
                     fontSize: 13,
                     height: 1.35,
                     color: AppColor.fgSecondary,

@@ -42,7 +42,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -81,7 +81,6 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
               Text(
                 '+${widget.exp} EXP',
                 style: const TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColor.expGold,
@@ -174,7 +173,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
           height: 36,
           decoration: BoxDecoration(
             color: isSelected ? AppColor.cyanDim : AppColor.surface,
-            borderRadius: BorderRadius.circular(AppRadius.full),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             border: Border.all(
               color: isSelected ? AppColor.borderGlowCyan : AppColor.border,
             ),

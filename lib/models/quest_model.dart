@@ -1,3 +1,4 @@
+import '../core/utils/app_time_formatter.dart';
 import 'enums/quest_enums.dart';
 
 class QuestModel {
@@ -11,6 +12,8 @@ class QuestModel {
   final int exp;
   final int estimatedMinutes;
   final DateTime? scheduledAt;
+  final DateTime? dueDate;
+  final DateTime? reminderTime;
   final DateTime? startedAt;
   final DateTime? completedAt;
   final DateTime? snoozedUntil;
@@ -30,6 +33,8 @@ class QuestModel {
     this.exp = 10,
     this.estimatedMinutes = 5,
     this.scheduledAt,
+    this.dueDate,
+    this.reminderTime,
     this.startedAt,
     this.completedAt,
     this.snoozedUntil,
@@ -44,11 +49,24 @@ class QuestModel {
   bool get isPending => status == QuestStatus.pending;
   bool get isSnoozed => status == QuestStatus.snoozed;
 
-  String get displayTime {
-    if (scheduledAt == null) return '--:--';
-    final h = scheduledAt!.hour.toString().padLeft(2, '0');
-    final m = scheduledAt!.minute.toString().padLeft(2, '0');
-    return '$h:$m';
+  /// Returns quest display time label with prefix.
+  /// Priority:
+  /// 1. If snoozed: "Hoãn đến HH:mm"
+  /// 2. If reminderTime exists: "Nhắc HH:mm"
+  /// 3. Else: "Linh hoạt"
+  String get displayTimeLabel {
+    final snoozed = AppTimeFormatter.formatSnoozedUntil(snoozedUntil);
+    if (snoozed != null) return snoozed;
+    final reminder = AppTimeFormatter.formatReminderTime(reminderTime);
+    if (reminder != null) return reminder;
+    return 'Linh hoạt';
+  }
+
+  /// Returns raw time (HH:mm) for display, or null if no time exists.
+  /// Priority: snoozedUntil > reminderTime > null
+  /// UI should hide time display when this returns null.
+  String? get displayTime {
+    return AppTimeFormatter.formatQuestActiveTime(snoozedUntil, reminderTime);
   }
 
   QuestModel copyWith({
@@ -62,6 +80,8 @@ class QuestModel {
     int? exp,
     int? estimatedMinutes,
     DateTime? scheduledAt,
+    DateTime? dueDate,
+    DateTime? reminderTime,
     DateTime? startedAt,
     DateTime? completedAt,
     DateTime? snoozedUntil,
@@ -81,6 +101,8 @@ class QuestModel {
       exp: exp ?? this.exp,
       estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
       scheduledAt: scheduledAt ?? this.scheduledAt,
+      dueDate: dueDate ?? this.dueDate,
+      reminderTime: reminderTime ?? this.reminderTime,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       snoozedUntil: snoozedUntil ?? this.snoozedUntil,
@@ -103,6 +125,8 @@ class QuestModel {
       exp: json['exp'] as int? ?? 10,
       estimatedMinutes: json['estimated_minutes'] as int? ?? 5,
       scheduledAt: json['scheduled_at'] != null ? DateTime.parse(json['scheduled_at'] as String) : null,
+      dueDate: json['due_date'] != null ? DateTime.parse(json['due_date'] as String) : null,
+      reminderTime: json['reminder_time'] != null ? DateTime.parse(json['reminder_time'] as String) : null,
       startedAt: json['started_at'] != null ? DateTime.parse(json['started_at'] as String) : null,
       completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at'] as String) : null,
       snoozedUntil: json['snoozed_until'] != null ? DateTime.parse(json['snoozed_until'] as String) : null,
@@ -125,6 +149,8 @@ class QuestModel {
       'exp': exp,
       'estimated_minutes': estimatedMinutes,
       'scheduled_at': scheduledAt?.toIso8601String(),
+      'due_date': dueDate?.toIso8601String(),
+      'reminder_time': reminderTime?.toIso8601String(),
       'started_at': startedAt?.toIso8601String(),
       'completed_at': completedAt?.toIso8601String(),
       'snoozed_until': snoozedUntil?.toIso8601String(),

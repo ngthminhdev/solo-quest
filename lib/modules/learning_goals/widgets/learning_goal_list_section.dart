@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/learning_goal_model.dart';
 import '../../../widgets/app_section_header/app_section_header.dart';
-import '../constants/learning_goals_constants.dart';
 import 'learning_goal_card.dart';
 import 'learning_goals_empty_view.dart';
 
@@ -23,6 +23,8 @@ class LearningGoalListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     if (goals.isEmpty) {
       return const LearningGoalsEmptyView();
     }
@@ -30,9 +32,9 @@ class LearningGoalListSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-          child: AppSectionHeader(title: LearningGoalsConstants.sectionTitle),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+          child: AppSectionHeader(title: l10n.lgSectionTitle),
         ),
         const SizedBox(height: AppSpacing.s12),
         ListView.separated(

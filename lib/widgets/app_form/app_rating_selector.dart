@@ -50,7 +50,7 @@ class AppRatingSelector extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(
                     color: isActive
-                        ? (activeColor ?? AppColor.cyan).withOpacity(0.3)
+                        ? (activeColor ?? AppColor.cyan).withValues(alpha:0.3)
                         : AppColor.border,
                   ),
                 ),
@@ -58,7 +58,6 @@ class AppRatingSelector extends StatelessWidget {
                   child: Text(
                     '$rating',
                     style: TextStyle(
-                      fontFamily: 'Exo2',
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: isActive

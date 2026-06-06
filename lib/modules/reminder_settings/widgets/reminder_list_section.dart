@@ -5,7 +5,7 @@ import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../models/enums/reminder_enums.dart';
 import '../../../models/reminder_setting_model.dart';
-import '../constants/reminder_settings_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import 'reminder_setting_card.dart';
 import 'reminder_settings_empty_view.dart';
 
@@ -34,10 +34,9 @@ class ReminderListSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            ReminderSettingsConstants.listTitle,
-            style: TextStyle(
-              fontFamily: 'Exo2',
+          Text(
+            context.l10n.reminderSettingsListTitle,
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: AppColor.fgMuted,
@@ -83,13 +82,13 @@ class _ReminderTypeFilterBar extends StatelessWidget {
       runSpacing: AppSpacing.s8,
       children: [
         _FilterChip(
-          label: ReminderSettingsConstants.filterAll,
+          label: context.l10n.reminderSettingsFilterAll,
           selected: selectedType == null,
           onTap: () => onChanged(null),
         ),
         ...ReminderType.values.map(
           (type) => _FilterChip(
-            label: type.label,
+            label: type.getLocalizedLabel(context.l10n),
             selected: selectedType == type,
             onTap: () => onChanged(type),
           ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
-import '../constants/onboarding_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import '../models/onboarding_data.dart';
 
 class OnboardingWelcomeStep extends StatelessWidget {
@@ -15,15 +14,21 @@ class OnboardingWelcomeStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final welcomeSteps = [
+      l10n.onboardingWelcomeStep1,
+      l10n.onboardingWelcomeStep2,
+      l10n.onboardingWelcomeStep3,
+      l10n.onboardingWelcomeStep4,
+      l10n.onboardingWelcomeStep5,
+    ];
+
     return Container(
       decoration: const BoxDecoration(
         gradient: RadialGradient(
           center: Alignment(0, 0.2),
           radius: 0.8,
-          colors: [
-            AppColor.cyanGlow,
-            AppColor.bgDeep,
-          ],
+          colors: [AppColor.cyanGlow, AppColor.bgDeep],
           stops: [0.0, 0.6],
         ),
       ),
@@ -41,7 +46,7 @@ class OnboardingWelcomeStep extends StatelessWidget {
                 height: 64,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: AppColor.levelGradient,
+                  color: AppColor.bgDeep,
                   boxShadow: const [
                     BoxShadow(
                       color: AppColor.cyanGlow,
@@ -55,15 +60,16 @@ class OnboardingWelcomeStep extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(
-                  RemixIcons.star_line,
-                  size: 32,
-                  color: AppColor.bgDeep,
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'assets/icons/app_icon_foreground.png',
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
+              // Greeting with user name
               Text(
-                OnboardingConstants.step0Title,
+                l10n.onboardingWelcomeGreeting(data.displayName),
                 style: AppTextStyle.h1.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 22,
@@ -72,7 +78,17 @@ class OnboardingWelcomeStep extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                OnboardingConstants.step0Subtitle,
+                l10n.onboardingWelcomeTitle,
+                style: AppTextStyle.h2.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                  color: AppColor.fgSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.onboardingWelcomeSubtitle,
                 style: AppTextStyle.body.copyWith(
                   color: AppColor.fgSecondary,
                   fontSize: 13,
@@ -81,12 +97,12 @@ class OnboardingWelcomeStep extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-              ...OnboardingConstants.step0Steps.asMap().entries.map(
-                    (entry) => _buildStepItem(entry.key + 1, entry.value),
-                  ),
+              ...welcomeSteps.asMap().entries.map(
+                (entry) => _buildStepItem(entry.key + 1, entry.value),
+              ),
               const SizedBox(height: AppSpacing.xl),
               Text(
-                OnboardingConstants.step0Hint,
+                l10n.onboardingWelcomeHint,
                 style: AppTextStyle.monoLabel.copyWith(
                   color: AppColor.fgMuted,
                   fontSize: 11,
@@ -126,7 +142,6 @@ class OnboardingWelcomeStep extends StatelessWidget {
               child: Text(
                 '$num',
                 style: const TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: AppColor.cyan,
@@ -136,10 +151,7 @@ class OnboardingWelcomeStep extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(
-              text,
-              style: AppTextStyle.body.copyWith(fontSize: 13),
-            ),
+            child: Text(text, style: AppTextStyle.body.copyWith(fontSize: 13)),
           ),
         ],
       ),

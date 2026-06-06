@@ -36,7 +36,6 @@ class WeeklySummaryHeader extends StatelessWidget {
           const Text(
             WeeklySummaryConstants.headerTitle,
             style: TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,

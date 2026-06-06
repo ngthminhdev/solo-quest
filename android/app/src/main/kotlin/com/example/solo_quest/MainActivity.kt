@@ -1,4 +1,4 @@
-package com.example.solo_quest
+package com.min.solo_quest
 
 import io.flutter.embedding.android.FlutterActivity
 

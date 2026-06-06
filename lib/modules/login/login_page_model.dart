@@ -1,14 +1,14 @@
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
-import '../../constants/app_constant.dart';
 import '../../models/auth_user_model.dart';
-import '../../routes/routes_config.dart';
+import '../../services/auth_exceptions.dart';
 import '../../services/auth_service.dart';
-import '../../services/daily_checkin_service.dart';
-import '../../services/local_storage_service.dart';
+import '../../services/auth_session_resolver.dart';
 import '../../services/service_providers.dart';
 
 class LoginPageState extends BasePageState {
@@ -43,17 +43,17 @@ class LoginPageState extends BasePageState {
 }
 
 class LoginPageModel extends BasePageModel<LoginPageState> {
-  LoginPageModel({
-    required this.authService,
-    required this.localStorageService,
-    required this.dailyCheckinService,
-  }) : super(LoginPageState());
+  LoginPageModel({required this.authService, required this.sessionResolver})
+    : super(LoginPageState());
 
   final AuthService authService;
-  final LocalStorageService localStorageService;
-  final DailyCheckinService dailyCheckinService;
+  final AuthSessionResolver sessionResolver;
 
   Future<String?> signInWithGoogle() async {
+    if (kDebugMode) {
+      developer.log('[AUTH] Google login tapped');
+    }
+
     state = state.updateState(
       loadState: AppLoadState.loading,
       isLockedPage: true,
@@ -61,47 +61,102 @@ class LoginPageModel extends BasePageModel<LoginPageState> {
     );
 
     try {
-      final user = await authService.signInWithGoogleMock();
-      state = state.updateState(
-        loadState: AppLoadState.ready,
-        user: user,
-        isLockedPage: false,
-      );
-      return resolvePostLoginRoute();
-    } catch (_) {
+      final user = await authService.signInWithGoogle();
+      return _finishSuccessfulLogin(user);
+    } on AuthException catch (e, st) {
+      if (e.code == AuthExceptionCode.googleCancelled) {
+        if (kDebugMode) {
+          developer.log(
+            '[AUTH] Google login cancelled: type=${e.runtimeType}, message=${e.message}',
+          );
+        }
+        state = state.updateState(
+          loadState: AppLoadState.error,
+          errorMessage: e.message,
+          isLockedPage: false,
+        );
+        return null;
+      }
+
+      if (kDebugMode) {
+        developer.log(
+          '[AUTH] Google login failed: type=${e.runtimeType}, code=${e.code}, message=${e.message}',
+        );
+        developer.log('[AUTH] StackTrace:\n$st');
+      }
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: 'Không thể đăng nhập bằng Google. Vui lòng thử lại.',
+        errorMessage: e.message,
+        isLockedPage: false,
+      );
+      return null;
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log('[AUTH] Google login failed: type=${e.runtimeType}, message=$e');
+        developer.log('[AUTH] StackTrace:\n$st');
+      }
+      state = state.updateState(
+        loadState: AppLoadState.error,
         isLockedPage: false,
       );
       return null;
     }
   }
 
-  Future<String> resolvePostLoginRoute() async {
-    final onboardingDone =
-        await localStorageService.getBool(AppStorageKey.hasCompletedOnboarding) ==
-            true;
-
-    if (!onboardingDone) {
-      return RoutesConfig.onboarding;
+  Future<String?> signInWithDevLogin() async {
+    if (kDebugMode) {
+      developer.log('[AUTH] Dev login tapped');
     }
 
-    final checkedIn = await dailyCheckinService.hasCheckedInToday();
+    state = state.updateState(
+      loadState: AppLoadState.loading,
+      isLockedPage: true,
+      clearError: true,
+    );
 
-    if (!checkedIn) {
-      return RoutesConfig.morningCheckin;
+    try {
+      final user = await authService.signInWithDevLogin();
+      return _finishSuccessfulLogin(user);
+    } catch (e) {
+      if (kDebugMode) {
+        developer.log('[AUTH] Dev login failed: $e');
+      }
+      state = state.updateState(
+        loadState: AppLoadState.error,
+        errorMessage:
+            'Cannot login with dev user. Please check backend dev user bootstrap.',
+        isLockedPage: false,
+      );
+      return null;
+    }
+  }
+
+  Future<String> _finishSuccessfulLogin(AuthUserModel user) async {
+    if (kDebugMode) {
+      developer.log('[AUTH] Login success, resolving post-login route...');
     }
 
-    return RoutesConfig.home;
+    state = state.updateState(
+      loadState: AppLoadState.ready,
+      user: user,
+      isLockedPage: false,
+    );
+
+    final route = await sessionResolver.resolveInitialRoute();
+
+    if (kDebugMode) {
+      developer.log('[AUTH] Navigating to: $route');
+    }
+
+    return route;
   }
 }
 
-final loginPageProvider =
-    StateNotifierProvider<LoginPageModel, LoginPageState>((ref) {
-  return LoginPageModel(
-    authService: ref.read(authServiceProvider),
-    localStorageService: ref.read(localStorageServiceProvider),
-    dailyCheckinService: ref.read(dailyCheckinServiceProvider),
-  );
-});
+final loginPageProvider = StateNotifierProvider<LoginPageModel, LoginPageState>(
+  (ref) {
+    return LoginPageModel(
+      authService: ref.read(authServiceProvider),
+      sessionResolver: ref.read(authSessionResolverProvider),
+    );
+  },
+);

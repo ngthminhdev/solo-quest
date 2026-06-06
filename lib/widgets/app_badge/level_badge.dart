@@ -25,7 +25,6 @@ class LevelBadge extends StatelessWidget {
         child: Text(
           '$level',
           style: TextStyle(
-            fontFamily: 'Exo2',
             fontSize: size * 0.44,
             fontWeight: FontWeight.w800,
             color: AppColor.bgDeep,

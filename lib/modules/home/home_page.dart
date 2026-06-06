@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:solo_quest/constants/app_spacing.dart';
+import 'dart:developer' as developer;
 
+import '../../core/network/api_exception.dart';
+
+import '../../constants/app_color.dart';
 import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../models/quest_model.dart';
 import '../../routes/routes_config.dart';
 import '../../widgets/app_scaffold/app_scaffold.dart';
-import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
+import '../../widgets/skeleton/skeleton_home_page.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
 import '../../widgets/app_dialog/quest_completion_dialog.dart';
 import '../../widgets/app_bottom_sheet/snooze_quest_sheet.dart';
 import '../../widgets/app_bottom_sheet/skip_quest_sheet.dart';
+import '../main/main_page_model.dart';
 import 'home_page_model.dart';
 import 'widgets/daily_progress_card.dart';
 import 'widgets/home_insight_card.dart';
 import 'widgets/active_quest_section.dart';
 import 'widgets/upcoming_quest_section.dart';
+import 'widgets/snoozed_quest_section.dart';
 import 'widgets/completed_quest_section.dart';
+import 'widgets/daily_review_cta_card.dart';
+import 'widgets/home_summary_footer.dart';
 import 'widgets/home_empty_quest_view.dart';
 
 class HomePage extends BasePage<HomePageModel, HomePageState> {
@@ -28,17 +37,39 @@ class HomePage extends BasePage<HomePageModel, HomePageState> {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, HomePageState> {
+class _HomePageState
+    extends BasePageConsumerState<HomePage, HomePageModel, HomePageState> {
+  static const _tabIndex = 0;
+  bool _settleListenerSet = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      pageModel.loadHomeData();
+      _tryLoadIfSettled();
     });
+  }
+
+  void _tryLoadIfSettled() {
+    final settled = ref.read(mainPageProvider.select((s) => s.settledIndex));
+    if (settled == _tabIndex) {
+      pageModel.loadHomeData();
+    }
   }
 
   @override
   void onBuild() {
+    if (!_settleListenerSet) {
+      _settleListenerSet = true;
+      ref.listen(mainPageProvider.select((s) => s.settledIndex), (prev, next) {
+        if (next == _tabIndex && prev != _tabIndex) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            pageModel.loadHomeData();
+          });
+        }
+      });
+    }
+
     listen((previous, next) {
       if (previous?.loadState == AppLoadState.loading &&
           next.loadState == AppLoadState.error &&
@@ -55,7 +86,7 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
     if (state.loadState == AppLoadState.loading && !state.hasAnyQuest) {
       return AppScaffold(
         showBottomNav: false,
-        body: const AppLoading(message: 'Đang tải dữ liệu...'),
+        body: const SkeletonHomePage(),
       );
     }
 
@@ -79,80 +110,119 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
     return AppScaffold(
       showBottomNav: false,
       scroll: false,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 14),
-            DailyProgressCard(
-              progress: state.progress,
-              completedToday: state.completedTodayQuestCount,
-              totalToday: state.totalTodayQuestCount,
-              completionRate: state.todayCompletionRate,
-            ),
-            HomeInsightCard(insight: state.todayInsight),
-            ActiveQuestSection(
-              quests: state.activeQuests,
-              onTap: _openQuestDetail,
-              onStart: _handleStartQuest,
-              onComplete: _handleCompleteQuest,
-              onSnooze: _handleSnoozeQuest,
-              onSkip: _handleSkipQuest,
-              onViewReason: _showQuestReason,
-            ),
-            UpcomingQuestSection(
-              quests: state.upcomingQuests,
-              onTap: _openQuestDetail,
-              onStart: _handleStartQuest,
-              onComplete: _handleCompleteQuest,
-            ),
-            CompletedQuestSection(
-              quests: state.completedQuests,
-              onTap: _openQuestDetail,
-            ),
-          ],
+      body: RefreshIndicator(
+        backgroundColor: AppColor.surface,
+        color: AppColor.cyan,
+        onRefresh: () async {
+          if (state.loadState == AppLoadState.loading) return;
+          await pageModel.loadHomeData();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: AppSpacing.s20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 14),
+              DailyProgressCard(
+                progress: state.progress,
+                completedToday: state.completedTodayQuestCount,
+                totalToday: state.totalTodayQuestCount,
+                completionRate: state.todayCompletionRate,
+              ),
+              HomeInsightCard(insight: state.todayInsight),
+              ActiveQuestSection(
+                quests: state.activeQuests,
+                allCompleted: state.allCompleted,
+                pendingActions: state.pendingActions,
+                onTap: _openQuestDetail,
+                onStart: _handleStartQuest,
+                onComplete: _handleCompleteQuest,
+                onSnooze: _handleSnoozeQuest,
+                onSkip: _handleSkipQuest,
+                onViewReason: _showQuestReason,
+              ),
+              UpcomingQuestSection(
+                quests: state.upcomingQuests,
+                pendingActions: state.pendingActions,
+                onTap: _openQuestDetail,
+                onStart: _handleStartQuest,
+                onComplete: _handleCompleteQuest,
+              ),
+              SnoozedQuestSection(
+                quests: state.snoozedQuests,
+                onTap: _openQuestDetail,
+              ),
+              CompletedQuestSection(
+                quests: state.completedQuests,
+                onTap: _openQuestDetail,
+              ),
+              if (state.shouldShowDailyReviewCta)
+                DailyReviewCtaCard(
+                  hasReviewed: false,
+                  onTap: () {
+                    Navigator.of(context).pushNamed(RoutesConfig.dailyReview);
+                  },
+                ),
+              HomeSummaryFooter(
+                completedCount: state.completedTodayQuestCount,
+                totalCount: state.totalTodayQuestCount,
+                earnedExp: state.dailyStatus?.todayEarnedExp ?? 0,
+                streakDays: state.progress?.streakDays ?? 0,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _openQuestDetail(QuestModel quest) {
-    Navigator.of(context).pushNamed(
-      RoutesConfig.questDetail,
-      arguments: {'id': quest.id},
-    );
+    Navigator.of(
+      context,
+    ).pushNamed(RoutesConfig.questDetail, arguments: {'id': quest.id});
   }
 
   Future<void> _handleStartQuest(QuestModel quest) async {
+    developer.log('[QUEST ACTION] start tapped: id=${quest.id}');
     try {
       await pageModel.startQuest(quest.id);
+      developer.log('[QUEST ACTION] start success: id=${quest.id}');
       if (mounted) {
-        AppToastService.success(context, 'Đã bắt đầu: ${quest.title}');
+        AppToastService.success(context, 'Đã bắt đầu quest');
       }
     } catch (e) {
+      developer.log('[QUEST ACTION] start failed: $e');
+      if (e is ApiException && e.rawBody != null) {
+        developer.log('[QUEST ACTION] raw response: ${e.rawBody}');
+      }
       if (mounted) {
-        AppToastService.error(context, 'Không thể bắt đầu nhiệm vụ');
+        AppToastService.error(context, 'Không thể bắt đầu quest');
       }
     }
   }
 
   Future<void> _handleCompleteQuest(QuestModel quest) async {
+    developer.log('[QUEST ACTION] complete tapped: id=${quest.id}');
     await QuestCompletionDialog.show(
       context: context,
       exp: quest.exp,
       onDone: () async {
         try {
           await pageModel.completeQuest(quest.id);
+          developer.log(
+            '[QUEST ACTION] complete success: id=${quest.id}, expGained=${quest.exp}',
+          );
           if (mounted) {
-            AppToastService.success(
-              context,
-              'Hoàn thành nhiệm vụ +${quest.exp} EXP',
-            );
+            AppToastService.success(context, 'Quest đã hoàn thành');
           }
         } catch (e) {
+          developer.log('[QUEST ACTION] complete failed: $e');
+          if (e is ApiException && e.rawBody != null) {
+            developer.log('[QUEST ACTION] raw response: ${e.rawBody}');
+          }
           if (mounted) {
-            AppToastService.error(context, 'Không thể hoàn thành nhiệm vụ');
+            AppToastService.error(context, 'Không thể hoàn thành quest');
           }
         }
       },
@@ -163,14 +233,20 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
     final minutes = await SnoozeQuestSheet.show(context);
     if (minutes == null) return;
 
+    developer.log('[QUEST ACTION] snooze tapped: id=${quest.id}, minutes=$minutes');
     try {
       await pageModel.snoozeQuest(quest.id, minutes: minutes);
+      developer.log('[QUEST ACTION] snooze success: id=${quest.id}');
       if (mounted) {
-        AppToastService.warning(context, 'Đã hoãn nhiệm vụ $minutes phút');
+        AppToastService.success(context, 'Đã hoãn quest');
       }
     } catch (e) {
+      developer.log('[QUEST ACTION] snooze failed: $e');
+      if (e is ApiException && e.rawBody != null) {
+        developer.log('[QUEST ACTION] raw response: ${e.rawBody}');
+      }
       if (mounted) {
-        AppToastService.error(context, 'Không thể hoãn nhiệm vụ');
+        AppToastService.error(context, 'Không thể hoãn quest');
       }
     }
   }
@@ -179,14 +255,20 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
     final reason = await SkipQuestSheet.show(context);
     if (reason == null) return;
 
+    developer.log('[QUEST ACTION] skip tapped: id=${quest.id}');
     try {
       await pageModel.skipQuest(quest.id, reason: reason);
+      developer.log('[QUEST ACTION] skip success: id=${quest.id}');
       if (mounted) {
-        AppToastService.warning(context, 'Đã bỏ qua nhiệm vụ');
+        AppToastService.success(context, 'Đã bỏ qua quest');
       }
     } catch (e) {
+      developer.log('[QUEST ACTION] skip failed: $e');
+      if (e is ApiException && e.rawBody != null) {
+        developer.log('[QUEST ACTION] raw response: ${e.rawBody}');
+      }
       if (mounted) {
-        AppToastService.error(context, 'Không thể bỏ qua nhiệm vụ');
+        AppToastService.error(context, 'Không thể bỏ qua quest');
       }
     }
   }
@@ -194,11 +276,11 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
   void _showQuestReason(QuestModel quest) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
       builder: (_) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
-          color: Color(0xFF0F1629),
+          color: AppColor.bgRaised,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -210,15 +292,16 @@ class _HomePageState extends BasePageConsumerState<HomePage, HomePageModel, Home
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFFE8ECF4),
+                color: AppColor.fg,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              quest.reason ?? 'Nhiệm vụ này được đề xuất dựa trên lịch sinh hoạt và mục tiêu hôm nay của bạn.',
+              quest.reason ??
+                  'Nhiệm vụ này được đề xuất dựa trên lịch sinh hoạt và mục tiêu hôm nay của bạn.',
               style: const TextStyle(
                 fontSize: 14,
-                color: Color(0xFF8B95A8),
+                color: AppColor.fgSecondary,
                 height: 1.6,
               ),
             ),

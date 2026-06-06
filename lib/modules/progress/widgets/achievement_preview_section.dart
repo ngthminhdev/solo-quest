@@ -6,6 +6,7 @@ import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/progress_model.dart';
 import '../../../models/enums/quest_enums.dart';
+import '../../../extensions/localization_extension.dart';
 
 class AchievementPreviewSection extends StatelessWidget {
   final ProgressModel progress;
@@ -16,22 +17,22 @@ class AchievementPreviewSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final achievements = [
       _Achievement(
-        title: 'Người khởi động',
-        description: 'Hoàn thành 5 quest đầu tiên',
+        title: context.l10n.progressAchievementStarter,
+        description: context.l10n.progressAchievementStarterDesc,
         icon: RemixIcons.rocket_line,
         color: AppColor.cyan,
         unlocked: progress.totalCompletedQuests >= 5,
       ),
       _Achievement(
-        title: 'Giữ lửa',
-        description: 'Duy trì streak 3 ngày',
+        title: context.l10n.progressAchievementKeeper,
+        description: context.l10n.progressAchievementKeeperDesc,
         icon: RemixIcons.fire_line,
         color: AppColor.warn,
         unlocked: progress.streakDays >= 3,
       ),
       _Achievement(
-        title: 'Học đều',
-        description: 'Hoàn thành 5 quest học tập',
+        title: context.l10n.progressAchievementLearner,
+        description: context.l10n.progressAchievementLearnerDesc,
         icon: RemixIcons.book_open_line,
         color: AppColor.violet,
         unlocked: (progress.completedByType[QuestType.learning] ?? 0) >= 5,
@@ -41,14 +42,14 @@ class AchievementPreviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
           child: Row(
             children: [
-              Icon(RemixIcons.award_line, size: 16, color: AppColor.expGold),
-              SizedBox(width: AppSpacing.s6),
+              const Icon(RemixIcons.award_line, size: 16, color: AppColor.expGold),
+              const SizedBox(width: AppSpacing.s6),
               Text(
-                'Thành tựu',
+                context.l10n.progressAchievementSectionTitle,
                 style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
@@ -167,10 +168,10 @@ class _AchievementMiniCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: achievement.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Text(
-                  'Đạt được',
+                  context.l10n.progressAchievementUnlocked,
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,

@@ -6,8 +6,10 @@ import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
 import '../../../helpers/time_helper.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/onboarding_constants.dart';
 import '../models/onboarding_data.dart';
+import 'onboarding_chip_selector.dart';
 
 class OnboardingScheduleStep extends StatelessWidget {
   final OnboardingData data;
@@ -15,8 +17,8 @@ class OnboardingScheduleStep extends StatelessWidget {
   final ValueChanged<String> onTargetSleepChanged;
   final ValueChanged<String> onFreeTimeStartChanged;
   final ValueChanged<String> onFreeTimeEndChanged;
-  final ValueChanged<String> onLearningTimeChanged;
-  final ValueChanged<String> onMovementTimeChanged;
+  final ValueChanged<String> onLearningTimeToggled;
+  final ValueChanged<String> onMovementTimeToggled;
 
   const OnboardingScheduleStep({
     super.key,
@@ -25,17 +27,31 @@ class OnboardingScheduleStep extends StatelessWidget {
     required this.onTargetSleepChanged,
     required this.onFreeTimeStartChanged,
     required this.onFreeTimeEndChanged,
-    required this.onLearningTimeChanged,
-    required this.onMovementTimeChanged,
+    required this.onLearningTimeToggled,
+    required this.onMovementTimeToggled,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
+    final learningTimeOptions = [
+      OnboardingStepOption('morning', l10n.onboardingTimeEarlyMorning),
+      OnboardingStepOption('lunch', l10n.onboardingTimeNoon),
+      OnboardingStepOption('evening', l10n.onboardingTimeEveningGeneral),
+    ];
+
+    final movementTimeOptions = [
+      OnboardingStepOption('morning', l10n.onboardingTimeEarlyMorning),
+      OnboardingStepOption('lunch', l10n.onboardingTimeNoon),
+      OnboardingStepOption('evening', l10n.onboardingTimeEveningGeneral),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step5Title,
+          l10n.onboardingStep5Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -44,7 +60,7 @@ class OnboardingScheduleStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step5Subtitle,
+          l10n.onboardingStep5Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -55,7 +71,7 @@ class OnboardingScheduleStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         _buildTimeField(
           context: context,
-          label: OnboardingConstants.wakeUpLabel,
+          label: l10n.onboardingStep5WakeUpLabel,
           value: data.wakeUpTime,
           onChanged: onWakeUpChanged,
           defaultTime: '07:00',
@@ -63,7 +79,7 @@ class OnboardingScheduleStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         _buildTimeField(
           context: context,
-          label: OnboardingConstants.targetSleepLabel,
+          label: l10n.onboardingStep5TargetSleepLabel,
           value: data.targetSleepTime,
           onChanged: onTargetSleepChanged,
           defaultTime: '23:00',
@@ -72,23 +88,22 @@ class OnboardingScheduleStep extends StatelessWidget {
         _buildFreeTimeRangeSection(context),
         const SizedBox(height: AppSpacing.lg),
         _buildChipSection(
-          label: OnboardingConstants.learningTimeLabel,
-          options: OnboardingConstants.learningTimeOptions,
-          selected: data.learningTimePreference,
-          onChanged: onLearningTimeChanged,
+          label: l10n.onboardingStep5LearningTimeLabel,
+          options: learningTimeOptions,
+          selected: data.learningTimePreferences,
+          onChanged: onLearningTimeToggled,
         ),
         const SizedBox(height: AppSpacing.lg),
         _buildChipSection(
-          label: OnboardingConstants.movementTimeLabel,
-          options: OnboardingConstants.movementTimeOptions,
-          selected: data.movementTimePreference,
-          onChanged: onMovementTimeChanged,
+          label: l10n.onboardingStep5MovementTimeLabel,
+          options: movementTimeOptions,
+          selected: data.movementTimePreferences,
+          onChanged: onMovementTimeToggled,
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step5SystemNote,
+          l10n.onboardingStep5SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -152,7 +167,6 @@ class OnboardingScheduleStep extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
-                    fontFamily: 'Exo2',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -165,11 +179,12 @@ class OnboardingScheduleStep extends StatelessWidget {
   }
 
   Widget _buildFreeTimeRangeSection(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.freeTimeRangeLabel,
+          l10n.onboardingStep5FreeTimeRangeLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -183,7 +198,7 @@ class OnboardingScheduleStep extends StatelessWidget {
             Expanded(
               child: _buildTimePickerField(
                 context: context,
-                label: OnboardingConstants.fromLabel,
+                label: l10n.onboardingStep5FromLabel,
                 value: data.freeTimeStart,
                 defaultTime: '20:00',
                 onChanged: onFreeTimeStartChanged,
@@ -193,7 +208,7 @@ class OnboardingScheduleStep extends StatelessWidget {
             Expanded(
               child: _buildTimePickerField(
                 context: context,
-                label: OnboardingConstants.toLabel,
+                label: l10n.onboardingStep5ToLabel,
                 value: data.freeTimeEnd,
                 defaultTime: '22:00',
                 onChanged: onFreeTimeEndChanged,
@@ -215,10 +230,7 @@ class OnboardingScheduleStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyle.caption.copyWith(fontSize: 12),
-        ),
+        Text(label, style: AppTextStyle.caption.copyWith(fontSize: 12)),
         const SizedBox(height: 4),
         GestureDetector(
           onTap: () async {
@@ -253,7 +265,6 @@ class OnboardingScheduleStep extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
-                    fontFamily: 'Exo2',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -267,8 +278,8 @@ class OnboardingScheduleStep extends StatelessWidget {
 
   Widget _buildChipSection({
     required String label,
-    required List<String> options,
-    required String selected,
+    required List<OnboardingStepOption> options,
+    required List<String> selected,
     required ValueChanged<String> onChanged,
   }) {
     return Column(
@@ -284,36 +295,11 @@ class OnboardingScheduleStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: options.map((option) {
-            final isSelected = selected == option;
-            return GestureDetector(
-              onTap: () => onChanged(option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColor.cyanDim : AppColor.surface,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(
-                    color: isSelected ? AppColor.cyan : AppColor.border,
-                  ),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColor.cyan : AppColor.fgSecondary,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        OnboardingChipSelector(
+          options: options,
+          selected: selected,
+          onChanged: onChanged,
+          layoutMode: ChipLayoutMode.equalWidthRow,
         ),
       ],
     );

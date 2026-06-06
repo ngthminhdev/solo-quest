@@ -90,10 +90,10 @@ class ProfileMenuTile extends StatelessWidget {
                   vertical: AppSpacing.s4,
                 ),
                 decoration: BoxDecoration(
-                  color: (badgeColor ?? AppColor.cyan).withOpacity(0.15),
+                  color: (badgeColor ?? AppColor.cyan).withValues(alpha:0.15),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(
-                    color: (badgeColor ?? AppColor.cyan).withOpacity(0.3),
+                    color: (badgeColor ?? AppColor.cyan).withValues(alpha:0.3),
                   ),
                 ),
                 child: Text(

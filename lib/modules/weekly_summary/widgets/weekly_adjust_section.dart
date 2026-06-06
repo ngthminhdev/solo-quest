@@ -5,6 +5,8 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/weekly_summary_model.dart';
+import '../../../models/enums/quest_enums.dart';
+import '../../../modules/quests/ui/quest_ui_extensions.dart';
 import '../constants/weekly_summary_constants.dart';
 
 class WeeklyAdjustSection extends StatelessWidget {
@@ -14,32 +16,15 @@ class WeeklyAdjustSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final adjustments = [
-      _AdjustData(
-        icon: RemixIcons.walk_line,
-        iconBg: AppColor.dangerDim,
-        title: 'Movement Quest',
-        desc: 'Bị bỏ qua 4 lần trong tuần. Có thể giảm từ 5 lần/tuần xuống 3 lần/tuần.',
-        barPercent: 0.3,
-        barColor: AppColor.danger,
-      ),
-      _AdjustData(
-        icon: RemixIcons.cup_line,
-        iconBg: AppColor.warnDim,
-        title: 'Break Quest buổi sáng',
-        desc: 'Hay bị hoãn vào buổi sáng. Đề xuất đổi từ mỗi 90 phút sang mỗi 120 phút.',
-        barPercent: 0.5,
-        barColor: AppColor.warn,
-      ),
-      _AdjustData(
-        icon: RemixIcons.book_open_line,
-        iconBg: AppColor.chipLearningBg,
-        title: 'Learning Quest giờ học',
-        desc: 'Hiệu quả hơn vào buổi tối. Đề xuất ưu tiên nhắc lúc 20:00–21:30.',
-        barPercent: 0.85,
-        barColor: AppColor.success,
-      ),
-    ];
+    // Derive adjustments from category breakdown: categories with rate < 0.70
+    final lowCategories = summary.categoryBreakdown
+        .where((c) => c.rate < 0.70)
+        .toList()
+      ..sort((a, b) => a.rate.compareTo(b.rate));
+
+    if (lowCategories.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -48,10 +33,57 @@ class WeeklyAdjustSection extends StatelessWidget {
         children: [
           const _SectionHeader(WeeklySummaryConstants.sectionAdjust),
           const SizedBox(height: AppSpacing.s12),
-          ...adjustments.map((data) => _AdjustCard(data: data)),
+          ...lowCategories.map((data) {
+            final ratePercent = (data.rate * 100).round();
+            final iconData = _getCategoryIcon(data.category);
+            final iconBg = _getCategoryIconBg(data.rate);
+            final barColor = _getCategoryBarColor(data.rate);
+
+            return _AdjustCard(
+              icon: iconData,
+              iconBg: iconBg,
+              title: data.displayLabel,
+              desc:
+                  'Hoàn thành ${data.completed}/${data.total} ($ratePercent%). Cần cải thiện.',
+              barPercent: data.rate,
+              barColor: barColor,
+            );
+          }),
         ],
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    try {
+      final type = QuestType.values.byName(category);
+      return type.icon;
+    } catch (_) {
+      switch (category) {
+        case 'main':
+          return RemixIcons.focus_3_line;
+        case 'side':
+          return RemixIcons.list_check_3;
+        case 'daily':
+          return RemixIcons.calendar_check_line;
+        case 'weekly':
+          return RemixIcons.calendar_2_line;
+        default:
+          return RemixIcons.question_line;
+      }
+    }
+  }
+
+  Color _getCategoryIconBg(double rate) {
+    if (rate < 0.40) return AppColor.dangerDim;
+    if (rate < 0.60) return AppColor.warnDim;
+    return AppColor.chipLearningBg;
+  }
+
+  Color _getCategoryBarColor(double rate) {
+    if (rate < 0.40) return AppColor.danger;
+    if (rate < 0.60) return AppColor.warn;
+    return AppColor.success;
   }
 }
 
@@ -74,7 +106,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _AdjustData {
+class _AdjustCard extends StatelessWidget {
   final IconData icon;
   final Color iconBg;
   final String title;
@@ -82,7 +114,7 @@ class _AdjustData {
   final double barPercent;
   final Color barColor;
 
-  const _AdjustData({
+  const _AdjustCard({
     required this.icon,
     required this.iconBg,
     required this.title,
@@ -90,12 +122,6 @@ class _AdjustData {
     required this.barPercent,
     required this.barColor,
   });
-}
-
-class _AdjustCard extends StatelessWidget {
-  final _AdjustData data;
-
-  const _AdjustCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -114,10 +140,10 @@ class _AdjustCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: data.iconBg,
+              color: iconBg,
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: Icon(data.icon, size: 18, color: AppColor.fg),
+            child: Icon(icon, size: 18, color: AppColor.fg),
           ),
           const SizedBox(width: AppSpacing.s12),
           Expanded(
@@ -125,7 +151,7 @@ class _AdjustCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.title,
+                  title,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -134,7 +160,7 @@ class _AdjustCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  data.desc,
+                  desc,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColor.fgSecondary,
@@ -142,20 +168,19 @@ class _AdjustCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.s8),
-                // Progress bar
                 Container(
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppColor.surfaceActive,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   child: FractionallySizedBox(
-                    widthFactor: data.barPercent,
+                    widthFactor: barPercent,
                     alignment: Alignment.centerLeft,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: data.barColor,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        color: barColor,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                     ),
                   ),

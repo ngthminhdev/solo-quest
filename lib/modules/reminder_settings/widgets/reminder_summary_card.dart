@@ -5,6 +5,8 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../widgets/app_card/app_glow_card.dart';
 
+import '../../../extensions/localization_extension.dart';
+
 class ReminderSummaryCard extends StatelessWidget {
   final int totalSettings;
   final int enabledCount;
@@ -27,7 +29,7 @@ class ReminderSummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryMetric(
               icon: RemixIcons.notification_3_line,
-              label: 'Tổng nhắc nhở',
+              label: context.l10n.reminderMetricTotal,
               value: totalSettings.toString(),
               color: AppColor.cyan,
             ),
@@ -35,7 +37,7 @@ class ReminderSummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryMetric(
               icon: RemixIcons.checkbox_circle_line,
-              label: 'Đang bật',
+              label: context.l10n.reminderMetricEnabled,
               value: enabledCount.toString(),
               color: AppColor.success,
             ),
@@ -43,7 +45,7 @@ class ReminderSummaryCard extends StatelessWidget {
           Expanded(
             child: _SummaryMetric(
               icon: RemixIcons.close_circle_line,
-              label: 'Đang tắt',
+              label: context.l10n.reminderMetricDisabled,
               value: disabledCount.toString(),
               color: AppColor.fgMuted,
             ),
@@ -76,7 +78,6 @@ class _SummaryMetric extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 20,
             fontWeight: FontWeight.w800,
             color: AppColor.fg,

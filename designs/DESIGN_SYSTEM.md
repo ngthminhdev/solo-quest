@@ -295,11 +295,11 @@ class AppShadows {
   ];
 
   static List<BoxShadow> get card => [
-    BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 24, offset: Offset(0, 4)),
+    BoxShadow(color: Colors.black.withValues(alpha:0.4), blurRadius: 24, offset: Offset(0, 4)),
   ];
 
   static List<BoxShadow> get elevated => [
-    BoxShadow(color: Colors.black.withOpacity(0.6), blurRadius: 32, offset: Offset(0, 8)),
+    BoxShadow(color: Colors.black.withValues(alpha:0.6), blurRadius: 32, offset: Offset(0, 8)),
   ];
 }
 ```

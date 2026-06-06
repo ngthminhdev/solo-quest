@@ -12,6 +12,7 @@ class OnboardingData {
   final String workStartTime;
   final String workEndTime;
   final String freeTimePreference;
+  final List<String> preferredFreeTimes;
 
   // Step 3 - Health & Activity
   final String activityLevel;
@@ -27,7 +28,9 @@ class OnboardingData {
   final String freeTimeStart;
   final String freeTimeEnd;
   final String learningTimePreference;
+  final List<String> learningTimePreferences;
   final String movementTimePreference;
+  final List<String> movementTimePreferences;
 
   // Step 6 - Reminders
   final int breakReminderInterval;
@@ -41,27 +44,30 @@ class OnboardingData {
   const OnboardingData({
     this.displayName = '',
     this.age,
-    this.gender = '',
+    this.gender = 'male',
     this.heightCm,
     this.weightKg,
-    this.mainActivity = '',
-    this.workScheduleType = '',
+    this.mainActivity = 'software_engineer',
+    this.workScheduleType = 'weekdays',
     this.workStartTime = '08:30',
     this.workEndTime = '17:30',
     this.freeTimePreference = '',
-    this.activityLevel = '',
-    this.lastWorkout = '',
+    this.preferredFreeTimes = const [],
+    this.activityLevel = 'very_little',
+    this.lastWorkout = 'longer_ago',
     this.healthLimitations = const [],
     this.mainGoals = const [],
     this.wakeUpTime = '07:00',
     this.targetSleepTime = '23:00',
     this.freeTimeStart = '20:00',
     this.freeTimeEnd = '22:00',
-    this.learningTimePreference = '',
-    this.movementTimePreference = '',
+    this.learningTimePreference = 'evening',
+    this.learningTimePreferences = const ['evening'],
+    this.movementTimePreference = 'evening',
+    this.movementTimePreferences = const ['evening'],
     this.breakReminderInterval = 90,
     this.breakDuration = '5',
-    this.waterReminderMode = '',
+    this.waterReminderMode = 'optimal',
     this.quietAfterTime = '22:00',
     this.preferredRewards = const [],
   });
@@ -77,6 +83,7 @@ class OnboardingData {
     String? workStartTime,
     String? workEndTime,
     String? freeTimePreference,
+    List<String>? preferredFreeTimes,
     String? activityLevel,
     String? lastWorkout,
     List<String>? healthLimitations,
@@ -86,7 +93,9 @@ class OnboardingData {
     String? freeTimeStart,
     String? freeTimeEnd,
     String? learningTimePreference,
+    List<String>? learningTimePreferences,
     String? movementTimePreference,
+    List<String>? movementTimePreferences,
     int? breakReminderInterval,
     String? breakDuration,
     String? waterReminderMode,
@@ -104,6 +113,7 @@ class OnboardingData {
       workStartTime: workStartTime ?? this.workStartTime,
       workEndTime: workEndTime ?? this.workEndTime,
       freeTimePreference: freeTimePreference ?? this.freeTimePreference,
+      preferredFreeTimes: preferredFreeTimes ?? this.preferredFreeTimes,
       activityLevel: activityLevel ?? this.activityLevel,
       lastWorkout: lastWorkout ?? this.lastWorkout,
       healthLimitations: healthLimitations ?? this.healthLimitations,
@@ -114,8 +124,12 @@ class OnboardingData {
       freeTimeEnd: freeTimeEnd ?? this.freeTimeEnd,
       learningTimePreference:
           learningTimePreference ?? this.learningTimePreference,
+      learningTimePreferences:
+          learningTimePreferences ?? this.learningTimePreferences,
       movementTimePreference:
           movementTimePreference ?? this.movementTimePreference,
+      movementTimePreferences:
+          movementTimePreferences ?? this.movementTimePreferences,
       breakReminderInterval:
           breakReminderInterval ?? this.breakReminderInterval,
       breakDuration: breakDuration ?? this.breakDuration,

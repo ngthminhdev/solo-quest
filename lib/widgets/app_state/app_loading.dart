@@ -23,7 +23,6 @@ class AppLoading extends StatelessWidget {
             Text(
               message!,
               style: const TextStyle(
-                fontFamily: 'Exo2',
                 fontSize: 14,
                 color: AppColor.fgSecondary,
               ),

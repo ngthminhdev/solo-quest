@@ -10,7 +10,7 @@ import '../../../widgets/app_button/app_button.dart';
 import '../../../widgets/app_form/app_toggle_row.dart';
 import '../../../widgets/app_text_field/app_text_field.dart';
 import '../../../widgets/app_toast/app_toast_service.dart';
-import '../constants/reminder_settings_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import 'reminder_frequency_selector.dart';
 import 'reminder_time_range_row.dart';
 
@@ -39,7 +39,7 @@ class ReminderSettingFormSheet {
   }) async {
     return AppBottomSheet.show<ReminderSettingFormResult>(
       context: context,
-      title: ReminderSettingsConstants.formTitle,
+      title: context.l10n.reminderSettingsFormTitle,
       subtitle: initialSetting.title,
       body: _ReminderSettingForm(initialSetting: initialSetting),
     );
@@ -96,7 +96,7 @@ class _ReminderSettingFormState extends State<_ReminderSettingForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _FormLabel('Tần suất'),
+          _FormLabel(context.l10n.reminderFormFrequency),
           const SizedBox(height: AppSpacing.s8),
           ReminderFrequencySelector(
             value: _frequency,
@@ -110,7 +110,7 @@ class _ReminderSettingFormState extends State<_ReminderSettingForm> {
             },
           ),
           const SizedBox(height: AppSpacing.s16),
-          const _FormLabel('Khung giờ'),
+          _FormLabel(context.l10n.reminderFormTimeWindow),
           const SizedBox(height: AppSpacing.s8),
           ReminderTimeRangeRow(
             startTime: _startTime,
@@ -121,30 +121,29 @@ class _ReminderSettingFormState extends State<_ReminderSettingForm> {
           const SizedBox(height: AppSpacing.s16),
           AppTextField(
             controller: _intervalController,
-            label: 'Interval minutes',
-            placeholder: 'Ví dụ: 90',
+            label: context.l10n.reminderFormMinIntervalLabel,
+            placeholder: context.l10n.reminderFormMinIntervalPlaceholder,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           const SizedBox(height: AppSpacing.s16),
           AppTextField(
             controller: _maxPerDayController,
-            label: 'Max per day',
-            placeholder: 'Ví dụ: 8',
+            label: context.l10n.reminderFormMaxPerDayLabel,
+            placeholder: context.l10n.reminderFormMaxPerDayPlaceholder,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
           const SizedBox(height: AppSpacing.s12),
           AppToggleRow(
-            title: 'Smart reminder',
-            subtitle:
-                'Cho phép SoloQuest tự điều chỉnh theo lịch và trạng thái.',
+            title: context.l10n.reminderFormSmartTitle,
+            subtitle: context.l10n.reminderFormSmartSubtitle,
             value: _smartEnabled,
             onChanged: (value) => setState(() => _smartEnabled = value),
           ),
           const SizedBox(height: AppSpacing.s20),
           AppButton(
-            label: 'Lưu cài đặt',
+            label: context.l10n.reminderFormSaveButton,
             onPressed: _handleSubmit,
             fullWidth: true,
           ),
@@ -159,18 +158,18 @@ class _ReminderSettingFormState extends State<_ReminderSettingForm> {
 
     if (_frequency == ReminderFrequency.fixed &&
         (_startTime == null || _startTime!.isEmpty)) {
-      AppToastService.error(context, 'Cần chọn thời điểm nhắc cố định');
+      AppToastService.error(context, context.l10n.reminderFormErrorFixedTimeRequired);
       return;
     }
 
     if (_frequency == ReminderFrequency.interval) {
       if ((_startTime == null || _startTime!.isEmpty) ||
           (_endTime == null || _endTime!.isEmpty)) {
-        AppToastService.error(context, 'Cần chọn đầy đủ khung giờ nhắc');
+        AppToastService.error(context, context.l10n.reminderFormErrorTimeRangeRequired);
         return;
       }
       if (intervalMinutes == null) {
-        AppToastService.error(context, 'Interval minutes phải lớn hơn 0');
+        AppToastService.error(context, context.l10n.reminderFormErrorIntervalInvalid);
         return;
       }
     }
@@ -178,17 +177,17 @@ class _ReminderSettingFormState extends State<_ReminderSettingForm> {
     if (_frequency == ReminderFrequency.randomInRange) {
       if ((_startTime == null || _startTime!.isEmpty) ||
           (_endTime == null || _endTime!.isEmpty)) {
-        AppToastService.error(context, 'Cần chọn đầy đủ khung giờ ngẫu nhiên');
+        AppToastService.error(context, context.l10n.reminderFormErrorRandomRangeRequired);
         return;
       }
       if (_maxPerDayController.text.trim().isNotEmpty && maxPerDay == null) {
-        AppToastService.error(context, 'Max per day phải lớn hơn 0');
+        AppToastService.error(context, context.l10n.reminderFormErrorMaxPerDayInvalid);
         return;
       }
     }
 
     if (_frequency == ReminderFrequency.smart && !_smartEnabled) {
-      AppToastService.error(context, 'Smart reminder cần được bật');
+      AppToastService.error(context, context.l10n.reminderFormErrorSmartRequired);
       return;
     }
 

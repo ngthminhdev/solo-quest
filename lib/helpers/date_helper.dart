@@ -1,10 +1,14 @@
 class DateHelper {
+  static String _pad(int n) => n.toString().padLeft(2, '0');
+
   static String formatDateTime(DateTime dateTime) {
-    return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
+    final local = dateTime.toLocal();
+    return '${_pad(local.day)}/${_pad(local.month)}/${local.year}';
   }
 
   static String formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final local = date.toLocal();
+    return '${_pad(local.day)}/${_pad(local.month)}/${local.year}';
   }
 
   static String formatDateRange(DateTime start, DateTime end) {
@@ -12,16 +16,20 @@ class DateHelper {
   }
 
   static String formatTime(DateTime dateTime) {
-    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    final local = dateTime.toLocal();
+    return '${_pad(local.hour)}:${_pad(local.minute)}';
   }
 
   static bool isSameDate(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+    final la = a.toLocal();
+    final lb = b.toLocal();
+    return la.year == lb.year && la.month == lb.month && la.day == lb.day;
   }
 
   static String formatRelative(DateTime dateTime) {
     final now = DateTime.now();
-    final diff = now.difference(dateTime);
+    final local = dateTime.toLocal();
+    final diff = now.difference(local);
 
     if (diff.inMinutes < 1) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -31,8 +39,9 @@ class DateHelper {
   }
 
   static String formatWeekday(DateTime dateTime) {
+    final local = dateTime.toLocal();
     const days = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
-    return days[dateTime.weekday - 1];
+    return days[local.weekday - 1];
   }
 
   static String formatFullDate(DateTime dateTime) {

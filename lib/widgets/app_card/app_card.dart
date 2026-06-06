@@ -79,7 +79,7 @@ class AppGlowCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  accentColor.withOpacity(0.12),
+                  accentColor.withValues(alpha:0.12),
                   AppColor.surface,
                 ],
               )
@@ -87,12 +87,12 @@ class AppGlowCard extends StatelessWidget {
         color: useGradient ? null : AppColor.surface,
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
-          color: accentColor.withOpacity(0.35),
+          color: accentColor.withValues(alpha:0.35),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withOpacity(0.14),
+            color: accentColor.withValues(alpha:0.14),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),

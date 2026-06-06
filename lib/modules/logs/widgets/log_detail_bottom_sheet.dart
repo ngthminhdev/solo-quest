@@ -10,7 +10,7 @@ import '../../../routes/routes_config.dart';
 import '../../../widgets/app_badge/quest_type_chip.dart';
 import '../../../widgets/app_badge/exp_badge.dart';
 import '../../../widgets/app_bottom_sheet/app_bottom_sheet.dart';
-import '../constants/logs_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class LogDetailBottomSheet {
   static void show(
@@ -39,7 +39,7 @@ class _LogDetailContent extends StatelessWidget {
         // Type badge
         _buildRow(
           icon: RemixIcons.folder_line,
-          label: 'Loại',
+          label: context.l10n.logsDetailTypeLabel,
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.s10,
@@ -65,7 +65,7 @@ class _LogDetailContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.s16),
           _buildRow(
             icon: RemixIcons.file_text_line,
-            label: 'Mô tả',
+            label: context.l10n.logsDetailDescLabel,
             child: Text(
               log.description,
               style: const TextStyle(
@@ -102,9 +102,11 @@ class _LogDetailContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.s16),
           _buildRow(
             icon: RemixIcons.gift_line,
-            label: 'Điểm thưởng',
+            label: context.l10n.logsDetailPointsLabel,
             child: Text(
-              '${log.pointsChanged! > 0 ? '+' : ''}${log.pointsChanged} điểm',
+              context.l10n.logsDetailPointsValue(
+                log.pointsChanged! > 0 ? '+${log.pointsChanged}' : '${log.pointsChanged}',
+              ),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -119,14 +121,21 @@ class _LogDetailContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.s16),
           _buildRow(
             icon: RemixIcons.emotion_line,
-            label: 'Cảm xúc',
-            child: Text(
-              '${log.mood!.iconText} ${log.mood!.label}',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColor.violet,
-              ),
+            label: context.l10n.logsDetailMoodLabel,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(log.mood!.icon, size: 16, color: AppColor.violet),
+                const SizedBox(width: 6),
+                Text(
+                  log.mood!.label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.violet,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -172,7 +181,7 @@ class _LogDetailContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColor.borderGlowCyan),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
@@ -182,8 +191,8 @@ class _LogDetailContent extends StatelessWidget {
                   ),
                   SizedBox(width: AppSpacing.s8),
                   Text(
-                    LogsConstants.viewQuestLabel,
-                    style: TextStyle(
+                    context.l10n.logsViewQuest,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColor.cyan,
@@ -224,32 +233,5 @@ class _LogDetailContent extends StatelessWidget {
     );
   }
 
-  Color get _typeColor {
-    switch (log.type) {
-      case LogEntryType.questCompleted:
-        return AppColor.success;
-      case LogEntryType.questSkipped:
-        return AppColor.warn;
-      case LogEntryType.questSnoozed:
-        return AppColor.info;
-      case LogEntryType.questStarted:
-        return AppColor.cyan;
-      case LogEntryType.questCreated:
-        return AppColor.fgSecondary;
-      case LogEntryType.morningCheckin:
-        return AppColor.cyan;
-      case LogEntryType.dailyReview:
-        return AppColor.violet;
-      case LogEntryType.rewardClaimed:
-        return AppColor.cyan;
-      case LogEntryType.levelUp:
-        return AppColor.expGold;
-      case LogEntryType.streakChanged:
-        return AppColor.warn;
-      case LogEntryType.profileUpdated:
-        return AppColor.fgSecondary;
-      case LogEntryType.ruleUpdated:
-        return AppColor.fgSecondary;
-    }
-  }
+  Color get _typeColor => log.type.color;
 }

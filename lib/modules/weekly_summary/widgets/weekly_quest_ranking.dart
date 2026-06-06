@@ -13,11 +13,16 @@ class WeeklyQuestRanking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rankings = [
-      _RankingData('Learning Quest', 'Hiệu quả nhất sau 20:00', 85, AppColor.success),
-      _RankingData('Water Quest', 'Ổn định khi nhắc cách nhau 90 phút', 78, AppColor.success),
-      _RankingData('Break Quest', 'Thường bị hoãn vào buổi sáng', 65, AppColor.warn),
-    ];
+    // Use category breakdown from model, sorted by rate descending
+    final categories = List<WeeklyCategoryBreakdown>.from(
+      summary.categoryBreakdown,
+    )..sort((a, b) => b.rate.compareTo(a.rate));
+
+    final topCategories = categories.take(3).toList();
+
+    if (topCategories.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -26,10 +31,19 @@ class WeeklyQuestRanking extends StatelessWidget {
         children: [
           const _SectionHeader(WeeklySummaryConstants.sectionTopQuests),
           const SizedBox(height: AppSpacing.s12),
-          ...rankings.asMap().entries.map((entry) {
+          ...topCategories.asMap().entries.map((entry) {
+            final position = entry.key + 1;
+            final data = entry.value;
+            final ratePercent = (data.rate * 100).round();
+            final rateColor =
+                ratePercent >= 70 ? AppColor.success : AppColor.warn;
+
             return _RankingCard(
-              position: entry.key + 1,
-              data: entry.value,
+              position: position,
+              name: data.displayLabel,
+              note: '${data.completed}/${data.total} hoàn thành',
+              rate: ratePercent,
+              rateColor: rateColor,
             );
           }),
         ],
@@ -57,20 +71,20 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _RankingData {
+class _RankingCard extends StatelessWidget {
+  final int position;
   final String name;
   final String note;
   final int rate;
   final Color rateColor;
 
-  const _RankingData(this.name, this.note, this.rate, this.rateColor);
-}
-
-class _RankingCard extends StatelessWidget {
-  final int position;
-  final _RankingData data;
-
-  const _RankingCard({required this.position, required this.data});
+  const _RankingCard({
+    required this.position,
+    required this.name,
+    required this.note,
+    required this.rate,
+    required this.rateColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +113,7 @@ class _RankingCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.name,
+                  name,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -107,7 +121,7 @@ class _RankingCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  data.note,
+                  note,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
@@ -117,12 +131,12 @@ class _RankingCard extends StatelessWidget {
             ),
           ),
           Text(
-            '${data.rate}%',
+            '$rate%',
             style: TextStyle(
               fontFamily: 'JetBrains Mono',
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: data.rateColor,
+              color: rateColor,
             ),
           ),
         ],

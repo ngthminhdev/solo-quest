@@ -14,14 +14,10 @@ class HomeInsightCard extends StatelessWidget {
     if (insight == null || insight!.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 14),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0x0D00F0FF), Color(0x0AA855F7)],
-        ),
+        gradient: AppColor.insightCardGradient,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColor.borderGlowCyan),
       ),
@@ -36,7 +32,11 @@ class HomeInsightCard extends StatelessWidget {
               color: AppColor.cyanDim,
               border: Border.all(color: AppColor.borderGlowCyan),
             ),
-            child: const Icon(RemixIcons.lightbulb_line, size: 18, color: AppColor.cyan),
+            child: const Icon(
+              RemixIcons.lightbulb_line,
+              size: 18,
+              color: AppColor.cyan,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -55,10 +55,13 @@ class HomeInsightCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColor.cyanDim,
-                        borderRadius: BorderRadius.circular(AppRadius.full),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                       child: const Text(
                         'AI',

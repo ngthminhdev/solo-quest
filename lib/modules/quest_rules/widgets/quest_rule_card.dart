@@ -6,8 +6,10 @@ import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../models/enums/quest_enums.dart';
 import '../../../models/quest_rule_model.dart';
+import '../../../modules/quests/ui/quest_ui_extensions.dart';
 import '../../../widgets/app_badge/quest_type_chip.dart';
 import '../../../widgets/app_card/app_card.dart';
+import '../../../extensions/localization_extension.dart';
 
 class QuestRuleCard extends StatelessWidget {
   final QuestRuleModel rule;
@@ -25,6 +27,7 @@ class QuestRuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final accent = _accentColor(rule.type);
 
     return Opacity(
@@ -96,24 +99,24 @@ class QuestRuleCard extends StatelessWidget {
                 QuestTypeChip(type: rule.type),
                 _InfoPill(
                   icon: RemixIcons.notification_badge_line,
-                  label: rule.enabled ? 'Đang bật' : 'Đang tắt',
+                  label: rule.enabled ? l10n.questRulesMetricEnabled : l10n.questRulesMetricDisabled,
                   color: rule.enabled ? AppColor.success : AppColor.fgMuted,
                 ),
                 _InfoPill(
                   icon: RemixIcons.flashlight_line,
-                  label: rule.difficulty.label,
+                  label: rule.difficulty.getLocalizedLabel(l10n),
                   color: _difficultyColor(rule.difficulty),
                 ),
                 if (rule.minIntervalMinutes != null)
                   _InfoPill(
                     icon: RemixIcons.timer_line,
-                    label: 'Mỗi ${rule.minIntervalMinutes} phút',
+                    label: l10n.questRulesRuleCardInterval(rule.minIntervalMinutes!),
                     color: AppColor.cyan,
                   ),
                 if (rule.maxPerDay != null)
                   _InfoPill(
                     icon: RemixIcons.speed_up_line,
-                    label: 'Tối đa ${rule.maxPerDay} lần/ngày',
+                    label: l10n.questRulesRuleCardMaxPerDay(rule.maxPerDay!),
                     color: AppColor.info,
                   ),
                 if (rule.activeTimeRange != null)
@@ -124,7 +127,7 @@ class QuestRuleCard extends StatelessWidget {
                   ),
                 _InfoPill(
                   icon: RemixIcons.arrow_up_circle_line,
-                  label: 'Ưu tiên ${rule.priority}',
+                  label: l10n.questRulesRuleCardPriority(rule.priority),
                   color: AppColor.warn,
                 ),
               ],
@@ -156,7 +159,7 @@ class QuestRuleCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    rule.difficulty.description,
+                    rule.difficulty.getLocalizedDescription(l10n),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -179,18 +182,18 @@ class QuestRuleCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(color: AppColor.borderGlowCyan),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           RemixIcons.edit_2_line,
                           size: 14,
                           color: AppColor.cyan,
                         ),
-                        SizedBox(width: AppSpacing.s4),
+                        const SizedBox(width: AppSpacing.s4),
                         Text(
-                          'Sửa',
-                          style: TextStyle(
+                          l10n.questRulesRuleCardEditButton,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: AppColor.cyan,
@@ -231,16 +234,7 @@ class QuestRuleCard extends StatelessWidget {
     }
   }
 
-  Color _difficultyColor(QuestDifficulty difficulty) {
-    switch (difficulty) {
-      case QuestDifficulty.easy:
-        return AppColor.success;
-      case QuestDifficulty.medium:
-        return AppColor.warn;
-      case QuestDifficulty.hard:
-        return AppColor.danger;
-    }
-  }
+  Color _difficultyColor(QuestDifficulty difficulty) => difficulty.color;
 }
 
 class _InfoPill extends StatelessWidget {

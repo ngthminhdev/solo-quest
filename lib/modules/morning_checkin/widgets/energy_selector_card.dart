@@ -5,7 +5,7 @@ import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/enums/user_enums.dart';
 import '../../../widgets/app_section/app_section_header.dart';
-import '../constants/morning_checkin_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class EnergySelectorCard extends StatelessWidget {
   final EnergyLevel? value;
@@ -22,8 +22,8 @@ class EnergySelectorCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AppSectionHeader(
-          title: MorningCheckinConstants.energyLabel,
+        AppSectionHeader(
+          title: context.l10n.morningCheckinEnergyLabel,
           dotColor: AppColor.cyan,
         ),
         Padding(
@@ -44,7 +44,7 @@ class EnergySelectorCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(
                           color: isSelected
-                              ? AppColor.borderGlowCyan
+                              ? AppColor.primaryBorder
                               : AppColor.border,
                         ),
                       ),
@@ -54,7 +54,7 @@ class EnergySelectorCard extends StatelessWidget {
                               style: const TextStyle(fontSize: 18)),
                           const SizedBox(height: 4),
                           Text(
-                            level.label,
+                            level.getLocalizedLabel(context.l10n),
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,

@@ -89,7 +89,7 @@ class SnoozeQuestSheet {
                 child: Container(
                   width: double.infinity,
                   height: 44,
-                  color: Colors.transparent,
+                  color: AppColor.transparent,
                   child: const Center(
                     child: Text(
                       'Huỷ',

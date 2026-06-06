@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/progress_model.dart';
 
 class StreakSafetyCard extends StatelessWidget {
@@ -12,6 +13,8 @@ class StreakSafetyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(
         AppSpacing.s16,
@@ -32,9 +35,9 @@ class StreakSafetyCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Chuỗi ngày liên tiếp',
-                style: TextStyle(
+              Text(
+                l10n.progressStreakDaysLabel(progress.streakDays),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fg,
@@ -52,9 +55,9 @@ class StreakSafetyCard extends StatelessWidget {
                         color: AppColor.warn,
                       ),
                     ),
-                    const TextSpan(
-                      text: ' ngày',
-                      style: TextStyle(
+                    TextSpan(
+                      text: l10n.progressStreakDaysSuffix,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: AppColor.fgSecondary,
@@ -74,7 +77,7 @@ class StreakSafetyCard extends StatelessWidget {
               Expanded(
                 child: _StreakStat(
                   value: '${progress.streakShields}',
-                  label: 'Shield còn lại',
+                  label: l10n.progressStreakShieldRemaining,
                   valueColor: AppColor.cyan,
                 ),
               ),
@@ -82,7 +85,7 @@ class StreakSafetyCard extends StatelessWidget {
               Expanded(
                 child: _StreakStat(
                   value: '${progress.lightDaysUsed}',
-                  label: 'Ngày nhẹ đã dùng',
+                  label: l10n.progressStreakLightDaysUsed,
                   valueColor: AppColor.success,
                 ),
               ),
@@ -90,7 +93,7 @@ class StreakSafetyCard extends StatelessWidget {
               Expanded(
                 child: _StreakStat(
                   value: '${progress.bestStreak}',
-                  label: 'Streak cao nhất',
+                  label: l10n.progressStreakMax,
                   valueColor: AppColor.warn,
                 ),
               ),
@@ -114,16 +117,15 @@ class StreakSafetyCard extends StatelessWidget {
                   height: 1.5,
                 ),
                 children: [
-                  const TextSpan(
-                    text: 'Streak Shield',
-                    style: TextStyle(
+                  TextSpan(
+                    text: l10n.progressStreakShield,
+                    style: const TextStyle(
                       color: AppColor.success,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const TextSpan(
-                    text:
-                        ' bảo vệ chuỗi khi bạn bận, mệt hoặc cần nghỉ. Dùng "ngày nhẹ" để giữ nhịp mà không cần hoàn thành nhiều quest.',
+                  TextSpan(
+                    text: l10n.progressStreakShieldNote,
                   ),
                 ],
               ),

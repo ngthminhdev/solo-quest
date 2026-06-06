@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:developer' as developer;
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
@@ -10,17 +11,15 @@ import '../../widgets/app_scaffold/app_scaffold.dart';
 import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
+import '../profile/profile_page_model.dart';
 import 'morning_checkin_page_model.dart';
-import 'constants/morning_checkin_constants.dart';
+import '../../extensions/localization_extension.dart';
 import 'widgets/morning_checkin_header.dart';
 import 'widgets/checkin_step_indicator.dart';
+import 'widgets/mood_selector_card.dart';
 import 'widgets/energy_selector_card.dart';
-import 'widgets/stress_selector_card.dart';
-import 'widgets/focus_selector_card.dart';
-import 'widgets/day_intensity_selector_card.dart';
-import 'widgets/main_focus_input_card.dart';
-import 'widgets/available_time_blocks_card.dart';
-import 'widgets/checkin_note_card.dart';
+import 'widgets/availability_selector_card.dart';
+import 'widgets/priority_selector_card.dart';
 import 'widgets/checkin_submit_bar.dart';
 
 class MorningCheckinPage
@@ -43,21 +42,26 @@ class _MorningCheckinPageState extends BasePageConsumerState<
   }
 
   @override
+  Widget build(BuildContext context) {
+    return super.build(context);
+  }
+
+  @override
   Widget renderPage(BuildContext context) {
     final state = read;
 
     if (state.loadState == AppLoadState.loading) {
       return AppScaffold(
-        title: MorningCheckinConstants.pageTitle,
-        body: const AppLoading(message: 'Đang tải...'),
+        title: context.l10n.morningCheckinPageTitle,
+        body: AppLoading(message: context.l10n.morningCheckinLoading),
       );
     }
 
     if (state.loadState == AppLoadState.error) {
       return AppScaffold(
-        title: MorningCheckinConstants.pageTitle,
+        title: context.l10n.morningCheckinPageTitle,
         body: AppErrorState(
-          message: state.errorMessage ?? MorningCheckinConstants.toastFailed,
+          message: state.errorMessage ?? context.l10n.morningCheckinToastFailed,
           onRetry: pageModel.loadTodayCheckin,
         ),
       );
@@ -86,39 +90,24 @@ class _MorningCheckinPageState extends BasePageConsumerState<
                     hasCheckedIn: state.hasCheckedInToday,
                   ),
                   const SizedBox(height: AppSpacing.s16),
+                  MoodSelectorCard(
+                    value: state.mood,
+                    onChanged: pageModel.setMood,
+                  ),
+                  const SizedBox(height: AppSpacing.s8),
                   EnergySelectorCard(
                     value: state.energyLevel,
                     onChanged: pageModel.setEnergyLevel,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  StressSelectorCard(
-                    value: state.stressLevel,
-                    onChanged: pageModel.setStressLevel,
+                  AvailabilitySelectorCard(
+                    value: state.availability,
+                    onChanged: pageModel.setAvailability,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  FocusSelectorCard(
-                    value: state.focusLevel,
-                    onChanged: pageModel.setFocusLevel,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  DayIntensitySelectorCard(
-                    value: state.dayIntensity,
-                    onChanged: pageModel.setDayIntensity,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  MainFocusInputCard(
-                    value: state.mainFocusToday,
-                    onChanged: pageModel.setMainFocusToday,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  AvailableTimeBlocksCard(
-                    selectedBlocks: state.availableTimeBlocks,
-                    onToggle: pageModel.toggleAvailableTimeBlock,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  CheckinNoteCard(
-                    value: state.note,
-                    onChanged: pageModel.setNote,
+                  PrioritySelectorCard(
+                    value: state.priority,
+                    onChanged: pageModel.setPriority,
                   ),
                   const SizedBox(height: AppSpacing.s32),
                 ],
@@ -131,26 +120,43 @@ class _MorningCheckinPageState extends BasePageConsumerState<
   }
 
   Future<void> _handleSubmit() async {
+    developer.log('[CHECKIN PAGE] _handleSubmit called');
     final state = read;
+    developer.log('[CHECKIN PAGE] canSubmit: ${state.canSubmit}, isLockedPage: ${state.isLockedPage}');
 
     if (!state.canSubmit) {
-      AppToastService.warning(context, MorningCheckinConstants.toastMissing);
+      developer.log('[CHECKIN PAGE] Cannot submit - showing warning toast');
+      AppToastService.warning(context, context.l10n.morningCheckinToastMissing);
       return;
     }
 
+    developer.log('[CHECKIN PAGE] Calling submitCheckin()');
     final success = await pageModel.submitCheckin();
+    developer.log('[CHECKIN PAGE] submitCheckin() returned: $success');
 
     if (!mounted) return;
 
     if (success) {
-      AppToastService.success(context, MorningCheckinConstants.toastSuccess);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RoutesConfig.home,
-        (route) => false,
-      );
+      // Invalidate profile provider to refresh hasCheckedInToday status
+      ref.invalidate(profilePageProvider);
+
+      developer.log('[CHECKIN PAGE] Showing success toast');
+      AppToastService.success(context, context.l10n.morningCheckinToastSuccess);
+
+      // Wait for toast animation to start before navigating
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (!mounted) return;
+
+      developer.log('[CHECKIN PAGE] Navigating back');
+      if (Navigator.of(context).canPop()) {
+        Navigator.pop(context);
+      } else {
+        Navigator.pushReplacementNamed(context, RoutesConfig.home);
+      }
     } else {
-      AppToastService.error(context, MorningCheckinConstants.toastFailed);
+      developer.log('[CHECKIN PAGE] Showing error toast');
+      AppToastService.error(context, context.l10n.morningCheckinToastFailed);
     }
   }
 }

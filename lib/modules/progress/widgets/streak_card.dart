@@ -5,6 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../widgets/app_card/app_card.dart';
+import '../../../extensions/localization_extension.dart';
 
 class StreakCard extends StatelessWidget {
   final int streakDays;
@@ -13,6 +14,13 @@ class StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String motivationMessage(int days) {
+      if (days == 0) return context.l10n.progressStreakMotivationStart;
+      if (days <= 2) return context.l10n.progressStreakMotivationGood;
+      if (days <= 6) return context.l10n.progressStreakMotivationForming;
+      return context.l10n.progressStreakMotivationStable;
+    }
+
     return AppCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.s16,
@@ -40,7 +48,7 @@ class StreakCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Streak $streakDays ngày',
+                  context.l10n.progressStreakDaysLabel(streakDays),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -49,7 +57,7 @@ class StreakCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.s2),
                 Text(
-                  _motivationMessage(streakDays),
+                  motivationMessage(streakDays),
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
@@ -66,9 +74,9 @@ class StreakCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColor.warnDim,
-                borderRadius: BorderRadius.circular(AppRadius.full),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
                 border: Border.all(
-                  color: AppColor.warn.withValues(alpha: 0.22),
+                  color: AppColor.warningStrongOverlay,
                 ),
               ),
               child: Text(
@@ -86,10 +94,4 @@ class StreakCard extends StatelessWidget {
     );
   }
 
-  String _motivationMessage(int days) {
-    if (days == 0) return 'Bắt đầu streak hôm nay';
-    if (days <= 2) return 'Bạn đang khởi động rất tốt';
-    if (days <= 6) return 'Chuỗi ngày đang hình thành';
-    return 'Thói quen của bạn đang rất ổn định';
-  }
 }

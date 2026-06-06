@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../core/utils/app_time_formatter.dart';
 import '../../../models/log_entry_model.dart';
 import '../../../models/enums/log_enums.dart';
 
@@ -108,9 +109,7 @@ class QuestDetailHistorySection extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    return '$day/$month';
+    return AppTimeFormatter.formatLocalDayMonth(date) ?? '';
   }
 
   String _getStatusIcon(LogEntryType type) {

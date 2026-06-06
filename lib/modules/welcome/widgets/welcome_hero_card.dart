@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_shadow.dart';
@@ -17,13 +16,13 @@ class WelcomeHeroCard extends StatelessWidget {
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: AppColor.levelGradient,
+            color: AppColor.bgDeep,
             boxShadow: AppShadow.glowCyan + AppShadow.glowViolet,
           ),
-          child: const Icon(
-            RemixIcons.star_line,
-            size: 40,
-            color: AppColor.bgDeep,
+          clipBehavior: Clip.antiAlias,
+          child: Image.asset(
+            'assets/icons/app_icon_foreground.png',
+            fit: BoxFit.contain,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -34,11 +33,10 @@ class WelcomeHeroCard extends StatelessWidget {
           child: const Text(
             'SoloQuest',
             style: TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 28,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.04,
-              color: Colors.white,
+              color: AppColor.white,
             ),
           ),
         ),

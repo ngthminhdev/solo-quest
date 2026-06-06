@@ -19,12 +19,12 @@ class AppToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColor.transparent,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: AppColor.surface,
-          borderRadius: BorderRadius.circular(AppRadius.full),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           border: Border.all(color: _borderColor),
         ),
         child: Row(
@@ -51,11 +51,11 @@ class AppToast extends StatelessWidget {
   Color get _borderColor {
     switch (type) {
       case AppToastType.success:
-        return AppColor.success.withOpacity(0.3);
+        return AppColor.successBorder;
       case AppToastType.error:
-        return AppColor.danger.withOpacity(0.3);
+        return AppColor.errorStrongBorder;
       case AppToastType.warning:
-        return AppColor.warn.withOpacity(0.3);
+        return AppColor.warningBorder;
       case AppToastType.info:
         return AppColor.borderGlowCyan;
     }

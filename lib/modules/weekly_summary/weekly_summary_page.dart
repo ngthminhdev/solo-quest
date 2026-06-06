@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
+import '../../constants/app_color.dart';
 import '../../constants/app_spacing.dart';
 import '../../routes/routes_config.dart';
 import '../../widgets/app_scaffold/app_scaffold.dart';
@@ -99,7 +100,7 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
             onToggle: pageModel.toggleSuggestion,
           ),
           const SizedBox(height: AppSpacing.s16),
-          const WeeklySchedulePreview(),
+          WeeklySchedulePreview(summary: summary),
           const SizedBox(height: AppSpacing.s16),
           const WeeklyProtectionCard(),
           const SizedBox(height: AppSpacing.s16),
@@ -124,22 +125,20 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: GestureDetector(
         onTap: () {
-          AppToastService.success(
+          AppToastService.info(
             context,
-            '${WeeklySummaryConstants.toastApplied} (${state.enabledSuggestionCount})',
+            'Tính năng áp dụng tự động sẽ được thêm sau.',
           );
         },
         child: Container(
           height: 48,
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF00F0FF), Color(0xFF00C4FF)],
-            ),
+            gradient: AppColor.weeklyChartGradient,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF00F0FF).withAlpha(60),
+                color: AppColor.cyan.withValues(alpha: 0.24),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -149,10 +148,9 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
           child: Text(
             '${WeeklySummaryConstants.ctaApply} (${state.enabledSuggestionCount})',
             style: const TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF060A14),
+              color: AppColor.bgDeep,
             ),
           ),
         ),
@@ -170,18 +168,17 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
           height: 44,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.transparent,
-            border: Border.all(color: const Color(0x0FFFFFFF)),
+            color: AppColor.transparent,
+            border: Border.all(color: AppColor.border),
             borderRadius: BorderRadius.circular(20),
           ),
           alignment: Alignment.center,
           child: const Text(
             WeeklySummaryConstants.ctaManual,
             style: TextStyle(
-              fontFamily: 'Exo2',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFFE8ECF4),
+              color: AppColor.fg,
             ),
           ),
         ),

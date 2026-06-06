@@ -38,17 +38,10 @@ class WeeklyStatsGrid extends StatelessWidget {
           ),
           _StatCard(
             label: 'Streak',
-            value: '5',
+            value: '${summary.streakDays}',
             color: AppColor.success,
             icon: RemixIcons.fire_line,
             sub: 'ngày liên tiếp',
-          ),
-          _StatCard(
-            label: 'Đã hoãn',
-            value: '12',
-            color: AppColor.warn,
-            icon: RemixIcons.time_line,
-            sub: 'lần trong tuần',
           ),
           _StatCard(
             label: 'Bỏ qua',
@@ -59,10 +52,16 @@ class WeeklyStatsGrid extends StatelessWidget {
           ),
           _StatCard(
             label: 'Daily Review',
-            value: '4/7',
+            value: '${summary.reviewedDays}/${summary.totalDays}',
             color: AppColor.violet,
             icon: RemixIcons.file_list_3_line,
             sub: 'ngày hoàn thành',
+          ),
+          _StatCard(
+            label: 'Tỷ lệ',
+            value: '${(summary.completionRate * 100).round()}%',
+            color: AppColor.cyan,
+            icon: RemixIcons.pie_chart_line,
           ),
         ],
       ),

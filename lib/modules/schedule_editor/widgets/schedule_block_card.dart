@@ -4,6 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/schedule_model.dart';
 import '../constants/schedule_editor_constants.dart';
 
@@ -21,6 +22,8 @@ class ScheduleBlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.s12),
       decoration: BoxDecoration(
@@ -86,11 +89,7 @@ class ScheduleBlockCard extends StatelessWidget {
           // Time range
           Row(
             children: [
-              Icon(
-                RemixIcons.time_line,
-                size: 14,
-                color: AppColor.fgMuted,
-              ),
+              Icon(RemixIcons.time_line, size: 14, color: AppColor.fgMuted),
               const SizedBox(width: AppSpacing.s6),
               Text(
                 block.timeRange.toString(),
@@ -121,7 +120,7 @@ class ScheduleBlockCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
                 child: Text(
-                  ScheduleEditorConstants.weekdayLabels[day] ?? '',
+                  ScheduleEditorConstants.weekdayLabel(l10n, day),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -134,42 +133,100 @@ class ScheduleBlockCard extends StatelessWidget {
 
           const SizedBox(height: AppSpacing.s8),
 
-          // Badge
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.s8,
-              vertical: AppSpacing.s4,
-            ),
-            decoration: BoxDecoration(
-              color: block.isFlexible ? AppColor.cyanDim : AppColor.bgRaised,
-              borderRadius: BorderRadius.circular(AppRadius.xs),
-              border: Border.all(
-                color: block.isFlexible
-                    ? AppColor.cyan.withOpacity(0.3)
-                    : AppColor.border,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  block.isFlexible ? RemixIcons.shuffle_line : RemixIcons.lock_line,
-                  size: 12,
-                  color: block.isFlexible ? AppColor.cyan : AppColor.fgMuted,
-                ),
-                const SizedBox(width: AppSpacing.s4),
-                Text(
-                  block.isFlexible
-                      ? ScheduleEditorConstants.badgeFlexible
-                      : ScheduleEditorConstants.badgeFixed,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: block.isFlexible ? AppColor.cyan : AppColor.fgMuted,
+          // Badges row
+          Wrap(
+            spacing: AppSpacing.s6,
+            runSpacing: AppSpacing.s4,
+            children: [
+              // Busy badge
+              if (block.isBusy)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.s8,
+                    vertical: AppSpacing.s4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColor.warnDim,
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                    border: Border.all(
+                      color: AppColor.warn.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        RemixIcons.prohibited_line,
+                        size: 12,
+                        color: AppColor.warn,
+                      ),
+                      const SizedBox(width: AppSpacing.s4),
+                      Text(
+                        ScheduleEditorConstants.text(
+                          l10n,
+                          ScheduleEditorConstants.badgeBusy,
+                        ),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.warn,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              // Flexible badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.s8,
+                  vertical: AppSpacing.s4,
+                ),
+                decoration: BoxDecoration(
+                  color: block.isFlexible
+                      ? AppColor.cyanDim
+                      : AppColor.bgRaised,
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
+                  border: Border.all(
+                    color: block.isFlexible
+                        ? AppColor.cyan.withValues(alpha: 0.3)
+                        : AppColor.border,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      block.isFlexible
+                          ? RemixIcons.shuffle_line
+                          : RemixIcons.lock_line,
+                      size: 12,
+                      color: block.isFlexible
+                          ? AppColor.cyan
+                          : AppColor.fgMuted,
+                    ),
+                    const SizedBox(width: AppSpacing.s4),
+                    Text(
+                      block.isFlexible
+                          ? ScheduleEditorConstants.text(
+                              l10n,
+                              ScheduleEditorConstants.badgeFlexible,
+                            )
+                          : ScheduleEditorConstants.text(
+                              l10n,
+                              ScheduleEditorConstants.badgeFixed,
+                            ),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: block.isFlexible
+                            ? AppColor.cyan
+                            : AppColor.fgMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -178,20 +235,24 @@ class ScheduleBlockCard extends StatelessWidget {
 
   IconData _getTypeIcon(String type) {
     switch (type) {
+      case 'school':
+        return RemixIcons.graduation_cap_line;
       case 'work':
         return RemixIcons.briefcase_4_line;
-      case 'study':
-        return RemixIcons.book_open_line;
-      case 'sleep':
-        return RemixIcons.moon_line;
-      case 'exercise':
-        return RemixIcons.run_line;
+      case 'commute':
+        return RemixIcons.bus_line;
       case 'meal':
         return RemixIcons.restaurant_line;
-      case 'freeTime':
-        return RemixIcons.time_line;
+      case 'sleep':
+        return RemixIcons.moon_line;
+      case 'study':
+        return RemixIcons.book_open_line;
       case 'personal':
         return RemixIcons.user_3_line;
+      case 'busy':
+        return RemixIcons.prohibited_line;
+      case 'free':
+        return RemixIcons.time_line;
       default:
         return RemixIcons.more_line;
     }

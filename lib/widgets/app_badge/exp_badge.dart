@@ -19,12 +19,11 @@ class ExpBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: AppColor.expGoldDim,
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
         showPrefix ? '+$exp EXP' : '$exp EXP',
         style: const TextStyle(
-          fontFamily: 'Exo2',
           fontSize: 11,
           fontWeight: FontWeight.w700,
           color: AppColor.expGold,

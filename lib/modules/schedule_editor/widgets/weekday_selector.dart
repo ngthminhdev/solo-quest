@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../constants/schedule_editor_constants.dart';
 
 class WeekdaySelector extends StatelessWidget {
@@ -17,6 +18,8 @@ class WeekdaySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Wrap(
       spacing: AppSpacing.s8,
       runSpacing: AppSpacing.s8,
@@ -37,7 +40,7 @@ class WeekdaySelector extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                ScheduleEditorConstants.weekdayLabels[day] ?? '',
+                ScheduleEditorConstants.weekdayLabel(l10n, day),
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

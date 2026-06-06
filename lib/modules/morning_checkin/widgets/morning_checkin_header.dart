@@ -3,6 +3,7 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_text_style.dart';
+import '../../../extensions/localization_extension.dart';
 
 class MorningCheckinHeader extends StatelessWidget {
   const MorningCheckinHeader({super.key});
@@ -22,13 +23,13 @@ class MorningCheckinHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Chào buổi sáng',
+                    Text(
+                      context.l10n.morningCheckinHeaderTitle,
                       style: AppTextStyle.heading,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Hãy dành 30 giây để app hiểu hôm nay của bạn.',
+                      context.l10n.morningCheckinHeaderSubtitle,
                       style: AppTextStyle.caption.copyWith(
                         color: AppColor.fgMuted,
                       ),

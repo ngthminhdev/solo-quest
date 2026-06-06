@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
+import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/enums/quest_enums.dart';
-import '../../../widgets/app_form/app_option_card.dart';
 
 class QuestDifficultySelector extends StatelessWidget {
   final QuestDifficulty value;
@@ -18,24 +19,150 @@ class QuestDifficultySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: QuestDifficulty.values.map((difficulty) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.s8),
-          child: AppOptionCard(
-            title: difficulty.label,
-            subtitle: difficulty.description,
-            selected: value == difficulty,
-            leading: Icon(
-              _iconFor(difficulty),
+    final l10n = context.l10n;
+
+    return GestureDetector(
+      onTap: () => _showDifficultyPicker(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s12,
+          vertical: AppSpacing.s10,
+        ),
+        decoration: BoxDecoration(
+          color: AppColor.surface,
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+          border: Border.all(color: AppColor.border),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              _iconFor(value),
               size: 18,
-              color: value == difficulty ? AppColor.cyan : AppColor.fgMuted,
+              color: AppColor.cyan,
             ),
-            onTap: () => onChanged(difficulty),
+            const SizedBox(width: AppSpacing.s12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value.getLocalizedLabel(l10n),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.fg,
+                    ),
+                  ),
+                  Text(
+                    value.getLocalizedDescription(l10n),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColor.fgMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              RemixIcons.arrow_down_s_line,
+              size: 18,
+              color: AppColor.fgMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDifficultyPicker(BuildContext context) async {
+    final l10n = context.l10n;
+
+    final result = await showModalBottomSheet<QuestDifficulty>(
+      context: context,
+      backgroundColor: AppColor.bgRaised,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.s16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+                  child: Text(
+                    l10n.questRulesGeneralDifficultySelectorTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColor.fg,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.s16),
+                ...QuestDifficulty.values.map((difficulty) {
+                  final selected = value == difficulty;
+                  return InkWell(
+                    onTap: () => Navigator.of(context).pop(difficulty),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.s16,
+                        vertical: AppSpacing.s14,
+                      ),
+                      color: selected ? AppColor.cyanDim : null,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _iconFor(difficulty),
+                            size: 18,
+                            color: selected ? AppColor.cyan : AppColor.fgMuted,
+                          ),
+                          const SizedBox(width: AppSpacing.s12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  difficulty.getLocalizedLabel(l10n),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: selected ? AppColor.cyan : AppColor.fg,
+                                  ),
+                                ),
+                                Text(
+                                  difficulty.getLocalizedDescription(l10n),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.fgMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (selected)
+                            const Icon(
+                              RemixIcons.check_line,
+                              size: 18,
+                              color: AppColor.cyan,
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
         );
-      }).toList(),
+      },
     );
+
+    if (result != null) {
+      onChanged(result);
+    }
   }
 
   IconData _iconFor(QuestDifficulty difficulty) {

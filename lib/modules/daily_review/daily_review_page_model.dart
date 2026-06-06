@@ -1,14 +1,15 @@
+import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
+import '../../core/utils/app_time_formatter.dart';
 import '../../models/daily_review_model.dart';
-import '../../models/log_entry_model.dart';
-import '../../models/enums/log_enums.dart';
 import '../../models/enums/quest_enums.dart';
+import '../../models/enums/user_enums.dart';
 import '../../services/daily_review_service.dart';
-import '../../services/log_service.dart';
 import '../../services/quest_service.dart';
 import '../../services/service_providers.dart';
 
@@ -16,19 +17,18 @@ class DailyReviewPageState extends BasePageState {
   final AppLoadState loadState;
   final DailyReviewModel? todayReview;
 
+  // Quest summary stats
   final int completedQuestCount;
   final int skippedQuestCount;
   final int earnedExp;
   final double completionRate;
 
-  final String? difficulty;
-  final List<String> helpfulQuests;
-  final List<String> annoyingQuests;
-  final LogMood? mood;
-  final int? energyLevel;
-  final int? satisfactionLevel;
-  final List<String> tomorrowAdjustments;
-  final String note;
+  // Simplified user input fields
+  final CheckinMood? mood;
+  final EnergyLevel? energyLevel;
+  final int? satisfaction;
+  final String reflection;
+  final CheckinPriority? tomorrowPriority;
 
   final String? errorMessage;
   final bool hasSubmitted;
@@ -40,14 +40,11 @@ class DailyReviewPageState extends BasePageState {
     this.skippedQuestCount = 0,
     this.earnedExp = 0,
     this.completionRate = 0,
-    this.difficulty,
-    this.helpfulQuests = const [],
-    this.annoyingQuests = const [],
     this.mood,
     this.energyLevel,
-    this.satisfactionLevel,
-    this.tomorrowAdjustments = const [],
-    this.note = '',
+    this.satisfaction,
+    this.reflection = '',
+    this.tomorrowPriority,
     this.errorMessage,
     this.hasSubmitted = false,
     super.isLockedPage,
@@ -61,14 +58,11 @@ class DailyReviewPageState extends BasePageState {
     int? skippedQuestCount,
     int? earnedExp,
     double? completionRate,
-    String? difficulty,
-    List<String>? helpfulQuests,
-    List<String>? annoyingQuests,
-    LogMood? mood,
-    int? energyLevel,
-    int? satisfactionLevel,
-    List<String>? tomorrowAdjustments,
-    String? note,
+    CheckinMood? mood,
+    EnergyLevel? energyLevel,
+    int? satisfaction,
+    String? reflection,
+    CheckinPriority? tomorrowPriority,
     String? errorMessage,
     bool? hasSubmitted,
     bool? isLockedPage,
@@ -80,21 +74,23 @@ class DailyReviewPageState extends BasePageState {
       skippedQuestCount: skippedQuestCount ?? this.skippedQuestCount,
       earnedExp: earnedExp ?? this.earnedExp,
       completionRate: completionRate ?? this.completionRate,
-      difficulty: difficulty ?? this.difficulty,
-      helpfulQuests: helpfulQuests ?? this.helpfulQuests,
-      annoyingQuests: annoyingQuests ?? this.annoyingQuests,
       mood: mood ?? this.mood,
       energyLevel: energyLevel ?? this.energyLevel,
-      satisfactionLevel: satisfactionLevel ?? this.satisfactionLevel,
-      tomorrowAdjustments: tomorrowAdjustments ?? this.tomorrowAdjustments,
-      note: note ?? this.note,
+      satisfaction: satisfaction ?? this.satisfaction,
+      reflection: reflection ?? this.reflection,
+      tomorrowPriority: tomorrowPriority ?? this.tomorrowPriority,
       errorMessage: errorMessage ?? this.errorMessage,
       hasSubmitted: hasSubmitted ?? this.hasSubmitted,
       isLockedPage: isLockedPage ?? this.isLockedPage,
     );
   }
 
-  bool get canSubmit => mood != null;
+  bool get canSubmit {
+    return mood != null &&
+        energyLevel != null &&
+        satisfaction != null &&
+        tomorrowPriority != null;
+  }
 
   bool get hasReviewedToday => todayReview != null || hasSubmitted;
 
@@ -105,14 +101,15 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
   DailyReviewPageModel({
     required this.dailyReviewService,
     required this.questService,
-    required this.logService,
   }) : super(DailyReviewPageState());
 
   final DailyReviewService dailyReviewService;
   final QuestService questService;
-  final LogService logService;
 
   Future<void> loadDailyReview() async {
+    if (kDebugMode) {
+      developer.log('[REVIEW] Loading today review');
+    }
     state = state.updateState(loadState: AppLoadState.loading);
 
     try {
@@ -126,6 +123,9 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
       final rate = total > 0 ? completed.length / total : 0.0;
 
       if (review != null) {
+        if (kDebugMode) {
+          developer.log('[REVIEW] Today review found: id=${review.id}, date=${review.date}');
+        }
         state = state.updateState(
           loadState: AppLoadState.ready,
           todayReview: review,
@@ -134,10 +134,16 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
           earnedExp: totalExp,
           completionRate: rate,
           mood: review.mood,
-          note: review.improvementTomorrow ?? '',
+          energyLevel: review.energyLevel,
+          satisfaction: review.satisfaction,
+          reflection: review.reflection ?? '',
+          tomorrowPriority: review.tomorrowPriority,
           hasSubmitted: true,
         );
       } else {
+        if (kDebugMode) {
+          developer.log('[REVIEW] No review today');
+        }
         state = state.updateState(
           loadState: AppLoadState.ready,
           completedQuestCount: completed.length,
@@ -147,66 +153,43 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
         );
       }
     } catch (e) {
+      if (kDebugMode) {
+        developer.log('[REVIEW] Failed to load today review: $e');
+      }
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: 'Không thể tải dữ liệu: ${e.toString()}',
       );
     }
   }
 
-  void setDifficulty(String value) {
-    state = state.updateState(difficulty: value);
-  }
-
-  void toggleHelpfulQuest(String value) {
-    final current = List<String>.from(state.helpfulQuests);
-    if (current.contains(value)) {
-      current.remove(value);
-    } else {
-      current.add(value);
-    }
-    state = state.updateState(helpfulQuests: current);
-  }
-
-  void toggleAnnoyingQuest(String value) {
-    final current = List<String>.from(state.annoyingQuests);
-    if (current.contains(value)) {
-      current.remove(value);
-    } else {
-      current.add(value);
-    }
-    state = state.updateState(annoyingQuests: current);
-  }
-
-  void setMood(LogMood value) {
+  void setMood(CheckinMood value) {
     state = state.updateState(mood: value);
   }
 
-  void setEnergyLevel(int value) {
+  void setEnergyLevel(EnergyLevel value) {
     state = state.updateState(energyLevel: value);
   }
 
-  void setSatisfactionLevel(int value) {
-    state = state.updateState(satisfactionLevel: value);
+  void setSatisfaction(int value) {
+    state = state.updateState(satisfaction: value);
   }
 
-  void toggleTomorrowAdjustment(String value) {
-    final current = List<String>.from(state.tomorrowAdjustments);
-    if (current.contains(value)) {
-      current.remove(value);
-    } else {
-      current.add(value);
-    }
-    state = state.updateState(tomorrowAdjustments: current);
+  void setReflection(String value) {
+    state = state.updateState(reflection: value);
   }
 
-  void setNote(String value) {
-    state = state.updateState(note: value);
+  void setTomorrowPriority(CheckinPriority value) {
+    state = state.updateState(tomorrowPriority: value);
   }
 
   Future<bool> submitReview() async {
     if (!state.canSubmit) return false;
     if (state.isLockedPage) return false;
+
+    if (kDebugMode) {
+      final localDate = AppTimeFormatter.todayLocalDateQuery();
+      developer.log('[REVIEW] Submit tapped — local date: $localDate');
+    }
 
     state = state.updateState(isLockedPage: true);
 
@@ -215,46 +198,22 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
       final review = DailyReviewModel(
         id: 'review_${now.millisecondsSinceEpoch}',
         date: now,
+        mood: state.mood!,
+        energyLevel: state.energyLevel!,
+        satisfaction: state.satisfaction!,
+        reflection: state.reflection.isEmpty ? null : state.reflection,
+        tomorrowPriority: state.tomorrowPriority!,
         completedQuestCount: state.completedQuestCount,
         skippedQuestCount: state.skippedQuestCount,
         earnedExp: state.earnedExp,
-        mood: state.mood!,
-        bestMoment: state.helpfulQuests.isEmpty
-            ? null
-            : state.helpfulQuests.join(', '),
-        challenge: state.annoyingQuests.isEmpty
-            ? null
-            : state.annoyingQuests.join(', '),
-        improvementTomorrow: state.tomorrowAdjustments.isEmpty
-            ? (state.note.isEmpty ? null : state.note)
-            : state.tomorrowAdjustments.join(', '),
         createdAt: now,
       );
 
       final saved = await dailyReviewService.saveReview(review);
 
-      await logService.addLog(LogEntryModel(
-        id: 'log_review_${now.millisecondsSinceEpoch}',
-        type: LogEntryType.dailyReview,
-        title: 'Đánh giá cuối ngày',
-        description:
-            'Hoàn thành ${state.completedQuestCount} quest, mood: ${state.mood!.label}',
-        createdAt: now,
-        mood: state.mood,
-        metadata: {
-          'completedQuestCount': state.completedQuestCount,
-          'skippedQuestCount': state.skippedQuestCount,
-          'earnedExp': state.earnedExp,
-          'completionRate': state.completionRate,
-          'difficulty': state.difficulty,
-          'helpfulQuests': state.helpfulQuests,
-          'annoyingQuests': state.annoyingQuests,
-          'energyLevel': state.energyLevel,
-          'satisfactionLevel': state.satisfactionLevel,
-          'tomorrowAdjustments': state.tomorrowAdjustments,
-          'note': state.note,
-        },
-      ));
+      if (kDebugMode) {
+        developer.log('[REVIEW] Save success: id=${saved.id}, date=${saved.date}');
+      }
 
       state = state.updateState(
         isLockedPage: false,
@@ -263,9 +222,11 @@ class DailyReviewPageModel extends BasePageModel<DailyReviewPageState> {
       );
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        developer.log('[REVIEW] Save failed: $e');
+      }
       state = state.updateState(
         isLockedPage: false,
-        errorMessage: 'Không thể lưu đánh giá: ${e.toString()}',
       );
       return false;
     }
@@ -277,6 +238,5 @@ final dailyReviewPageProvider =
   return DailyReviewPageModel(
     dailyReviewService: ref.read(dailyReviewServiceProvider),
     questService: ref.read(questServiceProvider),
-    logService: ref.read(logServiceProvider),
   );
 });

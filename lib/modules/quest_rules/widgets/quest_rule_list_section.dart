@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/enums/quest_enums.dart';
 import '../../../models/quest_rule_model.dart';
-import '../constants/quest_rules_constants.dart';
 import 'quest_rule_card.dart';
 import 'quest_rules_empty_view.dart';
 
@@ -31,14 +31,16 @@ class QuestRuleListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            QuestRulesConstants.listTitle,
-            style: TextStyle(
+          Text(
+            l10n.questRulesListTitle,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColor.fg,
@@ -75,15 +77,17 @@ class _TypeFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     final chips = <Widget>[
       _FilterChip(
-        label: 'Tất cả',
+        label: l10n.questRulesFilterAll,
         selected: selectedType == null,
         onTap: () => onChanged(null),
       ),
       ...QuestType.values.map(
         (type) => _FilterChip(
-          label: type.label,
+          label: type.getLocalizedLabel(l10n),
           selected: selectedType == type,
           onTap: () => onChanged(type),
         ),

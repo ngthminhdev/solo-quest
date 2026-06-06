@@ -15,12 +15,18 @@ class LearningGoalsPageState extends BasePageState {
   final List<LearningGoalModel> goals;
   final String? selectedCategory;
   final String? errorMessage;
+  final bool showAiSuggestions;
+  final bool isLoadingAiSuggestions;
+  final Set<String> selectedSuggestionIds;
 
   LearningGoalsPageState({
     this.loadState = AppLoadState.idle,
     this.goals = const [],
     this.selectedCategory,
     this.errorMessage,
+    this.showAiSuggestions = false,
+    this.isLoadingAiSuggestions = false,
+    this.selectedSuggestionIds = const {},
     super.isLockedPage,
   });
 
@@ -32,6 +38,9 @@ class LearningGoalsPageState extends BasePageState {
     bool clearSelectedCategory = false,
     String? errorMessage,
     bool? isLockedPage,
+    bool? showAiSuggestions,
+    bool? isLoadingAiSuggestions,
+    Set<String>? selectedSuggestionIds,
   }) {
     return LearningGoalsPageState(
       loadState: loadState ?? this.loadState,
@@ -41,6 +50,9 @@ class LearningGoalsPageState extends BasePageState {
           : selectedCategory ?? this.selectedCategory,
       errorMessage: errorMessage ?? this.errorMessage,
       isLockedPage: isLockedPage ?? this.isLockedPage,
+      showAiSuggestions: showAiSuggestions ?? this.showAiSuggestions,
+      isLoadingAiSuggestions: isLoadingAiSuggestions ?? this.isLoadingAiSuggestions,
+      selectedSuggestionIds: selectedSuggestionIds ?? this.selectedSuggestionIds,
     );
   }
 
@@ -239,11 +251,47 @@ class LearningGoalsPageModel extends BasePageModel<LearningGoalsPageState> {
   }
 
   void selectCategory(String? category) {
-    state = state.updateState(selectedCategory: category);
+    state = state.updateState(
+      selectedCategory: category,
+      clearSelectedCategory: category == null,
+    );
   }
 
   void clearCategoryFilter() {
     state = state.updateState(clearSelectedCategory: true);
+  }
+
+  Future<void> showAiSuggestions() async {
+    // Simulate loading AI suggestions
+    state = state.updateState(isLoadingAiSuggestions: true);
+
+    // TODO: Backend integration - Replace with real API call to fetch AI suggestions
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    state = state.updateState(
+      isLoadingAiSuggestions: false,
+      showAiSuggestions: true,
+    );
+  }
+
+  void toggleSuggestionSelection(String suggestionId) {
+    final currentSelections = Set<String>.from(state.selectedSuggestionIds);
+
+    if (currentSelections.contains(suggestionId)) {
+      currentSelections.remove(suggestionId);
+    } else {
+      currentSelections.add(suggestionId);
+    }
+
+    state = state.updateState(selectedSuggestionIds: currentSelections);
+  }
+
+  bool isSuggestionSelected(String suggestionId) {
+    return state.selectedSuggestionIds.contains(suggestionId);
+  }
+
+  void hideAiSuggestions() {
+    state = state.updateState(showAiSuggestions: false);
   }
 }
 

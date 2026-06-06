@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:remixicon/remixicon.dart';
 
+import '../../../extensions/localization_extension.dart';
 import '../../../widgets/app_button/app_button.dart';
 import '../../../widgets/app_state/app_empty_state.dart';
-import '../constants/quest_rules_constants.dart';
 
 class QuestRulesEmptyView extends StatelessWidget {
   final VoidCallback? onReset;
@@ -12,17 +12,22 @@ class QuestRulesEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       children: [
-        const AppEmptyState(
+        AppEmptyState(
           icon: RemixIcons.inbox_archive_line,
-          title: QuestRulesConstants.emptyTitle,
-          message: QuestRulesConstants.emptyMessage,
+          title: l10n.questRulesEmptyTitle,
+          message: l10n.questRulesEmptyMessage,
         ),
         if (onReset != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: AppButton(label: 'Khôi phục mặc định', onPressed: onReset),
+            child: AppButton(
+              label: l10n.questRulesResetDefault,
+              onPressed: onReset,
+            ),
           ),
       ],
     );

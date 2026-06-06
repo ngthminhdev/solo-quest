@@ -4,14 +4,14 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
-import '../constants/daily_review_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class DailyReviewSubmitBar extends StatelessWidget {
   final bool canSubmit;
   final bool isLoading;
   final bool hasReviewed;
   final VoidCallback onSubmit;
-  final VoidCallback onViewWeekly;
+  final VoidCallback? onViewWeekly;
 
   const DailyReviewSubmitBar({
     super.key,
@@ -19,7 +19,7 @@ class DailyReviewSubmitBar extends StatelessWidget {
     required this.isLoading,
     required this.hasReviewed,
     required this.onSubmit,
-    required this.onViewWeekly,
+    this.onViewWeekly,
   });
 
   @override
@@ -40,38 +40,6 @@ class DailyReviewSubmitBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Log note
-          Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.s10),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.s12,
-              vertical: AppSpacing.s8,
-            ),
-            decoration: BoxDecoration(
-              color: AppColor.bgDeep,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  RemixIcons.file_text_line,
-                  size: 14,
-                  color: AppColor.fgMuted,
-                ),
-                const SizedBox(width: AppSpacing.s8),
-                const Expanded(
-                  child: Text(
-                    DailyReviewConstants.linkToLogs,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColor.fgMuted,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           // Submit button
           GestureDetector(
             onTap: enabled ? onSubmit : null,
@@ -106,10 +74,9 @@ class DailyReviewSubmitBar extends StatelessWidget {
                         const SizedBox(width: AppSpacing.s8),
                         Text(
                           hasReviewed
-                              ? DailyReviewConstants.updateText
-                              : DailyReviewConstants.submitText,
+                              ? context.l10n.dailyReviewUpdateText
+                              : context.l10n.dailyReviewSubmitText,
                           style: TextStyle(
-                            fontFamily: 'Exo2',
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color:
@@ -121,31 +88,30 @@ class DailyReviewSubmitBar extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: AppSpacing.s8),
-
-          // View weekly button
-          GestureDetector(
-            onTap: onViewWeekly,
-            child: Container(
-              height: 44,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: Border.all(color: AppColor.border),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                DailyReviewConstants.linkToWeekly,
-                style: TextStyle(
-                  fontFamily: 'Exo2',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.fg,
+          if (onViewWeekly != null) ...[
+            const SizedBox(height: AppSpacing.s8),
+            GestureDetector(
+              onTap: onViewWeekly,
+              child: Container(
+                height: 44,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColor.transparent,
+                  border: Border.all(color: AppColor.border),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  context.l10n.dailyReviewLinkToWeekly,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.fg,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

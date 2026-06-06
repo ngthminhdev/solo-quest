@@ -71,6 +71,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
 
           // Mission card
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.s16),
             decoration: BoxDecoration(
               color: AppColor.surface,
@@ -101,6 +102,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
                 if (quest.reason != null && quest.reason!.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.s12),
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.only(top: AppSpacing.s12),
                     decoration: BoxDecoration(
                       border: Border(

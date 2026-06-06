@@ -10,17 +10,16 @@ import '../../widgets/app_scaffold/app_scaffold.dart';
 import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
+import '../profile/profile_page_model.dart';
 import 'daily_review_page_model.dart';
-import 'constants/daily_review_constants.dart';
+import '../../extensions/localization_extension.dart';
 import 'widgets/daily_review_header.dart';
 import 'widgets/daily_review_summary_card.dart';
-import 'widgets/daily_mood_selector_card.dart';
-import 'widgets/daily_review_quest_section.dart';
-import 'widgets/daily_review_difficulty_card.dart';
-import 'widgets/daily_review_chip_selector_card.dart';
-import 'widgets/daily_review_tomorrow_card.dart';
-import 'widgets/daily_review_note_card.dart';
-import 'widgets/daily_review_insight_card.dart';
+import 'widgets/review_mood_selector_card.dart';
+import 'widgets/review_energy_selector_card.dart';
+import 'widgets/review_satisfaction_selector_card.dart';
+import 'widgets/review_reflection_card.dart';
+import 'widgets/review_tomorrow_priority_card.dart';
 import 'widgets/daily_review_submit_bar.dart';
 
 class DailyReviewPage
@@ -47,18 +46,18 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
 
     if (state.loadState == AppLoadState.loading) {
       return AppScaffold(
-        title: DailyReviewConstants.pageTitle,
+        title: context.l10n.dailyReviewPageTitle,
         showBackButton: true,
-        body: const AppLoading(message: 'Đang tải dữ liệu hôm nay...'),
+        body: AppLoading(message: context.l10n.dailyReviewLoading),
       );
     }
 
     if (state.loadState == AppLoadState.error) {
       return AppScaffold(
-        title: DailyReviewConstants.pageTitle,
+        title: context.l10n.dailyReviewPageTitle,
         showBackButton: true,
         body: AppErrorState(
-          message: state.errorMessage ?? DailyReviewConstants.toastFailed,
+          message: state.errorMessage ?? context.l10n.dailyReviewToastFailed,
           onRetry: pageModel.loadDailyReview,
         ),
       );
@@ -78,7 +77,7 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: AppSpacing.s16),
+              padding: const EdgeInsets.only(bottom: 80),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -91,53 +90,30 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
                     completionRate: state.completionRate,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  DailyReviewQuestSection(
-                    completedCount: state.completedQuestCount,
-                    skippedCount: state.skippedQuestCount,
+                  ReviewMoodSelectorCard(
+                    value: state.mood,
+                    onChanged: pageModel.setMood,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  DailyReviewDifficultyCard(
-                    selected: state.difficulty,
-                    onChanged: pageModel.setDifficulty,
+                  ReviewEnergySelectorCard(
+                    value: state.energyLevel,
+                    onChanged: pageModel.setEnergyLevel,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  DailyReviewChipSelectorCard(
-                    title: DailyReviewConstants.sectionHelpful,
-                    options: DailyReviewConstants.questTypeChips,
-                    selected: state.helpfulQuests,
-                    onToggle: pageModel.toggleHelpfulQuest,
+                  ReviewSatisfactionSelectorCard(
+                    value: state.satisfaction,
+                    onChanged: pageModel.setSatisfaction,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  DailyReviewChipSelectorCard(
-                    title: DailyReviewConstants.sectionAnnoying,
-                    options: [
-                      ...DailyReviewConstants.questTypeChips,
-                      ...DailyReviewConstants.annoyingExtraChips,
-                    ],
-                    selected: state.annoyingQuests,
-                    onToggle: pageModel.toggleAnnoyingQuest,
+                  ReviewReflectionCard(
+                    value: state.reflection,
+                    onChanged: pageModel.setReflection,
                   ),
                   const SizedBox(height: AppSpacing.s8),
-                  DailyMoodSelectorCard(
-                    mood: state.mood,
-                    energyLevel: state.energyLevel,
-                    satisfactionLevel: state.satisfactionLevel,
-                    onMoodChanged: pageModel.setMood,
-                    onEnergyChanged: pageModel.setEnergyLevel,
-                    onSatisfactionChanged: pageModel.setSatisfactionLevel,
+                  ReviewTomorrowPriorityCard(
+                    value: state.tomorrowPriority,
+                    onChanged: pageModel.setTomorrowPriority,
                   ),
-                  const SizedBox(height: AppSpacing.s8),
-                  DailyReviewTomorrowCard(
-                    selected: state.tomorrowAdjustments,
-                    onToggle: pageModel.toggleTomorrowAdjustment,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  DailyReviewNoteCard(
-                    value: state.note,
-                    onChanged: pageModel.setNote,
-                  ),
-                  const SizedBox(height: AppSpacing.s8),
-                  const DailyReviewInsightCard(),
                   const SizedBox(height: AppSpacing.s32),
                 ],
               ),
@@ -152,7 +128,7 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
     final state = read;
 
     if (!state.canSubmit) {
-      AppToastService.warning(context, DailyReviewConstants.toastMissing);
+      AppToastService.warning(context, context.l10n.dailyReviewToastMissing);
       return;
     }
 
@@ -161,14 +137,13 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
     if (!mounted) return;
 
     if (success) {
-      AppToastService.success(context, DailyReviewConstants.toastSuccess);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RoutesConfig.home,
-        (route) => false,
-      );
+      // Invalidate profile provider to refresh hasReviewedToday status
+      ref.invalidate(profilePageProvider);
+
+      AppToastService.success(context, context.l10n.dailyReviewToastSuccess);
+      Navigator.pop(context);
     } else {
-      AppToastService.error(context, DailyReviewConstants.toastFailed);
+      AppToastService.error(context, context.l10n.dailyReviewToastFailed);
     }
   }
 }

@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/learning_goal_model.dart';
 import '../../../widgets/app_bottom_sheet/app_bottom_sheet.dart';
 import '../../../widgets/app_button/app_button.dart';
-import '../constants/learning_goals_constants.dart';
 
 class LearningGoalProgressSheet {
   static Future<double?> show(
     BuildContext context, {
     required LearningGoalModel goal,
   }) async {
+    final l10n = context.l10n;
+
     return await AppBottomSheet.show<double>(
       context: context,
-      title: LearningGoalsConstants.progressSheetTitle,
+      title: l10n.lgProgressSheetTitle,
       body: _LearningGoalProgressForm(goal: goal),
     );
   }
@@ -42,6 +44,8 @@ class _LearningGoalProgressFormState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.s16,
@@ -49,7 +53,6 @@ class _LearningGoalProgressFormState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Goal title
           Text(
             widget.goal.title,
             style: const TextStyle(
@@ -61,7 +64,6 @@ class _LearningGoalProgressFormState
 
           const SizedBox(height: AppSpacing.s20),
 
-          // Progress percentage
           Center(
             child: Text(
               '${(_progress * 100).toInt()}%',
@@ -75,13 +77,12 @@ class _LearningGoalProgressFormState
 
           const SizedBox(height: AppSpacing.s16),
 
-          // Slider
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColor.cyan,
               inactiveTrackColor: AppColor.surface,
               thumbColor: AppColor.cyan,
-              overlayColor: AppColor.cyan.withOpacity(0.2),
+              overlayColor: AppColor.primaryHoverOverlay,
               trackHeight: 6,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             ),
@@ -100,7 +101,6 @@ class _LearningGoalProgressFormState
 
           const SizedBox(height: AppSpacing.s8),
 
-          // Min/Max labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -123,9 +123,8 @@ class _LearningGoalProgressFormState
 
           const SizedBox(height: AppSpacing.s24),
 
-          // Submit button
           AppButton(
-            label: LearningGoalsConstants.progressSheetButton,
+            label: l10n.lgProgressSheetButton,
             onPressed: _handleSubmit,
             variant: AppButtonVariant.primary,
             fullWidth: true,

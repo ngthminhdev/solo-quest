@@ -3,9 +3,9 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/learning_roadmap_model.dart';
 import '../../../widgets/app_progress_bar/app_progress_bar.dart';
-import '../constants/learning_roadmap_constants.dart';
 
 class RoadmapCard extends StatelessWidget {
   final LearningRoadmapModel roadmap;
@@ -19,6 +19,7 @@ class RoadmapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isCompleted = roadmap.computedProgress >= 1.0;
     final progressPercent = (roadmap.computedProgress * 100).round();
 
@@ -31,7 +32,7 @@ class RoadmapCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isCompleted
-                ? AppColor.success.withOpacity(0.3)
+                ? AppColor.successBorder
                 : AppColor.border,
           ),
         ),
@@ -79,7 +80,7 @@ class RoadmapCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${roadmap.completedSteps}/${roadmap.totalSteps} bước',
+                  l10n.lrCardSteps(roadmap.completedSteps, roadmap.totalSteps),
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColor.fgMuted,
@@ -93,7 +94,7 @@ class RoadmapCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${roadmap.totalEstimatedMinutes} phút',
+                  l10n.lrCardMinutes(roadmap.totalEstimatedMinutes),
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColor.fgMuted,
@@ -103,7 +104,6 @@ class RoadmapCard extends StatelessWidget {
                 Text(
                   '$progressPercent%',
                   style: TextStyle(
-                    fontFamily: 'Exo2',
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: isCompleted ? AppColor.success : AppColor.cyan,
@@ -122,7 +122,7 @@ class RoadmapCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  LearningRoadmapConstants.viewRoadmapButton,
+                  l10n.lrViewRoadmapButton,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -151,6 +151,8 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -159,10 +161,9 @@ class _StatusBadge extends StatelessWidget {
       ),
       child: Text(
         isCompleted
-            ? LearningRoadmapConstants.statusCompleted
-            : LearningRoadmapConstants.statusLearning,
+            ? l10n.lrStatusCompleted
+            : l10n.lrStatusLearning,
         style: TextStyle(
-          fontFamily: 'Exo2',
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: isCompleted ? AppColor.success : AppColor.cyan,

@@ -1,13 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page_model.dart';
 import '../../base/base_page_state.dart';
+import '../../core/network/api_exception.dart';
 import '../../models/schedule_model.dart';
-import '../../models/log_entry_model.dart';
-import '../../models/enums/log_enums.dart';
 import '../../services/schedule_service.dart';
-import '../../services/log_service.dart';
 import '../../services/service_providers.dart';
 
 class ScheduleEditorPageState extends BasePageState {
@@ -51,11 +50,9 @@ class ScheduleEditorPageState extends BasePageState {
 class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
   ScheduleEditorPageModel({
     required this.scheduleService,
-    required this.logService,
   }) : super(ScheduleEditorPageState());
 
   final ScheduleService scheduleService;
-  final LogService logService;
 
   Future<void> loadSchedule() async {
     try {
@@ -69,9 +66,12 @@ class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
         errorMessage: null,
       );
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ScheduleEditor] loadSchedule error: $e');
+      }
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: e.toString(),
+        errorMessage: _userFriendlyError(e, 'load'),
       );
     }
   }
@@ -86,9 +86,12 @@ class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
         errorMessage: null,
       );
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ScheduleEditor] refreshSchedule error: $e');
+      }
       state = state.updateState(
         loadState: AppLoadState.error,
-        errorMessage: e.toString(),
+        errorMessage: _userFriendlyError(e, 'load'),
       );
     }
   }
@@ -99,25 +102,17 @@ class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
 
       await scheduleService.addScheduleBlock(block);
 
-      // Add log entry
-      await logService.addLog(
-        LogEntryModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          createdAt: DateTime.now(),
-          type: LogEntryType.ruleUpdated,
-          title: 'Đã thêm block lịch: ${block.title}',
-          description: 'Thời gian: ${block.timeRange}',
-        ),
-      );
-
       await loadSchedule();
 
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ScheduleEditor] addBlock error: $e');
+      }
       state = state.updateState(
         isLockedPage: false,
-        errorMessage: e.toString(),
+        errorMessage: _userFriendlyError(e, 'create'),
       );
       return false;
     }
@@ -134,9 +129,12 @@ class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ScheduleEditor] updateBlock error: $e');
+      }
       state = state.updateState(
         isLockedPage: false,
-        errorMessage: e.toString(),
+        errorMessage: _userFriendlyError(e, 'update'),
       );
       return false;
     }
@@ -153,19 +151,43 @@ class ScheduleEditorPageModel extends BasePageModel<ScheduleEditorPageState> {
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[ScheduleEditor] deleteBlock error: $e');
+      }
       state = state.updateState(
         isLockedPage: false,
-        errorMessage: e.toString(),
+        errorMessage: _userFriendlyError(e, 'delete'),
       );
       return false;
     }
   }
+
+  String _userFriendlyError(Object error, String action) {
+    if (error is ApiException) {
+      switch (error.statusCode) {
+        case 400:
+          return error.message;
+        case 401:
+          return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+        case 404:
+          return 'Không tìm thấy lịch sinh hoạt này.';
+        case 500:
+          return 'Lỗi server. Vui lòng thử lại sau.';
+        default:
+          if (error.error == 'network_error') {
+            return 'Không có kết nối mạng. Vui lòng kiểm tra mạng.';
+          }
+          return error.message;
+      }
+    }
+    return 'Không thể $action lịch sinh hoạt. Vui lòng thử lại.';
+  }
 }
 
 final scheduleEditorPageProvider =
-    StateNotifierProvider<ScheduleEditorPageModel, ScheduleEditorPageState>((ref) {
+    StateNotifierProvider<ScheduleEditorPageModel, ScheduleEditorPageState>(
+        (ref) {
   return ScheduleEditorPageModel(
     scheduleService: ref.read(scheduleServiceProvider),
-    logService: ref.read(logServiceProvider),
   );
 });

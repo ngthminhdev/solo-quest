@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
-import '../constants/morning_checkin_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class CheckinStepIndicator extends StatelessWidget {
   final double progress;
@@ -25,9 +25,8 @@ class CheckinStepIndicator extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                MorningCheckinConstants.stepTitle,
+                context.l10n.morningCheckinStepTitle,
                 style: const TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.08,
@@ -36,10 +35,9 @@ class CheckinStepIndicator extends StatelessWidget {
               ),
               Text(
                 hasCheckedIn
-                    ? 'Đã hoàn tất'
+                    ? context.l10n.morningCheckinCompleted
                     : '${(progress * 100).toInt()}%',
                 style: TextStyle(
-                  fontFamily: 'Exo2',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: hasCheckedIn ? AppColor.success : AppColor.cyan,

@@ -91,7 +91,7 @@ class AppChoiceBottomSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: selectedBorderColor != null ? Colors.white : AppColor.bgDeep,
+                  color: selectedBorderColor != null ? AppColor.white : AppColor.bgDeep,
                 ),
               ),
             ),
@@ -103,7 +103,7 @@ class AppChoiceBottomSheet extends StatelessWidget {
           child: Container(
             width: double.infinity,
             height: 44,
-            color: Colors.transparent,
+            color: AppColor.transparent,
             child: const Center(
               child: Text(
                 'Huỷ',

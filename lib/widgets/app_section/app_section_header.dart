@@ -49,7 +49,6 @@ class AppSectionHeader extends StatelessWidget {
             Text(
               count!,
               style: const TextStyle(
-                fontFamily: 'Exo2',
                 fontSize: 10,
                 color: AppColor.fgMuted,
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/schedule_model.dart';
 import '../../../widgets/app_bottom_sheet/app_bottom_sheet.dart';
 import '../../../widgets/app_button/app_button.dart';
@@ -18,6 +19,7 @@ class ScheduleBlockFormResult {
   final String end;
   final List<int> weekdays;
   final bool isFlexible;
+  final bool isBusy;
 
   const ScheduleBlockFormResult({
     required this.title,
@@ -26,6 +28,7 @@ class ScheduleBlockFormResult {
     required this.end,
     required this.weekdays,
     required this.isFlexible,
+    required this.isBusy,
   });
 }
 
@@ -37,8 +40,14 @@ class ScheduleBlockFormSheet {
     return await AppBottomSheet.show<ScheduleBlockFormResult>(
       context: context,
       title: initialBlock == null
-          ? ScheduleEditorConstants.formTitleAdd
-          : ScheduleEditorConstants.formTitleEdit,
+          ? ScheduleEditorConstants.text(
+              context.l10n,
+              ScheduleEditorConstants.formTitleCreate,
+            )
+          : ScheduleEditorConstants.text(
+              context.l10n,
+              ScheduleEditorConstants.formTitleEdit,
+            ),
       body: _ScheduleBlockForm(initialBlock: initialBlock),
     );
   }
@@ -60,6 +69,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
   late String _endTime;
   late List<int> _selectedWeekdays;
   late bool _isFlexible;
+  late bool _isBusy;
 
   @override
   void initState() {
@@ -71,6 +81,9 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
     _endTime = block?.timeRange.end ?? '';
     _selectedWeekdays = block?.weekdays ?? [1, 2, 3, 4, 5];
     _isFlexible = block?.isFlexible ?? false;
+    _isBusy =
+        block?.isBusy ??
+        ScheduleEditorConstants.defaultIsBusyForType(_selectedType);
   }
 
   @override
@@ -79,8 +92,20 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
     super.dispose();
   }
 
+  void _onTypeChanged(String newType) {
+    setState(() {
+      _selectedType = newType;
+      // Auto-set isBusy based on type only when creating (not editing)
+      if (widget.initialBlock == null) {
+        _isBusy = ScheduleEditorConstants.defaultIsBusyForType(newType);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.s16,
@@ -91,15 +116,21 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
           // Title field
           AppTextField(
             controller: _titleController,
-            label: ScheduleEditorConstants.labelTitle,
-            placeholder: 'Ví dụ: Làm việc, Học Flutter...',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelTitle,
+            ),
+            placeholder: l10n.scheduleEditorTitlePlaceholder,
           ),
 
           const SizedBox(height: AppSpacing.s16),
 
           // Type selector
           Text(
-            ScheduleEditorConstants.labelType,
+            ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelType,
+            ),
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -113,7 +144,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
             children: ScheduleEditorConstants.blockTypes.entries.map((entry) {
               final isSelected = _selectedType == entry.key;
               return GestureDetector(
-                onTap: () => setState(() => _selectedType = entry.key),
+                onTap: () => _onTypeChanged(entry.key),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.s12,
@@ -127,7 +158,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
                     ),
                   ),
                   child: Text(
-                    entry.value,
+                    ScheduleEditorConstants.blockTypeLabel(l10n, entry.key),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -143,7 +174,10 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
 
           // Time range
           Text(
-            'Thời gian',
+            ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelTime,
+            ),
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -162,7 +196,10 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
 
           // Weekdays
           Text(
-            ScheduleEditorConstants.labelWeekdays,
+            ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.labelDays,
+            ),
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -176,6 +213,56 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
           ),
 
           const SizedBox(height: AppSpacing.s16),
+
+          // Busy toggle
+          GestureDetector(
+            onTap: () => setState(() => _isBusy = !_isBusy),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.s12),
+              decoration: BoxDecoration(
+                color: AppColor.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColor.border),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ScheduleEditorConstants.text(
+                            l10n,
+                            ScheduleEditorConstants.badgeBusy,
+                          ),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.fg,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.s4),
+                        Text(
+                          l10n.scheduleEditorBusyDescription,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColor.fgMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: _isBusy,
+                    onChanged: (value) => setState(() => _isBusy = value),
+                    activeThumbColor: AppColor.cyan,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.s12),
 
           // Flexible toggle
           GestureDetector(
@@ -194,7 +281,10 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ScheduleEditorConstants.labelFlexible,
+                          ScheduleEditorConstants.text(
+                            l10n,
+                            ScheduleEditorConstants.badgeFlexible,
+                          ),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -203,7 +293,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
                         ),
                         const SizedBox(height: AppSpacing.s4),
                         Text(
-                          'Có thể điều chỉnh thời gian linh hoạt',
+                          l10n.scheduleEditorFlexibleDescription,
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColor.fgMuted,
@@ -215,7 +305,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
                   Switch(
                     value: _isFlexible,
                     onChanged: (value) => setState(() => _isFlexible = value),
-                    activeColor: AppColor.cyan,
+                    activeThumbColor: AppColor.cyan,
                   ),
                 ],
               ),
@@ -226,7 +316,10 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
 
           // Submit button
           AppButton(
-            label: widget.initialBlock == null ? 'Thêm' : 'Cập nhật',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.buttonSave,
+            ),
             onPressed: _handleSubmit,
             variant: AppButtonVariant.primary,
             fullWidth: true,
@@ -239,17 +332,35 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
   void _handleSubmit() {
     // Validate
     if (_titleController.text.trim().isEmpty) {
-      AppToastService.error(context, ScheduleEditorConstants.errorTitleRequired);
+      AppToastService.error(
+        context,
+        ScheduleEditorConstants.text(
+          context.l10n,
+          ScheduleEditorConstants.errorTitleRequired,
+        ),
+      );
       return;
     }
 
     if (_startTime.isEmpty || _endTime.isEmpty) {
-      AppToastService.error(context, ScheduleEditorConstants.errorTimeRequired);
+      AppToastService.error(
+        context,
+        ScheduleEditorConstants.text(
+          context.l10n,
+          ScheduleEditorConstants.errorTimeRequired,
+        ),
+      );
       return;
     }
 
     if (_selectedWeekdays.isEmpty) {
-      AppToastService.error(context, ScheduleEditorConstants.errorWeekdaysRequired);
+      AppToastService.error(
+        context,
+        ScheduleEditorConstants.text(
+          context.l10n,
+          ScheduleEditorConstants.errorWeekdaysRequired,
+        ),
+      );
       return;
     }
 
@@ -260,6 +371,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
       end: _endTime,
       weekdays: _selectedWeekdays,
       isFlexible: _isFlexible,
+      isBusy: _isBusy,
     );
 
     Navigator.of(context).pop(result);

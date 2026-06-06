@@ -5,7 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
-import '../constants/onboarding_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class OnboardingBottomBar extends StatelessWidget {
   final int currentStep;
@@ -27,14 +27,16 @@ class OnboardingBottomBar extends StatelessWidget {
     this.onNext,
   });
 
-  String get _nextLabel {
-    if (currentStep == 0) return OnboardingConstants.startLabel;
-    if (currentStep == 8) return OnboardingConstants.startCheckinLabel;
-    return OnboardingConstants.nextLabel;
+  String _getNextLabel(BuildContext context) {
+    final l10n = context.l10n;
+    if (currentStep == 0) return l10n.onboardingWelcomeStart;
+    if (isLastStep) return l10n.onboardingStep8StartCheckin;
+    return l10n.onboardingNext;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -44,9 +46,7 @@ class OnboardingBottomBar extends StatelessWidget {
       ),
       decoration: const BoxDecoration(
         color: AppColor.bgRaised,
-        border: Border(
-          top: BorderSide(color: AppColor.border, width: 0.5),
-        ),
+        border: Border(top: BorderSide(color: AppColor.border, width: 0.5)),
       ),
       child: Row(
         children: [
@@ -73,7 +73,7 @@ class OnboardingBottomBar extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      OnboardingConstants.backLabel,
+                      l10n.onboardingBack,
                       style: AppTextStyle.buttonSmall.copyWith(
                         color: AppColor.fgSecondary,
                       ),
@@ -108,7 +108,7 @@ class OnboardingBottomBar extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _nextLabel,
+                          _getNextLabel(context),
                           style: AppTextStyle.button.copyWith(
                             color: canContinue
                                 ? AppColor.bgDeep

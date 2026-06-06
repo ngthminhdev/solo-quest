@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/progress_model.dart';
 import '../../../widgets/app_progress/app_progress_bar.dart';
 
@@ -13,25 +14,19 @@ class SummaryHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final clampedProgress = progress.levelProgress.clamp(0.0, 1.0);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       padding: const EdgeInsets.all(AppSpacing.s20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0x0F00F0FF),
-            Color(0x0AA855F7),
-          ],
-        ),
+        gradient: AppColor.heroCardGradient,
         border: Border.all(color: AppColor.borderGlowCyan),
         borderRadius: BorderRadius.circular(AppRadius.xl),
         boxShadow: [
           BoxShadow(
-            color: AppColor.cyan.withValues(alpha: 0.08),
+            color: AppColor.primarySubtleOverlay,
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -49,9 +44,9 @@ class SummaryHeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Cấp độ hiện tại',
-                      style: TextStyle(
+                    Text(
+                      l10n.progressCurrentLevel,
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColor.fgMuted,
                         letterSpacing: 0.06,
@@ -112,8 +107,8 @@ class SummaryHeroCard extends StatelessWidget {
               Expanded(
                 child: _StatCell(
                   value: '${progress.streakDays}',
-                  suffix: ' ngày',
-                  label: 'Streak',
+                  suffix: l10n.progressStreakDaysSuffix,
+                  label: l10n.progressStreakLabel,
                   valueColor: AppColor.warn,
                 ),
               ),
@@ -121,7 +116,7 @@ class SummaryHeroCard extends StatelessWidget {
               Expanded(
                 child: _StatCell(
                   value: '${(progress.weeklyCompletionRate * 100).toInt()}%',
-                  label: 'Hoàn thành',
+                  label: l10n.progressCompletedLabel,
                   valueColor: AppColor.cyan,
                 ),
               ),
@@ -130,7 +125,7 @@ class SummaryHeroCard extends StatelessWidget {
                 child: _StatCell(
                   value: '${progress.weeklyTotalCompleted}',
                   suffix: '/${progress.weeklyTotalPlanned}',
-                  label: 'Quest tuần',
+                  label: l10n.progressWeeklyQuest,
                   valueColor: AppColor.success,
                 ),
               ),

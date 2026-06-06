@@ -4,6 +4,8 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
+import '../constants/schedule_editor_constants.dart';
 
 class ScheduleSummaryCard extends StatelessWidget {
   final int totalBlocks;
@@ -19,6 +21,8 @@ class ScheduleSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.s14),
       decoration: BoxDecoration(
@@ -30,19 +34,28 @@ class ScheduleSummaryCard extends StatelessWidget {
         children: [
           _StatItem(
             icon: RemixIcons.time_line,
-            label: 'Tổng block',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.summaryTotal,
+            ),
             value: totalBlocks.toString(),
           ),
           const SizedBox(width: AppSpacing.s16),
           _StatItem(
             icon: RemixIcons.lock_line,
-            label: 'Cố định',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.badgeFixed,
+            ),
             value: fixedBlockCount.toString(),
           ),
           const SizedBox(width: AppSpacing.s16),
           _StatItem(
             icon: RemixIcons.shuffle_line,
-            label: 'Linh hoạt',
+            label: ScheduleEditorConstants.text(
+              l10n,
+              ScheduleEditorConstants.badgeFlexible,
+            ),
             value: flexibleBlockCount.toString(),
           ),
         ],
@@ -67,11 +80,7 @@ class _StatItem extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: AppColor.cyan,
-          ),
+          Icon(icon, size: 20, color: AppColor.cyan),
           const SizedBox(height: AppSpacing.s6),
           Text(
             value,
@@ -82,13 +91,7 @@ class _StatItem extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.s2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: AppColor.fgMuted,
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 11, color: AppColor.fgMuted)),
         ],
       ),
     );

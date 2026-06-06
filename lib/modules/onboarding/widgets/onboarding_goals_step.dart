@@ -5,7 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
-import '../constants/onboarding_constants.dart';
+import '../../../extensions/localization_extension.dart';
 import '../models/onboarding_data.dart';
 
 class OnboardingGoalsStep extends StatelessWidget {
@@ -20,11 +20,13 @@ class OnboardingGoalsStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          OnboardingConstants.step4Title,
+          l10n.onboardingStep4Title,
           style: AppTextStyle.h1.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -33,7 +35,7 @@ class OnboardingGoalsStep extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          OnboardingConstants.step4Subtitle,
+          l10n.onboardingStep4Subtitle,
           style: AppTextStyle.body.copyWith(
             color: AppColor.fgSecondary,
             fontSize: 13,
@@ -43,7 +45,7 @@ class OnboardingGoalsStep extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.mainGoalsLabel,
+          l10n.onboardingStep4MainGoalsLabel,
           style: AppTextStyle.captionBold.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -52,12 +54,11 @@ class OnboardingGoalsStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        ..._buildGoalOptions(),
+        ..._buildGoalOptions(context),
         const SizedBox(height: AppSpacing.xl),
         Text(
-          OnboardingConstants.step4SystemNote,
+          l10n.onboardingStep4SystemNote,
           style: const TextStyle(
-            fontFamily: 'Exo2',
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -68,61 +69,62 @@ class OnboardingGoalsStep extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildGoalOptions() {
+  List<Widget> _buildGoalOptions(BuildContext context) {
+    final l10n = context.l10n;
     final goals = [
       _GoalOption(
         value: 'Uống Nước',
-        name: 'Uống Nước',
-        desc: 'Xây dựng thói quen uống nước đều đặn',
+        name: l10n.onboardingGoalWater,
+        desc: l10n.onboardingGoalWaterDesc,
         icon: RemixIcons.drop_line,
         color: AppColor.chipWaterBg,
       ),
       _GoalOption(
         value: 'Vận Động',
-        name: 'Vận Động',
-        desc: 'Vận động và tập thể dục hàng ngày',
+        name: l10n.onboardingGoalFitness,
+        desc: l10n.onboardingGoalFitnessDesc,
         icon: RemixIcons.run_line,
         color: AppColor.chipMovementBg,
       ),
       _GoalOption(
         value: 'Học Tập',
-        name: 'Học Tập',
-        desc: 'Dành thời gian học và xây dựng kỹ năng',
+        name: l10n.onboardingGoalLearning,
+        desc: l10n.onboardingGoalLearningDesc,
         icon: RemixIcons.book_open_line,
         color: AppColor.chipLearningBg,
       ),
       _GoalOption(
         value: 'Chánh Niệm',
-        name: 'Chánh Niệm',
-        desc: 'Thiền và quản lý căng thẳng',
+        name: l10n.onboardingGoalMindfulness,
+        desc: l10n.onboardingGoalMindfulnessDesc,
         icon: RemixIcons.heart_line,
         color: AppColor.violetDim,
       ),
       _GoalOption(
         value: 'Ngủ Tốt Hơn',
-        name: 'Ngủ Tốt Hơn',
-        desc: 'Thói quen ngủ tốt hơn',
+        name: l10n.onboardingGoalSleep,
+        desc: l10n.onboardingGoalSleepDesc,
         icon: RemixIcons.moon_line,
         color: AppColor.chipSleepBg,
       ),
       _GoalOption(
         value: 'Tập Trung Tốt Hơn',
-        name: 'Tập Trung Tốt Hơn',
-        desc: 'Giảm phân tâm, tăng hiệu suất',
+        name: l10n.onboardingGoalFocus,
+        desc: l10n.onboardingGoalFocusDesc,
         icon: RemixIcons.focus_2_line,
         color: AppColor.dangerDim,
       ),
       _GoalOption(
         value: 'Giảm Cân',
-        name: 'Giảm Cân',
-        desc: 'Kiểm soát cân nặng lành mạnh',
+        name: l10n.onboardingGoalWeight,
+        desc: l10n.onboardingGoalWeightDesc,
         icon: RemixIcons.scales_line,
         color: AppColor.warnDim,
       ),
       _GoalOption(
         value: 'Kỷ Luật Hơn',
-        name: 'Kỷ Luật Hơn',
-        desc: 'Xây dựng thói quen và nề nếp',
+        name: l10n.onboardingGoalDiscipline,
+        desc: l10n.onboardingGoalDisciplineDesc,
         icon: RemixIcons.shield_check_line,
         color: AppColor.chipMovementBg,
       ),
@@ -184,7 +186,7 @@ class OnboardingGoalsStep extends StatelessWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected ? AppColor.cyan : Colors.transparent,
+                  color: isSelected ? AppColor.cyan : AppColor.transparent,
                   border: Border.all(
                     color: isSelected ? AppColor.cyan : AppColor.border,
                     width: 2,

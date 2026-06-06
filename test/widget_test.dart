@@ -11,7 +11,6 @@ void main() {
     expect(RoutesConfig.questDetail, '/quest-detail');
     expect(RoutesConfig.logs, '/logs');
     expect(RoutesConfig.progress, '/progress');
-    expect(RoutesConfig.rewards, '/rewards');
     expect(RoutesConfig.dailyReview, '/daily-review');
     expect(RoutesConfig.weeklySummary, '/weekly-summary');
     expect(RoutesConfig.profile, '/profile');

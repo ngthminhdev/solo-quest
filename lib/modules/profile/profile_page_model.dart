@@ -7,8 +7,10 @@ import '../../models/auth_user_model.dart';
 import '../../models/user_profile_model.dart';
 import '../../models/progress_model.dart';
 import '../../services/auth_service.dart';
+import '../../services/profile_service.dart';
 import '../../services/progress_service.dart';
 import '../../services/daily_checkin_service.dart';
+import '../../services/daily_review_service.dart';
 import '../../services/service_providers.dart';
 
 class ProfilePageState extends BasePageState {
@@ -21,7 +23,7 @@ class ProfilePageState extends BasePageState {
   final String? errorMessage;
 
   ProfilePageState({
-    this.loadState = AppLoadState.idle,
+    this.loadState = AppLoadState.loading,
     this.profile,
     this.progress,
     this.authUser,
@@ -78,13 +80,17 @@ class ProfilePageState extends BasePageState {
 
 class ProfilePageModel extends BasePageModel<ProfilePageState> {
   ProfilePageModel({
+    required this.profileService,
     required this.progressService,
     required this.dailyCheckinService,
+    required this.dailyReviewService,
     required this.authService,
   }) : super(ProfilePageState());
 
+  final ProfileService profileService;
   final ProgressService progressService;
   final DailyCheckinService dailyCheckinService;
+  final DailyReviewService dailyReviewService;
   final AuthService authService;
 
   Future<void> loadProfile() async {
@@ -92,35 +98,23 @@ class ProfilePageModel extends BasePageModel<ProfilePageState> {
 
     try {
       final results = await Future.wait([
+        profileService.getProfile(),
         progressService.getProgress(),
         authService.getCurrentUser(),
       ]);
 
-      final progress = results[0] as ProgressModel;
-      final authUser = results[1] as AuthUserModel?;
+      final profile = results[0] as UserProfileModel?;
+      final progress = results[1] as ProgressModel;
+      final authUser = results[2] as AuthUserModel?;
 
-      final hasCheckedIn = await dailyCheckinService.hasCheckedInToday();
-      final hasReviewed = false;
+      if (profile == null) {
+        throw Exception('Profile not found');
+      }
 
-      final now = DateTime.now();
-      final profile = UserProfileModel(
-        id: authUser?.id ?? 'user_1',
-        name: authUser?.name ?? 'Minh',
-        level: progress.level,
-        currentLevelExp: progress.currentLevelExp,
-        nextLevelExp: progress.nextLevelExp,
-        totalExp: progress.totalExp,
-        rewardPoints: progress.rewardPoints,
-        streakDays: progress.streakDays,
-        totalCompletedQuests: progress.totalCompletedQuests,
-        mainGoals: [
-          'Học Flutter đều hơn',
-          'Uống nước và nghỉ mắt đúng giờ',
-          'Tổng kết mỗi ngày',
-        ],
-        createdAt: now.subtract(const Duration(days: 30)),
-        updatedAt: now,
-      );
+      final [hasCheckedIn, hasReviewed ] = await Future.wait([
+        dailyCheckinService.hasCheckedInToday(),
+        dailyReviewService.hasReviewedToday(),
+      ]);
 
       state = state.updateState(
         loadState: AppLoadState.ready,
@@ -164,8 +158,10 @@ class ProfilePageModel extends BasePageModel<ProfilePageState> {
 final profilePageProvider =
     StateNotifierProvider<ProfilePageModel, ProfilePageState>((ref) {
   return ProfilePageModel(
+    profileService: ref.read(profileServiceProvider),
     progressService: ref.read(progressServiceProvider),
     dailyCheckinService: ref.read(dailyCheckinServiceProvider),
+    dailyReviewService: ref.read(dailyReviewServiceProvider),
     authService: ref.read(authServiceProvider),
   );
 });

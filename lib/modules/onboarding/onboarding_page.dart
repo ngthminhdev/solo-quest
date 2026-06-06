@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../constants/app_color.dart';
+import '../../extensions/localization_extension.dart';
 import '../../routes/routes_config.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
 import 'onboarding_page_model.dart';
-import 'constants/onboarding_constants.dart';
 import 'widgets/onboarding_progress_header.dart';
 import 'widgets/onboarding_step_container.dart';
 import 'widgets/onboarding_bottom_bar.dart';
@@ -17,8 +17,6 @@ import 'widgets/onboarding_work_study_step.dart';
 import 'widgets/onboarding_health_activity_step.dart';
 import 'widgets/onboarding_goals_step.dart';
 import 'widgets/onboarding_schedule_step.dart';
-import 'widgets/onboarding_reminders_step.dart';
-import 'widgets/onboarding_rewards_step.dart';
 import 'widgets/onboarding_complete_step.dart';
 
 class OnboardingPage
@@ -29,8 +27,21 @@ class OnboardingPage
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
-    OnboardingPageModel, OnboardingPageState> {
+class _OnboardingPageState
+    extends
+        BasePageConsumerState<
+          OnboardingPage,
+          OnboardingPageModel,
+          OnboardingPageState
+        > {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      pageModel.prefillFromProfile();
+    });
+  }
+
   @override
   Widget renderPage(BuildContext context) {
     final state = read;
@@ -97,7 +108,7 @@ class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
           onWorkScheduleChanged: pageModel.updateWorkScheduleType,
           onWorkStartTimeChanged: pageModel.updateWorkStartTime,
           onWorkEndTimeChanged: pageModel.updateWorkEndTime,
-          onFreeTimeChanged: pageModel.updateFreeTimePreference,
+          onFreeTimeToggled: pageModel.togglePreferredFreeTime,
         );
       case 3:
         return OnboardingHealthActivityStep(
@@ -118,23 +129,10 @@ class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
           onTargetSleepChanged: pageModel.updateTargetSleepTime,
           onFreeTimeStartChanged: pageModel.updateFreeTimeStart,
           onFreeTimeEndChanged: pageModel.updateFreeTimeEnd,
-          onLearningTimeChanged: pageModel.updateLearningTimePreference,
-          onMovementTimeChanged: pageModel.updateMovementTimePreference,
+          onLearningTimeToggled: pageModel.toggleLearningTimePreference,
+          onMovementTimeToggled: pageModel.toggleMovementTimePreference,
         );
       case 6:
-        return OnboardingRemindersStep(
-          data: state.data,
-          onBreakIntervalChanged: pageModel.updateBreakReminderInterval,
-          onBreakDurationChanged: pageModel.updateBreakDuration,
-          onWaterModeChanged: pageModel.updateWaterReminderMode,
-          onQuietAfterChanged: pageModel.updateQuietAfterTime,
-        );
-      case 7:
-        return OnboardingRewardsStep(
-          data: state.data,
-          onRewardToggled: pageModel.togglePreferredReward,
-        );
-      case 8:
         return OnboardingCompleteStep(data: state.data);
       default:
         return const SizedBox.shrink();
@@ -143,12 +141,10 @@ class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
 
   Future<void> _handleNextOrFinish() async {
     final state = read;
+    final l10n = context.l10n;
 
     if (!state.canContinue) {
-      AppToastService.warning(
-        context,
-        OnboardingConstants.validationMessage,
-      );
+      AppToastService.warning(context, l10n.onboardingValidation);
       return;
     }
 
@@ -162,10 +158,7 @@ class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
     if (!mounted) return;
 
     if (success) {
-      AppToastService.success(
-        context,
-        OnboardingConstants.completionMessage,
-      );
+      AppToastService.success(context, l10n.onboardingComplete);
 
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -175,7 +168,7 @@ class _OnboardingPageState extends BasePageConsumerState<OnboardingPage,
     } else {
       AppToastService.error(
         context,
-        read.errorMessage ?? OnboardingConstants.completionErrorMessage,
+        read.errorMessage ?? l10n.onboardingCompleteError,
       );
     }
   }

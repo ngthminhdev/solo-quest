@@ -7,7 +7,7 @@ import '../../../constants/app_spacing.dart';
 import '../../../models/quest_rule_model.dart';
 import '../../../widgets/app_badge/quest_type_chip.dart';
 import '../../../widgets/app_card/app_card.dart';
-import '../constants/quest_rules_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class QuestTypePrioritySection extends StatelessWidget {
   final List<QuestRuleModel> rules;
@@ -30,11 +30,11 @@ class QuestTypePrioritySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(RemixIcons.sort_desc, size: 18, color: AppColor.violet),
-              SizedBox(width: AppSpacing.s8),
+            children: [
+              const Icon(RemixIcons.sort_desc, size: 18, color: AppColor.violet),
+              const SizedBox(width: AppSpacing.s8),
               Text(
-                QuestRulesConstants.priorityTitle,
+                context.l10n.questRulesPriorityTitle,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -64,7 +64,7 @@ class QuestTypePrioritySection extends StatelessWidget {
                     QuestTypeChip(type: rule.type),
                     const SizedBox(width: AppSpacing.s6),
                     Text(
-                      'Ưu tiên ${rule.priority}',
+                      context.l10n.questRulesPriorityValue(rule.priority),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,

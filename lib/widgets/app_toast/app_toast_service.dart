@@ -9,10 +9,11 @@ class AppToastService {
     AppToastType type = AppToastType.info,
   }) {
     final overlay = Overlay.of(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => Positioned(
-        bottom: 80 + MediaQuery.of(context).padding.bottom,
+        bottom: 80 + bottomPadding,
         left: 20,
         right: 20,
         child: Center(

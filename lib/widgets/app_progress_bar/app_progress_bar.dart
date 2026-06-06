@@ -25,13 +25,13 @@ class AppProgressBar extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColor.surface,
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.full),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
         child: LinearProgressIndicator(
           value: clampedProgress,
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColor.transparent,
           valueColor: AlwaysStoppedAnimation<Color>(
             progressColor ?? AppColor.cyan,
           ),

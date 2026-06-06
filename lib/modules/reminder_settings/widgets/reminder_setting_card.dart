@@ -4,6 +4,7 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../models/enums/reminder_enums.dart';
 import '../../../models/reminder_setting_model.dart';
 import '../../../widgets/app_card/app_card.dart';
@@ -56,7 +57,7 @@ class ReminderSettingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        setting.title,
+                        setting.type.getLocalizedTitle(context.l10n),
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -65,7 +66,7 @@ class ReminderSettingCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.s2),
                       Text(
-                        setting.description,
+                        setting.type.getLocalizedDescription(context.l10n),
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColor.fgMuted,
@@ -90,14 +91,14 @@ class ReminderSettingCard extends StatelessWidget {
               children: [
                 _InfoPill(
                   icon: RemixIcons.notification_badge_line,
-                  label: setting.status.label,
+                  label: setting.status.getLocalizedLabel(context.l10n),
                   color: setting.isEnabled
                       ? AppColor.success
                       : AppColor.fgMuted,
                 ),
                 _InfoPill(
                   icon: RemixIcons.repeat_line,
-                  label: setting.frequency.label,
+                  label: setting.frequency.getLocalizedLabel(context.l10n),
                   color: AppColor.cyan,
                 ),
                 if (_timeLabel != null)
@@ -109,19 +110,19 @@ class ReminderSettingCard extends StatelessWidget {
                 if (setting.intervalMinutes != null)
                   _InfoPill(
                     icon: RemixIcons.timer_line,
-                    label: 'Mỗi ${setting.intervalMinutes} phút',
+                    label: context.l10n.reminderCardInterval(setting.intervalMinutes.toString()),
                     color: AppColor.warn,
                   ),
                 if (setting.maxPerDay != null)
                   _InfoPill(
                     icon: RemixIcons.speed_up_line,
-                    label: 'Tối đa ${setting.maxPerDay} lần/ngày',
+                    label: context.l10n.reminderCardMaxPerDay(setting.maxPerDay.toString()),
                     color: AppColor.info,
                   ),
                 if (setting.smartEnabled)
-                  const _InfoPill(
+                  _InfoPill(
                     icon: RemixIcons.sparkling_line,
-                    label: 'Smart reminder',
+                    label: context.l10n.reminderCardSmartReminder,
                     color: AppColor.cyan,
                   ),
               ],
@@ -131,7 +132,7 @@ class ReminderSettingCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    setting.frequency.description,
+                    setting.frequency.getLocalizedDescription(context.l10n),
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
@@ -152,18 +153,18 @@ class ReminderSettingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(color: AppColor.borderGlowCyan),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           RemixIcons.edit_2_line,
                           size: 14,
                           color: AppColor.cyan,
                         ),
-                        SizedBox(width: AppSpacing.s4),
+                        const SizedBox(width: AppSpacing.s4),
                         Text(
-                          'Sửa',
-                          style: TextStyle(
+                          context.l10n.reminderCardEditButton,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColor.cyan,
@@ -186,7 +187,7 @@ class ReminderSettingCard extends StatelessWidget {
     if (setting.endTime == null || setting.endTime!.isEmpty) {
       return setting.startTime;
     }
-    return '${setting.startTime ?? '--:--'} - ${setting.endTime}';
+    return '${setting.startTime ?? ''} - ${setting.endTime}';
   }
 
   Color _accentColor(ReminderType type) {

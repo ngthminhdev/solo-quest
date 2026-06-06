@@ -1,7 +1,14 @@
 import '../models/learning_goal_model.dart';
 import '../models/learning_roadmap_model.dart';
+import '../core/api/services/learning_roadmap_api_service.dart';
+import '../core/api/dto/roadmap_suggestion_dto.dart';
+import '../core/network/api_exception.dart';
 
 class LearningService {
+  final LearningRoadmapApiService _roadmapApiService;
+
+  LearningService({LearningRoadmapApiService? roadmapApiService})
+      : _roadmapApiService = roadmapApiService ?? LearningRoadmapApiService();
   static final List<LearningGoalModel> _goals = [
     LearningGoalModel(
       id: '1',
@@ -98,145 +105,38 @@ class LearningService {
     throw Exception('Goal not found');
   }
 
-  // ── Roadmap methods ──
-
-  static final List<LearningRoadmapModel> _roadmaps = [
-    LearningRoadmapModel(
-      id: 'rm-1',
-      title: 'Flutter App Architecture',
-      description: 'Nắm vững MVVM, Riverpod và các pattern xây dựng Flutter app chuyên nghiệp.',
-      steps: [
-        const LearningRoadmapStepModel(
-          id: 'rm-1-s1',
-          title: 'Hiểu MVVM + Riverpod',
-          description: 'Tìm hiểu kiến trúc MVVM và cách Riverpod quản lý state.',
-          completed: true,
-          estimatedMinutes: 30,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-1-s2',
-          title: 'Tạo BasePage / BasePageModel',
-          description: 'Xây dựng base classes để tái sử dụng cho mọi feature module.',
-          completed: true,
-          estimatedMinutes: 45,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-1-s3',
-          title: 'Tạo service layer',
-          description: 'Tách business logic ra service, học cách inject qua Riverpod.',
-          completed: false,
-          estimatedMinutes: 40,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-1-s4',
-          title: 'Build Home UI',
-          description: 'Áp dụng kiến thức vào xây dựng màn hình Home thực tế.',
-          completed: false,
-          estimatedMinutes: 60,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-1-s5',
-          title: 'Refactor component system',
-          description: 'Tái cấu trúc UI components để dùng lại hiệu quả.',
-          completed: false,
-          estimatedMinutes: 35,
-        ),
-      ],
-    ),
-    LearningRoadmapModel(
-      id: 'rm-2',
-      title: 'Dart Async Mastery',
-      description: 'Làm chủ bất đồng bộ trong Dart: Future, Stream, error handling.',
-      steps: [
-        const LearningRoadmapStepModel(
-          id: 'rm-2-s1',
-          title: 'Future và async/await',
-          description: 'Nắm vững cách sử dụng Future và async/await trong Dart.',
-          completed: true,
-          estimatedMinutes: 25,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-2-s2',
-          title: 'Error handling',
-          description: 'Xử lý lỗitry/catch, custom exceptions và best practices.',
-          completed: false,
-          estimatedMinutes: 30,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-2-s3',
-          title: 'Streams basics',
-          description: 'Hiểu Stream, StreamController và cách lắng nghe dữ liệu.',
-          completed: false,
-          estimatedMinutes: 35,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-2-s4',
-          title: 'Service abstraction',
-          description: 'Tạo abstract service interface để dễ mock và test.',
-          completed: false,
-          estimatedMinutes: 20,
-        ),
-      ],
-    ),
-    LearningRoadmapModel(
-      id: 'rm-3',
-      title: 'SoloQuest MVP',
-      description: 'Hoàn thành MVP của ứng dụng SoloQuest với đầy đủ tính năng core.',
-      steps: [
-        const LearningRoadmapStepModel(
-          id: 'rm-3-s1',
-          title: 'Quest data model',
-          description: 'Thiết kế model cho quest, step, reward.',
-          completed: true,
-          estimatedMinutes: 30,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-3-s2',
-          title: 'Home quest flow',
-          description: 'Xây dựng flow hiển thị và tương tác quest trên Home.',
-          completed: true,
-          estimatedMinutes: 45,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-3-s3',
-          title: 'Logs system',
-          description: 'Xây dựng hệ thống ghi log hoạt động.',
-          completed: false,
-          estimatedMinutes: 30,
-        ),
-        const LearningRoadmapStepModel(
-          id: 'rm-3-s4',
-          title: 'Progress & rewards loop',
-          description: 'Hoàn thành vòng lặp tiến độ và phần thưởng.',
-          completed: false,
-          estimatedMinutes: 40,
-        ),
-      ],
-    ),
-  ];
+  // ── Roadmap methods (API-backed) ──
 
   Future<List<LearningRoadmapModel>> getRoadmaps() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return List.from(_roadmaps);
-  }
-
-  Future<LearningRoadmapModel?> getRoadmapById(String roadmapId) async {
-    await Future.delayed(const Duration(milliseconds: 200));
     try {
-      return _roadmaps.firstWhere((r) => r.id == roadmapId);
-    } catch (_) {
-      return null;
+      final dtos = await _roadmapApiService.getRoadmaps();
+      return dtos.map((dto) => _convertRoadmapDtoToModel(dto)).toList();
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to load roadmaps: $e');
     }
   }
 
-  Future<LearningRoadmapModel> updateRoadmap(LearningRoadmapModel roadmap) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _roadmaps.indexWhere((r) => r.id == roadmap.id);
-    if (index != -1) {
-      _roadmaps[index] = roadmap;
-      return roadmap;
+  Future<LearningRoadmapModel> getRoadmapById(String roadmapId) async {
+    try {
+      final dto = await _roadmapApiService.getRoadmapDetail(roadmapId);
+      return _convertRoadmapDtoToModel(dto);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to load roadmap: $e');
     }
-    throw Exception('Roadmap not found');
+  }
+
+  Future<void> followRoadmap(String roadmapId) async {
+    try {
+      await _roadmapApiService.followRoadmap(roadmapId);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to follow roadmap: $e');
+    }
   }
 
   Future<LearningRoadmapModel> toggleRoadmapStep({
@@ -244,19 +144,98 @@ class LearningService {
     required String stepId,
     required bool completed,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final rmIndex = _roadmaps.indexWhere((r) => r.id == roadmapId);
-    if (rmIndex == -1) throw Exception('Roadmap not found');
+    try {
+      await _roadmapApiService.toggleStep(roadmapId, stepId, completed);
 
-    final roadmap = _roadmaps[rmIndex];
-    final stepIndex = roadmap.steps.indexWhere((s) => s.id == stepId);
-    if (stepIndex == -1) throw Exception('Step not found');
+      // Fetch updated roadmap to get complete state
+      final updatedRoadmap = await getRoadmapById(roadmapId);
+      return updatedRoadmap;
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to toggle step: $e');
+    }
+  }
 
-    final updatedSteps = List<LearningRoadmapStepModel>.from(roadmap.steps);
-    updatedSteps[stepIndex] = updatedSteps[stepIndex].copyWith(completed: completed);
+  /// Convert DTO to Model
+  LearningRoadmapModel _convertRoadmapDtoToModel(dynamic dto) {
+    return LearningRoadmapModel(
+      id: dto.id,
+      title: dto.title,
+      description: dto.description,
+      category: dto.category,
+      difficulty: dto.difficulty,
+      estimatedMinutes: dto.estimatedMinutes,
+      source: dto.source,
+      status: dto.status,
+      enabled: dto.enabled,
+      startedAt: dto.startedAt,
+      completedAt: dto.completedAt,
+      steps: dto.steps.map<LearningRoadmapStepModel>((stepDto) {
+        return LearningRoadmapStepModel(
+          id: stepDto.id,
+          title: stepDto.title,
+          description: stepDto.description,
+          completed: stepDto.completed,
+          estimatedMinutes: stepDto.estimatedMinutes,
+          orderIndex: stepDto.orderIndex,
+          completedAt: stepDto.completedAt,
+        );
+      }).toList(),
+      progress: dto.progressPercent / 100.0,
+    );
+  }
 
-    final updatedRoadmap = roadmap.copyWith(steps: updatedSteps);
-    _roadmaps[rmIndex] = updatedRoadmap;
-    return updatedRoadmap;
+  /// Legacy: kept for compatibility but no longer used for roadmaps
+  Future<LearningRoadmapModel> updateRoadmap(LearningRoadmapModel roadmap) async {
+    throw UnimplementedError('Use API-backed methods instead');
+  }
+
+  /// Suggest roadmap templates based on preferences
+  Future<List<RoadmapSuggestionDto>> suggestRoadmaps({
+    required String learningGoal,
+    String? category,
+    String? difficulty,
+    int? maxDuration,
+  }) async {
+    try {
+      final request = SuggestRoadmapsRequestDto(
+        learningGoal: learningGoal,
+        category: category,
+        difficulty: difficulty,
+        maxDuration: maxDuration,
+      );
+      return await _roadmapApiService.suggestRoadmaps(request);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to suggest roadmaps: $e');
+    }
+  }
+
+  /// Create roadmap from template
+  Future<LearningRoadmapModel> createRoadmapFromTemplate({
+    required String templateId,
+    required String learningGoal,
+    String? category,
+    String? difficulty,
+    int? maxDuration,
+  }) async {
+    try {
+      final request = CreateRoadmapFromTemplateRequestDto(
+        templateId: templateId,
+        source: 'template',
+        learningGoal: learningGoal,
+        category: category,
+        difficulty: difficulty,
+        maxDuration: maxDuration,
+      );
+      final dto = await _roadmapApiService.createRoadmapFromTemplate(request);
+      return _convertRoadmapDtoToModel(dto);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to create roadmap from template: $e');
+    }
   }
 }

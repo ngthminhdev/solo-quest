@@ -4,8 +4,8 @@ import 'package:remixicon/remixicon.dart';
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
+import '../../../extensions/localization_extension.dart';
 import '../../../widgets/app_card/app_card.dart';
-import '../constants/quest_rules_constants.dart';
 
 class QuestDailyLimitCard extends StatelessWidget {
   final int value;
@@ -21,6 +21,8 @@ class QuestDailyLimitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return AppCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.s16,
@@ -42,22 +44,22 @@ class QuestDailyLimitCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.s12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  QuestRulesConstants.dailyLimitTitle,
-                  style: TextStyle(
+                  l10n.questRulesDailyLimitTitle,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColor.fg,
                   ),
                 ),
-                SizedBox(height: AppSpacing.s4),
+                const SizedBox(height: AppSpacing.s4),
                 Text(
-                  QuestRulesConstants.dailyLimitSubtitle,
-                  style: TextStyle(
+                  l10n.questRulesDailyLimitSubtitle,
+                  style: const TextStyle(
                     fontSize: 11,
                     height: 1.35,
                     color: AppColor.fgSecondary,
