@@ -6,6 +6,7 @@ import '../../../constants/app_radius.dart';
 import '../../../constants/app_text_style.dart';
 import '../../../extensions/localization_extension.dart';
 import '../models/onboarding_data.dart';
+import '../utils/onboarding_display_mapper.dart';
 
 class OnboardingCompleteStep extends StatelessWidget {
   final OnboardingData data;
@@ -76,50 +77,6 @@ class OnboardingCompleteStep extends StatelessWidget {
   Widget _buildSummaryCard(BuildContext context) {
     final l10n = context.l10n;
 
-    String getLocalizedActivity(String key) {
-      switch (key) {
-        case 'Software Engineer':
-          return l10n.onboardingStep2ActivityDeveloper;
-        case 'Sinh Viên':
-          return l10n.onboardingStep2ActivityStudent;
-        case 'Nhân Viên Văn Phòng':
-          return l10n.onboardingStep2ActivityOffice;
-        case 'Freelancer':
-          return l10n.onboardingStep2ActivityFreelancer;
-        case 'Khác':
-          return l10n.onboardingStep2ActivityOther;
-        default:
-          return key;
-      }
-    }
-
-    String getLocalizedGoals(List<String> keys) {
-      if (keys.isEmpty) return '—';
-      final localized = keys.map((key) {
-        switch (key) {
-          case 'Uống Nước':
-            return l10n.onboardingGoalWater;
-          case 'Vận Động':
-            return l10n.onboardingGoalFitness;
-          case 'Học Tập':
-            return l10n.onboardingGoalLearning;
-          case 'Chánh Niệm':
-            return l10n.onboardingGoalMindfulness;
-          case 'Ngủ Tốt Hơn':
-            return l10n.onboardingGoalSleep;
-          case 'Tập Trung Tốt Hơn':
-            return l10n.onboardingGoalFocus;
-          case 'Giảm Cân':
-            return l10n.onboardingGoalWeight;
-          case 'Kỷ Luật Hơn':
-            return l10n.onboardingGoalDiscipline;
-          default:
-            return key;
-        }
-      });
-      return localized.join(' · ');
-    }
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -150,7 +107,10 @@ class OnboardingCompleteStep extends StatelessWidget {
             l10n.onboardingStep8LabelWork,
             data.mainActivity.isEmpty
                 ? '—'
-                : getLocalizedActivity(data.mainActivity),
+                : OnboardingDisplayMapper.localizedMainActivity(
+                    context,
+                    data.mainActivity,
+                  ),
           ),
           _buildSummaryRow(
             l10n.onboardingStep8LabelSchedule,
@@ -160,7 +120,7 @@ class OnboardingCompleteStep extends StatelessWidget {
           ),
           _buildSummaryRow(
             l10n.onboardingStep8LabelGoals,
-            getLocalizedGoals(data.mainGoals),
+            OnboardingDisplayMapper.localizedGoals(context, data.mainGoals),
             highlight: true,
           ),
           _buildSummaryRow(
@@ -227,13 +187,17 @@ class OnboardingCompleteStep extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13, color: AppColor.fgSecondary),
+          SizedBox(
+            width: 80,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 13, color: AppColor.fgSecondary),
+            ),
           ),
-          SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacing.sm),
           Flexible(
             child: Text(
               value,
@@ -243,6 +207,7 @@ class OnboardingCompleteStep extends StatelessWidget {
                 color: highlight ? AppColor.cyan : AppColor.fg,
               ),
               textAlign: TextAlign.right,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),

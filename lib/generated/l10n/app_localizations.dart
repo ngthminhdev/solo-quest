@@ -2534,6 +2534,24 @@ abstract class AppLocalizations {
   /// **'Vui lòng thử lại.'**
   String get onboardingCompleteError;
 
+  /// No description provided for @onboardingGeneratingQuestsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang cá nhân hóa quest hôm nay...'**
+  String get onboardingGeneratingQuestsTitle;
+
+  /// No description provided for @onboardingGeneratingQuestsSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'SoloQuest đang dựa trên mục tiêu và lịch sinh hoạt của bạn để chuẩn bị nhiệm vụ đầu tiên.'**
+  String get onboardingGeneratingQuestsSubtitle;
+
+  /// No description provided for @onboardingGenerateQuestsFallbackMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu hồ sơ. Quest hôm nay sẽ được tạo lại sau.'**
+  String get onboardingGenerateQuestsFallbackMessage;
+
   /// No description provided for @onboardingProgressLabel.
   ///
   /// In vi, this message translates to:
@@ -2735,7 +2753,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingStep2Title.
   ///
   /// In vi, this message translates to:
-  /// **'Công Việc & Học Tập'**
+  /// **'Lịch làm việc'**
   String get onboardingStep2Title;
 
   /// No description provided for @onboardingStep2Subtitle.
@@ -2821,6 +2839,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Thứ 2–7'**
   String get onboardingStep2ScheduleMonSat;
+
+  /// No description provided for @onboardingStep2ScheduleFullWeek.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cả tuần'**
+  String get onboardingStep2ScheduleFullWeek;
 
   /// No description provided for @onboardingStep2ScheduleFlexible.
   ///
@@ -3014,6 +3038,18 @@ abstract class AppLocalizations {
   /// **'[ HỆ THỐNG ] Mục tiêu có thể điều chỉnh bất cứ lúc nào từ cài đặt'**
   String get onboardingStep4SystemNote;
 
+  /// No description provided for @onboardingStep4LearningTopicLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn muốn học gì trước?'**
+  String get onboardingStep4LearningTopicLabel;
+
+  /// No description provided for @onboardingStep4LearningTopicHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Flutter, tiếng Anh, AI, công việc...'**
+  String get onboardingStep4LearningTopicHint;
+
   /// No description provided for @onboardingGoalWater.
   ///
   /// In vi, this message translates to:
@@ -3025,6 +3061,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Xây dựng thói quen uống nước đều đặn'**
   String get onboardingGoalWaterDesc;
+
+  /// No description provided for @onboardingGoalHealth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sức Khỏe'**
+  String get onboardingGoalHealth;
+
+  /// No description provided for @onboardingGoalHealthDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xây dựng thói quen lành mạnh mỗi ngày'**
+  String get onboardingGoalHealthDesc;
 
   /// No description provided for @onboardingGoalFitness.
   ///
@@ -3121,6 +3169,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Hệ thống cần biết nhịp sinh hoạt để xếp quest đúng giờ'**
   String get onboardingStep5Subtitle;
+
+  /// No description provided for @onboardingStep5ScheduleHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có thể chỉnh lịch sinh hoạt chi tiết sau trong Cài đặt.'**
+  String get onboardingStep5ScheduleHint;
 
   /// No description provided for @onboardingStep5WakeUpLabel.
   ///
@@ -5767,6 +5821,186 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đạt mốc {points} điểm'**
   String rewardsHistoryMilestone(Object points);
+
+  /// No description provided for @timerStart.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu đếm giờ'**
+  String get timerStart;
+
+  /// No description provided for @timerDuration.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời lượng'**
+  String get timerDuration;
+
+  /// No description provided for @timerRemaining.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn lại'**
+  String get timerRemaining;
+
+  /// No description provided for @timerComplete.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hoàn thành'**
+  String get timerComplete;
+
+  /// No description provided for @timerStop.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dừng'**
+  String get timerStop;
+
+  /// No description provided for @timerTimeUp.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hết giờ'**
+  String get timerTimeUp;
+
+  /// No description provided for @timerTimeout.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hết thời gian'**
+  String get timerTimeout;
+
+  /// No description provided for @timerQuestEnded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhiệm vụ đã kết thúc'**
+  String get timerQuestEnded;
+
+  /// No description provided for @timerCompleteQuest.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hoàn thành nhiệm vụ'**
+  String get timerCompleteQuest;
+
+  /// No description provided for @timerConfirmReplace.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đang có một bộ đếm đang chạy. Dừng bộ đếm hiện tại để bắt đầu bộ đếm mới?'**
+  String get timerConfirmReplace;
+
+  /// No description provided for @timerWaterNoTimer.
+  ///
+  /// In vi, this message translates to:
+  /// **'Uống nước không cần đếm giờ'**
+  String get timerWaterNoTimer;
+
+  /// No description provided for @timerOpen.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở'**
+  String get timerOpen;
+
+  /// No description provided for @reminderWaterTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Uống nước'**
+  String get reminderWaterTitle;
+
+  /// No description provided for @reminderWaterBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến giờ uống một ngụm nước rồi.'**
+  String get reminderWaterBody;
+
+  /// No description provided for @reminderWaterBtn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã uống'**
+  String get reminderWaterBtn;
+
+  /// No description provided for @reminderBreakTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nghỉ mắt một chút'**
+  String get reminderBreakTitle;
+
+  /// No description provided for @reminderBreakBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hãy rời mắt khỏi màn hình và nghỉ nhẹ vài phút.'**
+  String get reminderBreakBody;
+
+  /// No description provided for @reminderBreakBtn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu nghỉ {minutes} phút'**
+  String reminderBreakBtn(Object minutes);
+
+  /// No description provided for @reminderMovementTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vận động nhẹ'**
+  String get reminderMovementTitle;
+
+  /// No description provided for @reminderMovementBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hãy đứng dậy và vận động nhẹ một chút.'**
+  String get reminderMovementBody;
+
+  /// No description provided for @reminderLearningTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học tập'**
+  String get reminderLearningTitle;
+
+  /// No description provided for @reminderLearningBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến giờ dành một chút thời gian để học.'**
+  String get reminderLearningBody;
+
+  /// No description provided for @reminderSleepTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuẩn bị đi ngủ'**
+  String get reminderSleepTitle;
+
+  /// No description provided for @reminderSleepBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến giờ thư giãn và chuẩn bị cho giấc ngủ.'**
+  String get reminderSleepBody;
+
+  /// No description provided for @reminderDailyReviewTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng kết ngày'**
+  String get reminderDailyReviewTitle;
+
+  /// No description provided for @reminderDailyReviewBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dành vài phút nhìn lại ngày hôm nay.'**
+  String get reminderDailyReviewBody;
+
+  /// No description provided for @reminderDailyReviewBtn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở tổng kết'**
+  String get reminderDailyReviewBtn;
+
+  /// No description provided for @reminderWaterPrompt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến giờ uống nước rồi.'**
+  String get reminderWaterPrompt;
+
+  /// No description provided for @reminderDailyReviewPrompt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến giờ tổng kết ngày.'**
+  String get reminderDailyReviewPrompt;
+
+  /// No description provided for @reminderBreakFinished.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hết thời gian nghỉ'**
+  String get reminderBreakFinished;
 }
 
 class _AppLocalizationsDelegate

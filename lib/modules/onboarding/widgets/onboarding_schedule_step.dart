@@ -36,14 +36,15 @@ class OnboardingScheduleStep extends StatelessWidget {
     final l10n = context.l10n;
 
     final learningTimeOptions = [
-      OnboardingStepOption('morning', l10n.onboardingTimeEarlyMorning),
+      OnboardingStepOption('early_morning', l10n.onboardingTimeEarlyMorning),
       OnboardingStepOption('lunch', l10n.onboardingTimeNoon),
       OnboardingStepOption('evening', l10n.onboardingTimeEveningGeneral),
     ];
 
     final movementTimeOptions = [
-      OnboardingStepOption('morning', l10n.onboardingTimeEarlyMorning),
+      OnboardingStepOption('early_morning', l10n.onboardingTimeEarlyMorning),
       OnboardingStepOption('lunch', l10n.onboardingTimeNoon),
+      OnboardingStepOption('after_work', l10n.onboardingTimeAfterWork),
       OnboardingStepOption('evening', l10n.onboardingTimeEveningGeneral),
     ];
 
@@ -65,6 +66,17 @@ class OnboardingScheduleStep extends StatelessWidget {
             color: AppColor.fgSecondary,
             fontSize: 13,
             height: 1.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.onboardingStep5ScheduleHint,
+          style: const TextStyle(
+            color: AppColor.cyan,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            height: 1.4,
           ),
           textAlign: TextAlign.center,
         ),
@@ -99,6 +111,7 @@ class OnboardingScheduleStep extends StatelessWidget {
           options: movementTimeOptions,
           selected: data.movementTimePreferences,
           onChanged: onMovementTimeToggled,
+          layoutMode: ChipLayoutMode.equalWidthGrid,
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
@@ -281,6 +294,7 @@ class OnboardingScheduleStep extends StatelessWidget {
     required List<OnboardingStepOption> options,
     required List<String> selected,
     required ValueChanged<String> onChanged,
+    ChipLayoutMode layoutMode = ChipLayoutMode.equalWidthRow,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +313,7 @@ class OnboardingScheduleStep extends StatelessWidget {
           options: options,
           selected: selected,
           onChanged: onChanged,
-          layoutMode: ChipLayoutMode.equalWidthRow,
+          layoutMode: layoutMode,
         ),
       ],
     );

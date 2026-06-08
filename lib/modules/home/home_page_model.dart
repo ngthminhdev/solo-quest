@@ -199,59 +199,58 @@ class HomePageModel extends BasePageModel<HomePageState> {
     final userName = results[3] as String?;
     final dailyReviewReminder = results[4] as ReminderSettingModel?;
 
-    // Featured quest selection priority:
-    // 1. first in_progress quest (status == active)
-    // 2. first pending quest with highest priority if priority exists
-    // 3. first pending quest
+    // ── Featured quest selection ──
+    // Collect all actionable (pending + active) quests.
+    // Exclude completed, skipped, and snoozed quests.
+    final pendingQuests = allQuests
+        .where((q) => q.isPending || q.isActive)
+        .toList();
+
+    // Sort by reminder_time ascending (quests without reminder time go last).
+    pendingQuests.sort((a, b) {
+      final aTime = a.reminderTime;
+      final bTime = b.reminderTime;
+      if (aTime == null && bTime == null) return 0;
+      if (aTime == null) return 1;
+      if (bTime == null) return -1;
+      return aTime.compareTo(bTime);
+    });
+
+    final now = DateTime.now();
     QuestModel? featuredQuest;
-    final activeQuestsList = allQuests.where((q) => q.isActive).toList();
-    if (activeQuestsList.isNotEmpty) {
-      featuredQuest = activeQuestsList.first;
-    } else {
-      final pendingQuestsList = allQuests.where((q) => q.isPending).toList();
-      if (pendingQuestsList.isNotEmpty) {
-        final sortedPending = List<QuestModel>.from(pendingQuestsList);
-        sortedPending.sort((a, b) {
-          if (a.isImportant != b.isImportant) {
-            return a.isImportant ? -1 : 1;
-          }
-          final diffCompare = b.difficulty.index.compareTo(a.difficulty.index);
-          if (diffCompare != 0) {
-            return diffCompare;
-          }
-          // Sort by reminder time if both have it
-          if (a.reminderTime != null && b.reminderTime != null) {
-            return a.reminderTime!.compareTo(b.reminderTime!);
-          }
-          // Quests with reminder time come before those without
-          if (a.reminderTime != null) return -1;
-          if (b.reminderTime != null) return 1;
-          return 0;
-        });
-        featuredQuest = sortedPending.first;
-      }
+
+    if (pendingQuests.isNotEmpty) {
+      // Prefer earliest overdue quest (reminder_time <= now).
+      final overdueIndex = pendingQuests.indexWhere(
+        (q) => q.reminderTime != null && q.reminderTime!.isBefore(now),
+      );
+      final firstOverdue = overdueIndex >= 0 ? pendingQuests[overdueIndex] : null;
+      final firstUpcoming = pendingQuests.first;
+
+      // If there's an overdue quest, pick the earliest one.
+      // Otherwise pick the earliest upcoming one.
+      featuredQuest = firstOverdue ?? firstUpcoming;
     }
 
     if (featuredQuest != null) {
       developer.log(
-        '[HOME] Featured quest: id=${featuredQuest.id}, title=${featuredQuest.title}, status=${featuredQuest.status.name}',
+        '[HOME] Featured quest: id=${featuredQuest.id}, title=${featuredQuest.title}, '
+        'status=${featuredQuest.status.name}, reminderTime=${featuredQuest.reminderTime}',
       );
     } else {
       developer.log('[HOME] Featured quest: id=none, title=none, status=none');
     }
 
-    // Upcoming list shows remaining non-completed, non-snoozed quests (excluding the featured one)
-    final upcoming = allQuests.where((q) {
-      if (featuredQuest != null && q.id == featuredQuest.id) {
-        return false;
-      }
-      return q.isPending || q.isActive;
+    // Upcoming list: remaining pending/active quests (excluding featured), sorted chronologically.
+    final upcoming = pendingQuests.where((q) {
+      if (featuredQuest != null && q.id == featuredQuest.id) return false;
+      return true;
     }).toList();
+
+    developer.log('[HOME] Upcoming quest count: ${upcoming.length}');
 
     // Separate snoozed quests
     final snoozed = allQuests.where((q) => q.isSnoozed).toList();
-
-    developer.log('[HOME] Upcoming quest count: ${upcoming.length}');
 
     final completed = allQuests.where((q) => q.isCompleted).toList();
 

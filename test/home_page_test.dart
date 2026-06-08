@@ -148,8 +148,13 @@ class FakeUserApiService extends Fake implements UserApiService {
 }
 
 class FakeReminderService extends Fake implements ReminderService {
+  @override
+  Future<List<ReminderSettingModel>> getReminderSettings() async => [];
+
+  @override
   Future<List<ReminderSettingModel>> getReminders() async => [];
 
+  @override
   Future<ReminderSettingModel?> getDailyReviewReminder() async => null;
 }
 
@@ -201,11 +206,26 @@ void main() {
   });
 
   group('Featured Quest Selection', () {
-    test('featured selector picks in_progress (active) quest first', () async {
+    test('featured selector picks earliest overdue pending quest', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Pending Quest 1', type: QuestType.learning, status: QuestStatus.pending),
-        const QuestModel(id: 'q2', title: 'Active Quest 1', type: QuestType.water, status: QuestStatus.active),
-        const QuestModel(id: 'q3', title: 'Active Quest 2', type: QuestType.movement, status: QuestStatus.active),
+        QuestModel(id: 'q1', title: 'Late Morning', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.subtract(const Duration(hours: 3))),
+        QuestModel(id: 'q2', title: 'Late Afternoon', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.subtract(const Duration(hours: 1))),
+        QuestModel(id: 'q3', title: 'Evening', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
+      ];
+
+      await homePageModel.loadHomeData();
+
+      expect(homePageModel.state.activeQuests.length, 1);
+      expect(homePageModel.state.activeQuests.first.id, 'q1');
+    });
+
+    test('featured selector picks earliest upcoming quest when none are overdue', () async {
+      final now = DateTime.now();
+      fakeQuestService.quests = [
+        QuestModel(id: 'q1', title: 'Evening Quest', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 4))),
+        QuestModel(id: 'q2', title: 'Next Quest', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
+        QuestModel(id: 'q3', title: 'Later Quest', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 6))),
       ];
 
       await homePageModel.loadHomeData();
@@ -214,68 +234,39 @@ void main() {
       expect(homePageModel.state.activeQuests.first.id, 'q2');
     });
 
-    test('featured selector picks pending quest when no in_progress, prioritizing highest difficulty', () async {
+    test('active quest is featured among pending quests', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(
-          id: 'q1',
-          title: 'Easy Pending',
-          type: QuestType.learning,
-          status: QuestStatus.pending,
-          difficulty: QuestDifficulty.easy,
-        ),
-        const QuestModel(
-          id: 'q2',
-          title: 'Hard Pending',
-          type: QuestType.water,
-          status: QuestStatus.pending,
-          difficulty: QuestDifficulty.hard,
-        ),
-        const QuestModel(
-          id: 'q3',
-          title: 'Medium Pending',
-          type: QuestType.movement,
-          status: QuestStatus.pending,
-          difficulty: QuestDifficulty.medium,
-        ),
+        QuestModel(id: 'q1', title: 'Pending First', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
+        QuestModel(id: 'q2', title: 'Active Quest', type: QuestType.water, status: QuestStatus.active, reminderTime: now.add(const Duration(hours: 2))),
       ];
 
       await homePageModel.loadHomeData();
 
       expect(homePageModel.state.activeQuests.length, 1);
-      expect(homePageModel.state.activeQuests.first.id, 'q2');
+      expect(homePageModel.state.activeQuests.first.id, 'q1');
     });
 
-    test('featured selector picks pending quest when no in_progress, prioritizing isImportant', () async {
+    test('quests without reminderTime come after those with reminderTime', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(
-          id: 'q1',
-          title: 'Hard Pending',
-          type: QuestType.learning,
-          status: QuestStatus.pending,
-          difficulty: QuestDifficulty.hard,
-          isImportant: false,
-        ),
-        const QuestModel(
-          id: 'q2',
-          title: 'Medium Important Pending',
-          type: QuestType.water,
-          status: QuestStatus.pending,
-          difficulty: QuestDifficulty.medium,
-          isImportant: true,
-        ),
+        const QuestModel(id: 'q1', title: 'No Time Quest 1', type: QuestType.learning, status: QuestStatus.pending),
+        const QuestModel(id: 'q2', title: 'No Time Quest 2', type: QuestType.water, status: QuestStatus.pending),
+        QuestModel(id: 'q3', title: 'Timed Quest', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
       ];
 
       await homePageModel.loadHomeData();
 
       expect(homePageModel.state.activeQuests.length, 1);
-      expect(homePageModel.state.activeQuests.first.id, 'q2');
+      expect(homePageModel.state.activeQuests.first.id, 'q3');
     });
 
     test('upcoming list excludes featured quest', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
-        const QuestModel(id: 'q2', title: 'Q2', type: QuestType.learning, status: QuestStatus.pending),
-        const QuestModel(id: 'q3', title: 'Q3', type: QuestType.movement, status: QuestStatus.pending),
+        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
+        QuestModel(id: 'q2', title: 'Upcoming 1', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
+        QuestModel(id: 'q3', title: 'Upcoming 2', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 3))),
       ];
 
       await homePageModel.loadHomeData();
@@ -288,11 +279,12 @@ void main() {
     });
 
     test('upcoming count is total remaining quests (excluding completed & featured)', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
-        const QuestModel(id: 'q2', title: 'Q2', type: QuestType.learning, status: QuestStatus.pending),
-        const QuestModel(id: 'q3', title: 'Q3', type: QuestType.movement, status: QuestStatus.pending),
-        const QuestModel(id: 'q4', title: 'Q4', type: QuestType.sleep, status: QuestStatus.completed),
+        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
+        QuestModel(id: 'q2', title: 'Upcoming 1', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
+        QuestModel(id: 'q3', title: 'Upcoming 2', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 3))),
+        const QuestModel(id: 'q4', title: 'Done', type: QuestType.sleep, status: QuestStatus.completed),
       ];
 
       await homePageModel.loadHomeData();
@@ -303,9 +295,10 @@ void main() {
     });
 
     test('no duplicate quest ids between featured and upcoming sections', () async {
+      final now = DateTime.now();
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
-        const QuestModel(id: 'q2', title: 'Q2', type: QuestType.learning, status: QuestStatus.pending),
+        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
+        QuestModel(id: 'q2', title: 'Upcoming', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
       ];
 
       await homePageModel.loadHomeData();

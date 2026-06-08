@@ -12,6 +12,8 @@ import '../../base/base_page_state.dart';
 import '../../constants/app_color.dart';
 import '../../services/auth_session_resolver.dart';
 import '../../services/service_providers.dart';
+import '../../core/notifications/fcm_service.dart';
+import '../../routes/routes_config.dart';
 
 class SplashPageState extends BasePageState {
   final AppLoadState loadState;
@@ -28,16 +30,30 @@ class SplashPageState extends BasePageState {
 }
 
 class SplashPageModel extends BasePageModel<SplashPageState> {
-  SplashPageModel({required this.sessionResolver}) : super(SplashPageState());
+  SplashPageModel({
+    required this.sessionResolver,
+    required this.fcmService,
+  }) : super(SplashPageState());
 
   final AuthSessionResolver sessionResolver;
+  final FcmService fcmService;
 
   Future<String> resolveInitialRoute() async {
     if (kDebugMode) {
       developer.log('[SPLASH] Checking stored session...');
     }
 
-    return sessionResolver.resolveInitialRoute();
+    final route = await sessionResolver.resolveInitialRoute();
+    if (route != RoutesConfig.login) {
+      fcmService.initialize().then((_) {
+        fcmService.processPendingNotificationPayload();
+      }).catchError((e) {
+        if (kDebugMode) {
+          developer.log('[SPLASH] FCM initialization error: $e');
+        }
+      });
+    }
+    return route;
   }
 
   Future<void> initialize() async {
@@ -56,6 +72,7 @@ final splashPageProvider =
     StateNotifierProvider<SplashPageModel, SplashPageState>((ref) {
       return SplashPageModel(
         sessionResolver: ref.read(authSessionResolverProvider),
+        fcmService: ref.read(fcmServiceProvider),
       );
     });
 

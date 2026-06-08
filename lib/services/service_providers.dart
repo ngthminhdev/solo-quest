@@ -22,8 +22,34 @@ import '../core/api/services/weekly_summary_api_service.dart';
 import '../core/api/services/schedule_api_service.dart';
 import '../core/api/services/learning_roadmap_api_service.dart';
 import '../core/api/services/user_api_service.dart';
+import '../core/notifications/local_notification_service.dart';
+import '../core/api/services/notification_api_service.dart';
+import '../core/notifications/fcm_service.dart';
+import '../core/notifications/fcm_notification_payload.dart';
 
-final questServiceProvider = Provider<QuestService>((ref) => QuestService());
+final localNotificationServiceProvider = Provider<LocalNotificationService>(
+  (ref) => LocalNotificationService(),
+);
+
+final notificationApiServiceProvider = Provider<NotificationApiService>(
+  (ref) => NotificationApiService(),
+);
+
+final fcmServiceProvider = Provider<FcmService>((ref) {
+  return FcmService(
+    ref: ref,
+    apiService: ref.read(notificationApiServiceProvider),
+    localNotificationService: ref.read(localNotificationServiceProvider),
+    localStorageService: ref.read(localStorageServiceProvider),
+    authService: ref.read(authServiceProvider),
+  );
+});
+
+final questServiceProvider = Provider<QuestService>(
+  (ref) => QuestService(
+    notificationService: ref.read(localNotificationServiceProvider),
+  ),
+);
 final logServiceProvider = Provider<LogService>((ref) => LogService());
 final progressServiceProvider = Provider<ProgressService>(
   (ref) => ProgressService(),
@@ -105,3 +131,5 @@ final authSessionResolverProvider = Provider<AuthSessionResolver>((ref) {
     dailyCheckinService: ref.read(dailyCheckinServiceProvider),
   );
 });
+
+final pendingReminderProvider = StateProvider<FcmNotificationPayload?>((ref) => null);

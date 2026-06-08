@@ -161,3 +161,13 @@ class QuestModel {
     };
   }
 }
+
+bool isCountdownEligible(QuestModel quest) {
+  if (quest.type == QuestType.water) return false;
+  if (quest.status == QuestStatus.completed ||
+      quest.status == QuestStatus.skipped ||
+      quest.status == QuestStatus.snoozed) {
+    return false;
+  }
+  return quest.estimatedMinutes > 0;
+}

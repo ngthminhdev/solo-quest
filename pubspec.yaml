@@ -46,6 +46,11 @@ dependencies:
   google_sign_in: ^7.2.0
   flutter_secure_storage: ^10.3.1
   flutter_launcher_icons: ^0.14.4
+  flutter_local_notifications: ^17.2.2
+  timezone: ^0.9.4
+  firebase_core: ^4.10.0
+  firebase_messaging: ^16.3.0
+  device_info_plus: ^12.4.0
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +80,8 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/config.yaml
+    - assets/config.local.yaml
+    - assets/config.development.yaml
 
   fonts:
     - family: GoogleSansCode

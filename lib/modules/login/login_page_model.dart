@@ -10,6 +10,7 @@ import '../../services/auth_exceptions.dart';
 import '../../services/auth_service.dart';
 import '../../services/auth_session_resolver.dart';
 import '../../services/service_providers.dart';
+import '../../core/notifications/fcm_service.dart';
 
 class LoginPageState extends BasePageState {
   final AppLoadState loadState;
@@ -43,11 +44,15 @@ class LoginPageState extends BasePageState {
 }
 
 class LoginPageModel extends BasePageModel<LoginPageState> {
-  LoginPageModel({required this.authService, required this.sessionResolver})
-    : super(LoginPageState());
+  LoginPageModel({
+    required this.authService,
+    required this.sessionResolver,
+    required this.fcmService,
+  }) : super(LoginPageState());
 
   final AuthService authService;
   final AuthSessionResolver sessionResolver;
+  final FcmService fcmService;
 
   Future<String?> signInWithGoogle() async {
     if (kDebugMode) {
@@ -142,6 +147,15 @@ class LoginPageModel extends BasePageModel<LoginPageState> {
       isLockedPage: false,
     );
 
+    // Initialize FCM on successful login
+    fcmService.initialize().then((_) {
+      fcmService.processPendingNotificationPayload();
+    }).catchError((e) {
+      if (kDebugMode) {
+        developer.log('[AUTH] FCM initialization error: $e');
+      }
+    });
+
     final route = await sessionResolver.resolveInitialRoute();
 
     if (kDebugMode) {
@@ -157,6 +171,7 @@ final loginPageProvider = StateNotifierProvider<LoginPageModel, LoginPageState>(
     return LoginPageModel(
       authService: ref.read(authServiceProvider),
       sessionResolver: ref.read(authSessionResolverProvider),
+      fcmService: ref.read(fcmServiceProvider),
     );
   },
 );

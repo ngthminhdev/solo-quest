@@ -10,7 +10,7 @@ class AiApiService {
 
   AiApiService({ApiClient? client}) : _client = client ?? ApiClient();
 
-  /// POST /api/ai/quests/generate-today
+  /// POST /api/quests/generate-today
   ///
   /// Triggers AI quest generation for today's date using the user's
   /// current preferences, schedule, and quest rules.
@@ -33,7 +33,7 @@ class AiApiService {
   Future<AiGenerateTodayResultDto?> generateTodayQuests() async {
     try {
       final result = await _client.post(
-        'ai/quests/generate-today',
+        'quests/generate-today',
         fromJson: (json) {
           final data = ApiResponseParser.extractObject(
             json,

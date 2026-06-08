@@ -11,4 +11,7 @@ class AppStorageKey {
   static const String hasCompletedOnboarding = 'has_completed_onboarding';
   static const String isAuthenticated = 'is_authenticated';
   static const String authUser = 'auth_user';
+  static const String fcmLastRegisteredToken = 'fcm_last_registered_token';
+  static const String fcmLastRegisteredUserId = 'fcm_last_registered_user_id';
+  static const String fcmLastRegisteredTokenId = 'fcm_last_registered_token_id';
 }

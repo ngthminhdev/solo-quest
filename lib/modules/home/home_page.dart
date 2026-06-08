@@ -10,6 +10,10 @@ import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../models/quest_model.dart';
+import '../../core/timer/countdown_session.dart';
+import '../../core/timer/countdown_timer_service.dart';
+import '../../extensions/localization_extension.dart';
+import '../../constants/app_radius.dart';
 import '../../routes/routes_config.dart';
 import '../../widgets/app_scaffold/app_scaffold.dart';
 import '../../widgets/app_state/app_error_state.dart';
@@ -185,6 +189,72 @@ class _HomePageState
 
   Future<void> _handleStartQuest(QuestModel quest) async {
     developer.log('[QUEST ACTION] start tapped: id=${quest.id}');
+    
+    // Check countdown eligibility
+    if (isCountdownEligible(quest)) {
+      final timerService = ref.read(countdownTimerServiceProvider.notifier);
+      final activeSession = ref.read(countdownTimerServiceProvider);
+      final l10n = context.l10n;
+
+      if (activeSession != null &&
+          activeSession.status == CountdownStatus.running &&
+          activeSession.questId != quest.id) {
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: AppColor.bgRaised,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            title: Text(
+              l10n.timerConfirmReplace,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColor.fg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(
+                  l10n.commonCancel,
+                  style: const TextStyle(color: AppColor.fgSecondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(
+                  l10n.commonConfirm,
+                  style: const TextStyle(color: AppColor.cyan),
+                ),
+              ),
+            ],
+          ),
+        );
+
+        if (confirm != true) return;
+        await timerService.cancelSession();
+      }
+
+      try {
+        await timerService.startSession(quest);
+        await pageModel.startQuest(quest.id);
+        developer.log('[QUEST ACTION] start success: id=${quest.id}');
+        if (mounted) {
+          AppToastService.success(context, 'Đã bắt đầu bộ đếm giờ');
+          _openQuestDetail(quest);
+        }
+      } catch (e) {
+        developer.log('[QUEST ACTION] start failed: $e');
+        if (mounted) {
+          AppToastService.error(context, 'Không thể bắt đầu bộ đếm');
+        }
+      }
+      return;
+    }
+
+    // Normal non-countdown quest start flow
     try {
       await pageModel.startQuest(quest.id);
       developer.log('[QUEST ACTION] start success: id=${quest.id}');
@@ -238,7 +308,7 @@ class _HomePageState
       await pageModel.snoozeQuest(quest.id, minutes: minutes);
       developer.log('[QUEST ACTION] snooze success: id=${quest.id}');
       if (mounted) {
-        AppToastService.success(context, 'Đã hoãn quest');
+        AppToastService.success(context, 'Đã hoãn. Solo sẽ nhắc lại sau $minutes phút.');
       }
     } catch (e) {
       developer.log('[QUEST ACTION] snooze failed: $e');

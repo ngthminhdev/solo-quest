@@ -8,8 +8,18 @@ class AppToastService {
     String message, {
     AppToastType type = AppToastType.info,
   }) {
-    final overlay = Overlay.of(context);
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    OverlayState? overlay;
+    if (context is StatefulElement && context.state is NavigatorState) {
+      overlay = (context.state as NavigatorState).overlay;
+    }
+    overlay ??= Overlay.maybeOf(context);
+
+    if (overlay == null) {
+      debugPrint('Warning: No Overlay found to show toast: $message');
+      return;
+    }
+
+    final bottomPadding = MediaQuery.maybeOf(context)?.padding.bottom ?? 0.0;
     late OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => Positioned(

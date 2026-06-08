@@ -12,6 +12,7 @@ import '../../services/progress_service.dart';
 import '../../services/daily_checkin_service.dart';
 import '../../services/daily_review_service.dart';
 import '../../services/service_providers.dart';
+import '../../core/notifications/fcm_service.dart';
 
 class ProfilePageState extends BasePageState {
   final AppLoadState loadState;
@@ -85,6 +86,7 @@ class ProfilePageModel extends BasePageModel<ProfilePageState> {
     required this.dailyCheckinService,
     required this.dailyReviewService,
     required this.authService,
+    required this.fcmService,
   }) : super(ProfilePageState());
 
   final ProfileService profileService;
@@ -92,6 +94,7 @@ class ProfilePageModel extends BasePageModel<ProfilePageState> {
   final DailyCheckinService dailyCheckinService;
   final DailyReviewService dailyReviewService;
   final AuthService authService;
+  final FcmService fcmService;
 
   Future<void> loadProfile() async {
     state = state.updateState(loadState: AppLoadState.loading);
@@ -135,6 +138,7 @@ class ProfilePageModel extends BasePageModel<ProfilePageState> {
   Future<bool> signOut() async {
     state = state.updateState(isLockedPage: true);
     try {
+      await fcmService.handleLogout();
       await authService.signOut();
       state = state.updateState(
         isLockedPage: false,
@@ -163,5 +167,6 @@ final profilePageProvider =
     dailyCheckinService: ref.read(dailyCheckinServiceProvider),
     dailyReviewService: ref.read(dailyReviewServiceProvider),
     authService: ref.read(authServiceProvider),
+    fcmService: ref.read(fcmServiceProvider),
   );
 });

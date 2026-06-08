@@ -3,14 +3,19 @@ import 'package:flutter/foundation.dart';
 
 import '../core/api/dto/quest_dto.dart';
 import '../core/api/services/quest_api_service.dart';
+import '../core/notifications/local_notification_service.dart';
 import '../core/utils/app_time_formatter.dart';
 import '../models/quest_model.dart';
 
 class QuestService {
   final QuestApiService _apiService;
+  final LocalNotificationService? _notificationService;
 
-  QuestService({QuestApiService? apiService})
-      : _apiService = apiService ?? QuestApiService();
+  QuestService({
+    QuestApiService? apiService,
+    LocalNotificationService? notificationService,
+  })  : _apiService = apiService ?? QuestApiService(),
+        _notificationService = notificationService;
 
   /// Convert QuestDto to QuestModel
   QuestModel _dtoToModel(QuestDto dto) {
@@ -78,21 +83,46 @@ class QuestService {
 
   Future<QuestModel> startQuest(String questId) async {
     final dto = await _apiService.startQuest(questId);
+    _cancelSnoozeNotification(questId);
     return _dtoToModel(dto);
   }
 
   Future<QuestModel> completeQuest(String questId, {String? note, String? mood}) async {
     final result = await _apiService.completeQuest(questId, note: note);
+    _cancelSnoozeNotification(questId);
     return _dtoToModel(result.quest);
   }
 
   Future<QuestModel> snoozeQuest(String questId, {required int minutes}) async {
     final dto = await _apiService.snoozeQuest(questId, minutes: minutes);
-    return _dtoToModel(dto);
+    final quest = _dtoToModel(dto);
+    _scheduleSnoozeNotification(quest);
+    return quest;
   }
 
   Future<QuestModel> skipQuest(String questId, {required String reason}) async {
     final dto = await _apiService.skipQuest(questId, reason: reason);
+    _cancelSnoozeNotification(questId);
     return _dtoToModel(dto);
+  }
+
+  void _scheduleSnoozeNotification(QuestModel quest) {
+    try {
+      _notificationService?.scheduleQuestSnoozeNotification(quest);
+    } catch (e) {
+      if (kDebugMode) {
+        developer.log('[QuestService] Failed to schedule snooze notification: $e');
+      }
+    }
+  }
+
+  void _cancelSnoozeNotification(String questId) {
+    try {
+      _notificationService?.cancelQuestSnoozeNotification(questId);
+    } catch (e) {
+      if (kDebugMode) {
+        developer.log('[QuestService] Failed to cancel snooze notification: $e');
+      }
+    }
   }
 }

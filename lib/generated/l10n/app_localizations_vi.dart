@@ -1299,6 +1299,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingCompleteError => 'Vui lòng thử lại.';
 
   @override
+  String get onboardingGeneratingQuestsTitle =>
+      'Đang cá nhân hóa quest hôm nay...';
+
+  @override
+  String get onboardingGeneratingQuestsSubtitle =>
+      'SoloQuest đang dựa trên mục tiêu và lịch sinh hoạt của bạn để chuẩn bị nhiệm vụ đầu tiên.';
+
+  @override
+  String get onboardingGenerateQuestsFallbackMessage =>
+      'Đã lưu hồ sơ. Quest hôm nay sẽ được tạo lại sau.';
+
+  @override
   String get onboardingProgressLabel => 'Bước';
 
   @override
@@ -1404,7 +1416,7 @@ class AppLocalizationsVi extends AppLocalizations {
       '[ HỆ THỐNG ] Dữ liệu hồ sơ được mã hóa. Chỉ dùng để tối ưu hóa nhiệm vụ.';
 
   @override
-  String get onboardingStep2Title => 'Công Việc & Học Tập';
+  String get onboardingStep2Title => 'Lịch làm việc';
 
   @override
   String get onboardingStep2Subtitle =>
@@ -1449,6 +1461,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingStep2ScheduleMonSat => 'Thứ 2–7';
+
+  @override
+  String get onboardingStep2ScheduleFullWeek => 'Cả tuần';
 
   @override
   String get onboardingStep2ScheduleFlexible => 'Linh hoạt';
@@ -1555,10 +1570,24 @@ class AppLocalizationsVi extends AppLocalizations {
       '[ HỆ THỐNG ] Mục tiêu có thể điều chỉnh bất cứ lúc nào từ cài đặt';
 
   @override
+  String get onboardingStep4LearningTopicLabel => 'Bạn muốn học gì trước?';
+
+  @override
+  String get onboardingStep4LearningTopicHint =>
+      'Flutter, tiếng Anh, AI, công việc...';
+
+  @override
   String get onboardingGoalWater => 'Uống Nước';
 
   @override
   String get onboardingGoalWaterDesc => 'Xây dựng thói quen uống nước đều đặn';
+
+  @override
+  String get onboardingGoalHealth => 'Sức Khỏe';
+
+  @override
+  String get onboardingGoalHealthDesc =>
+      'Xây dựng thói quen lành mạnh mỗi ngày';
 
   @override
   String get onboardingGoalFitness => 'Vận Động';
@@ -1609,6 +1638,10 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get onboardingStep5Subtitle =>
       'Hệ thống cần biết nhịp sinh hoạt để xếp quest đúng giờ';
+
+  @override
+  String get onboardingStep5ScheduleHint =>
+      'Bạn có thể chỉnh lịch sinh hoạt chi tiết sau trong Cài đặt.';
 
   @override
   String get onboardingStep5WakeUpLabel => 'Giờ Thức Dậy';
@@ -3036,4 +3069,98 @@ class AppLocalizationsVi extends AppLocalizations {
   String rewardsHistoryMilestone(Object points) {
     return 'Đạt mốc $points điểm';
   }
+
+  @override
+  String get timerStart => 'Bắt đầu đếm giờ';
+
+  @override
+  String get timerDuration => 'Thời lượng';
+
+  @override
+  String get timerRemaining => 'Còn lại';
+
+  @override
+  String get timerComplete => 'Hoàn thành';
+
+  @override
+  String get timerStop => 'Dừng';
+
+  @override
+  String get timerTimeUp => 'Hết giờ';
+
+  @override
+  String get timerTimeout => 'Đã hết thời gian';
+
+  @override
+  String get timerQuestEnded => 'Nhiệm vụ đã kết thúc';
+
+  @override
+  String get timerCompleteQuest => 'Hoàn thành nhiệm vụ';
+
+  @override
+  String get timerConfirmReplace =>
+      'Bạn đang có một bộ đếm đang chạy. Dừng bộ đếm hiện tại để bắt đầu bộ đếm mới?';
+
+  @override
+  String get timerWaterNoTimer => 'Uống nước không cần đếm giờ';
+
+  @override
+  String get timerOpen => 'Mở';
+
+  @override
+  String get reminderWaterTitle => 'Uống nước';
+
+  @override
+  String get reminderWaterBody => 'Đến giờ uống một ngụm nước rồi.';
+
+  @override
+  String get reminderWaterBtn => 'Đã uống';
+
+  @override
+  String get reminderBreakTitle => 'Nghỉ mắt một chút';
+
+  @override
+  String get reminderBreakBody =>
+      'Hãy rời mắt khỏi màn hình và nghỉ nhẹ vài phút.';
+
+  @override
+  String reminderBreakBtn(Object minutes) {
+    return 'Bắt đầu nghỉ $minutes phút';
+  }
+
+  @override
+  String get reminderMovementTitle => 'Vận động nhẹ';
+
+  @override
+  String get reminderMovementBody => 'Hãy đứng dậy và vận động nhẹ một chút.';
+
+  @override
+  String get reminderLearningTitle => 'Học tập';
+
+  @override
+  String get reminderLearningBody => 'Đến giờ dành một chút thời gian để học.';
+
+  @override
+  String get reminderSleepTitle => 'Chuẩn bị đi ngủ';
+
+  @override
+  String get reminderSleepBody => 'Đến giờ thư giãn và chuẩn bị cho giấc ngủ.';
+
+  @override
+  String get reminderDailyReviewTitle => 'Tổng kết ngày';
+
+  @override
+  String get reminderDailyReviewBody => 'Dành vài phút nhìn lại ngày hôm nay.';
+
+  @override
+  String get reminderDailyReviewBtn => 'Mở tổng kết';
+
+  @override
+  String get reminderWaterPrompt => 'Đến giờ uống nước rồi.';
+
+  @override
+  String get reminderDailyReviewPrompt => 'Đến giờ tổng kết ngày.';
+
+  @override
+  String get reminderBreakFinished => 'Đã hết thời gian nghỉ';
 }

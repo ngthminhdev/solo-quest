@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Local",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor",
+        "local",
+        "--dart-define=APP_CONFIG_FILE=assets/config.local.yaml"
+      ]
+    },
+    {
+      "name": "Flutter Development",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor",
+        "development",
+        "--dart-define=APP_CONFIG_FILE=assets/config.development.yaml"
+      ]
+    },
+    {
+      "name": "Flutter Production",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "args": [
+        "--flavor",
+        "production",
+        "--dart-define=APP_CONFIG_FILE=assets/config.yaml"
+      ]
+    }
+  ]
+}

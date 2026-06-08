@@ -41,6 +41,7 @@ class MainPageState extends BasePageState {
 
 class MainPageModel extends BasePageModel<MainPageState> {
   Timer? _settleTimer;
+  PageController? _pageController;
 
   MainPageModel()
       : super(MainPageState(
@@ -57,29 +58,47 @@ class MainPageModel extends BasePageModel<MainPageState> {
 
   int get settledIndex => state.settledIndex;
 
-  void onNavbarChange(int index, PageController pageController) {
-    // Cancel any pending settle timer
+  void setPageController(PageController controller) {
+    _pageController = controller;
+  }
+
+  void clearPageController(PageController controller) {
+    if (_pageController == controller) {
+      _pageController = null;
+    }
+  }
+
+  void goToTab(int index, {bool animate = true}) {
     _settleTimer?.cancel();
 
-    // Mark as unsettled during animation — prevents intermediate pages from loading
     state = state.updateState(selectedIndex: index, settledIndex: -1);
 
-    // Always animate for smooth scroll experience
-    pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    final controller = _pageController;
+    if (controller != null && controller.hasClients) {
+      if (animate) {
+        controller.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        controller.jumpToPage(index);
+      }
+    }
 
-    // After animation completes, mark the target page as settled so its API fires
     _settleTimer = Timer(const Duration(milliseconds: 350), () {
       state = state.updateState(settledIndex: index);
     });
   }
 
+  void onNavbarChange(int index, PageController pageController) {
+    goToTab(index, animate: true);
+  }
+
   @override
   void dispose() {
     _settleTimer?.cancel();
+    _pageController = null;
     super.dispose();
   }
 }

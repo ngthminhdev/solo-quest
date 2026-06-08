@@ -73,19 +73,19 @@ class OnboardingHealthActivityStep extends StatelessWidget {
     final l10n = context.l10n;
     final options = [
       _ActivityOption(
-        value: 'very_little',
+        value: 'sedentary',
         name: l10n.onboardingStep3ActivityLevelLittle,
         desc: l10n.onboardingStep3ActivityLevelLittleDesc,
         icon: RemixIcons.rest_time_line,
       ),
       _ActivityOption(
-        value: 'occasional',
+        value: 'light',
         name: l10n.onboardingStep3ActivityLevelOccasional,
         desc: l10n.onboardingStep3ActivityLevelOccasionalDesc,
         icon: RemixIcons.walk_line,
       ),
       _ActivityOption(
-        value: 'regular',
+        value: 'active',
         name: l10n.onboardingStep3ActivityLevelRegular,
         desc: l10n.onboardingStep3ActivityLevelRegularDesc,
         icon: RemixIcons.run_line,
@@ -172,12 +172,12 @@ class OnboardingHealthActivityStep extends StatelessWidget {
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(
-                            RemixIcons.check_line,
-                            size: 14,
-                            color: AppColor.bgDeep,
-                          )
-                        : null,
+                      ? const Icon(
+                          RemixIcons.check_line,
+                          size: 14,
+                          color: AppColor.bgDeep,
+                        )
+                      : null,
                   ),
                 ],
               ),
@@ -191,9 +191,9 @@ class OnboardingHealthActivityStep extends StatelessWidget {
   Widget _buildLastWorkoutSection(BuildContext context) {
     final l10n = context.l10n;
     final lastWorkoutOptions = [
-      OnboardingStepOption('today', l10n.onboardingStep3LastWorkoutToday),
+      OnboardingStepOption('recently', l10n.onboardingStep3LastWorkoutToday),
       OnboardingStepOption('this_week', l10n.onboardingStep3LastWorkoutWeek),
-      OnboardingStepOption('longer_ago', l10n.onboardingStep3LastWorkoutLonger),
+      OnboardingStepOption('long_ago', l10n.onboardingStep3LastWorkoutLonger),
     ];
 
     return Column(

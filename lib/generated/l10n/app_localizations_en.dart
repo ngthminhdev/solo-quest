@@ -1304,6 +1304,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingCompleteError => 'Please try again.';
 
   @override
+  String get onboardingGeneratingQuestsTitle =>
+      'Personalizing today\'s quests...';
+
+  @override
+  String get onboardingGeneratingQuestsSubtitle =>
+      'SoloQuest is using your goals and routine to prepare your first quests.';
+
+  @override
+  String get onboardingGenerateQuestsFallbackMessage =>
+      'Your profile was saved. Today\'s quests will be generated again later.';
+
+  @override
   String get onboardingProgressLabel => 'Step';
 
   @override
@@ -1409,7 +1421,7 @@ class AppLocalizationsEn extends AppLocalizations {
       '[ SYSTEM ] Profile data is encrypted. Only used for quest optimization.';
 
   @override
-  String get onboardingStep2Title => 'Work & Study';
+  String get onboardingStep2Title => 'Work Schedule';
 
   @override
   String get onboardingStep2Subtitle =>
@@ -1454,6 +1466,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingStep2ScheduleMonSat => 'Mon–Sat';
+
+  @override
+  String get onboardingStep2ScheduleFullWeek => 'Full Week';
 
   @override
   String get onboardingStep2ScheduleFlexible => 'Flexible';
@@ -1560,11 +1575,25 @@ class AppLocalizationsEn extends AppLocalizations {
       '[ SYSTEM ] Goals can be adjusted at any time from settings';
 
   @override
+  String get onboardingStep4LearningTopicLabel =>
+      'What do you want to learn first?';
+
+  @override
+  String get onboardingStep4LearningTopicHint =>
+      'Flutter, English, AI, work...';
+
+  @override
   String get onboardingGoalWater => 'Drink Water';
 
   @override
   String get onboardingGoalWaterDesc =>
       'Build habit of drinking water regularly';
+
+  @override
+  String get onboardingGoalHealth => 'Health';
+
+  @override
+  String get onboardingGoalHealthDesc => 'Build healthy habits every day';
 
   @override
   String get onboardingGoalFitness => 'Exercise';
@@ -1616,6 +1645,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingStep5Subtitle =>
       'The system needs to know your routine to schedule quests on time';
+
+  @override
+  String get onboardingStep5ScheduleHint =>
+      'You can adjust your detailed lifestyle schedule later in Settings.';
 
   @override
   String get onboardingStep5WakeUpLabel => 'Wake-up Time';
@@ -3041,4 +3074,98 @@ class AppLocalizationsEn extends AppLocalizations {
   String rewardsHistoryMilestone(Object points) {
     return 'Reached $points points';
   }
+
+  @override
+  String get timerStart => 'Start Timer';
+
+  @override
+  String get timerDuration => 'Duration';
+
+  @override
+  String get timerRemaining => 'Remaining';
+
+  @override
+  String get timerComplete => 'Complete';
+
+  @override
+  String get timerStop => 'Stop';
+
+  @override
+  String get timerTimeUp => 'Time\'s up';
+
+  @override
+  String get timerTimeout => 'Time limit exceeded';
+
+  @override
+  String get timerQuestEnded => 'Quest has ended';
+
+  @override
+  String get timerCompleteQuest => 'Complete quest';
+
+  @override
+  String get timerConfirmReplace =>
+      'You have an active timer running. Stop the current timer to start a new one?';
+
+  @override
+  String get timerWaterNoTimer => 'No timer needed for drinking water';
+
+  @override
+  String get timerOpen => 'Open';
+
+  @override
+  String get reminderWaterTitle => 'Drink Water';
+
+  @override
+  String get reminderWaterBody => 'Time to take a sip of water.';
+
+  @override
+  String get reminderWaterBtn => 'Drank';
+
+  @override
+  String get reminderBreakTitle => 'Take a short break';
+
+  @override
+  String get reminderBreakBody =>
+      'Look away from the screen and take a short break.';
+
+  @override
+  String reminderBreakBtn(Object minutes) {
+    return 'Start $minutes-min break';
+  }
+
+  @override
+  String get reminderMovementTitle => 'Move a bit';
+
+  @override
+  String get reminderMovementBody => 'Get up and stretch a bit.';
+
+  @override
+  String get reminderLearningTitle => 'Learning';
+
+  @override
+  String get reminderLearningBody => 'Time to spend some time learning.';
+
+  @override
+  String get reminderSleepTitle => 'Time to sleep';
+
+  @override
+  String get reminderSleepBody => 'Time to relax and prepare for sleep.';
+
+  @override
+  String get reminderDailyReviewTitle => 'Daily review';
+
+  @override
+  String get reminderDailyReviewBody => 'Spend a few minutes reviewing today.';
+
+  @override
+  String get reminderDailyReviewBtn => 'Open review';
+
+  @override
+  String get reminderWaterPrompt => 'Time to drink water.';
+
+  @override
+  String get reminderDailyReviewPrompt => 'Time for daily review.';
+
+  @override
+  String get reminderBreakFinished => 'Break time is up';
 }

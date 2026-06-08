@@ -166,7 +166,8 @@ class OnboardingWorkStudyStep extends StatelessWidget {
     final l10n = context.l10n;
     final workScheduleOptions = [
       OnboardingStepOption('weekdays', l10n.onboardingStep2ScheduleWeekday),
-      OnboardingStepOption('full_week', l10n.onboardingStep2ScheduleMonSat),
+      OnboardingStepOption('monday_to_saturday', l10n.onboardingStep2ScheduleMonSat),
+      OnboardingStepOption('full_week', l10n.onboardingStep2ScheduleFullWeek),
       OnboardingStepOption('flexible', l10n.onboardingStep2ScheduleFlexible),
       OnboardingStepOption('night_shift', l10n.onboardingStep2ScheduleNight),
     ];
@@ -210,7 +211,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
           options: workScheduleOptions,
           selected: data.workScheduleType,
           onChanged: onWorkScheduleChanged,
-          layoutMode: ChipLayoutMode.equalWidthGrid,
+          layoutMode: ChipLayoutMode.wrap,
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(

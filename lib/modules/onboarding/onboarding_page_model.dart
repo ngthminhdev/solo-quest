@@ -25,6 +25,8 @@ class OnboardingPageState extends BasePageState {
   final int totalSteps;
   final OnboardingData data;
   final String? errorMessage;
+  final bool isGeneratingQuests;
+  final String? postOnboardingFallbackMessage;
 
   OnboardingPageState({
     this.loadState = AppLoadState.idle,
@@ -32,6 +34,8 @@ class OnboardingPageState extends BasePageState {
     this.totalSteps = 7,
     this.data = const OnboardingData(),
     this.errorMessage,
+    this.isGeneratingQuests = false,
+    this.postOnboardingFallbackMessage,
     super.isLockedPage,
   });
 
@@ -43,6 +47,8 @@ class OnboardingPageState extends BasePageState {
     OnboardingData? data,
     String? errorMessage,
     bool? isLockedPage,
+    bool? isGeneratingQuests,
+    String? postOnboardingFallbackMessage,
   }) {
     return OnboardingPageState(
       loadState: loadState ?? this.loadState,
@@ -51,6 +57,9 @@ class OnboardingPageState extends BasePageState {
       data: data ?? this.data,
       errorMessage: errorMessage ?? this.errorMessage,
       isLockedPage: isLockedPage ?? this.isLockedPage,
+      isGeneratingQuests: isGeneratingQuests ?? this.isGeneratingQuests,
+      postOnboardingFallbackMessage:
+          postOnboardingFallbackMessage ?? this.postOnboardingFallbackMessage,
     );
   }
 
@@ -97,33 +106,43 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
     required this.localStorageService,
     required this.questRuleService,
     required this.logService,
+    required this.questService,
     UserApiService? userApiService,
+    AiApiService? aiApiService,
   }) : _userApiService = userApiService ?? UserApiService(),
+       _aiApiService = aiApiService ?? AiApiService(),
        super(OnboardingPageState());
 
   final ProfileService profileService;
   final LocalStorageService localStorageService;
   final QuestRuleService questRuleService;
   final LogService logService;
+  final QuestService questService;
   final UserApiService _userApiService;
+  final AiApiService _aiApiService;
+
+  /// Whether generate-today has already been attempted (prevents double calls).
+  bool _generateTodayAttempted = false;
 
   static const Map<String, String> _mainGoalApiValues = {
-    'Uống Nước': 'water',
+    'Uống Nước': 'health',
     'Vận Động': 'movement',
     'Học Tập': 'learning',
     'Chánh Niệm': 'mindfulness',
     'Ngủ Tốt Hơn': 'sleep',
-    'Tập Trung Tốt Hơn': 'focus',
-    'Giảm Cân': 'weight',
-    'Kỷ Luật Hơn': 'discipline',
-    'water': 'water',
+    'Tập Trung Tốt Hơn': 'productivity',
+    'Giảm Cân': 'weight_loss',
+    'Kỷ Luật Hơn': 'productivity',
+    'water': 'health',
     'movement': 'movement',
     'learning': 'learning',
     'mindfulness': 'mindfulness',
     'sleep': 'sleep',
-    'focus': 'focus',
-    'weight': 'weight',
-    'discipline': 'discipline',
+    'focus': 'productivity',
+    'productivity': 'productivity',
+    'weight': 'weight_loss',
+    'weight_loss': 'weight_loss',
+    'health': 'health',
   };
 
   static const Map<String, String> _genderApiValues = {
@@ -140,54 +159,68 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
 
   static const Map<String, String> _workScheduleTypeApiValues = {
     'weekdays': 'weekdays',
+    'monday_to_saturday': 'monday_to_saturday',
     'full_week': 'full_week',
     'flexible': 'flexible',
     'night_shift': 'night_shift',
+    'custom': 'custom',
     'Mon-Fri': 'weekdays',
     'Mon–Fri': 'weekdays',
-    'Mon-Sat': 'full_week',
-    'Mon–Sat': 'full_week',
+    'Mon-Sat': 'monday_to_saturday',
+    'Mon–Sat': 'monday_to_saturday',
     'Flexible': 'flexible',
     'Night Shift': 'night_shift',
     'Thứ 2-6': 'weekdays',
     'Thứ 2–6': 'weekdays',
     'Thứ 2 - Thứ 6': 'weekdays',
     'Thứ 2 – Thứ 6': 'weekdays',
-    'Thứ 2-7': 'full_week',
-    'Thứ 2–7': 'full_week',
+    'Thứ 2-7': 'monday_to_saturday',
+    'Thứ 2–7': 'monday_to_saturday',
     'Linh hoạt': 'flexible',
     'Ca đêm': 'night_shift',
   };
 
   static const Map<String, String> _activityLevelApiValues = {
-    'very_little': 'very_little',
-    'occasional': 'occasional',
-    'regular': 'regular',
-    'Rất ít': 'very_little',
-    'Thỉnh thoảng': 'occasional',
-    'Đều đặn': 'regular',
+    'sedentary': 'sedentary',
+    'light': 'light',
+    'moderate': 'moderate',
+    'active': 'active',
+    'very_little': 'sedentary',
+    'occasional': 'light',
+    'regular': 'active',
+    'Rất ít': 'sedentary',
+    'Thỉnh thoảng': 'light',
+    'Đều đặn': 'active',
   };
 
   static const Map<String, String> _lastWorkoutApiValues = {
-    'today': 'today',
+    'recently': 'recently',
     'this_week': 'this_week',
-    'longer_ago': 'longer_ago',
-    'Hôm nay': 'today',
+    'long_ago': 'long_ago',
+    'today': 'recently',
+    'longer_ago': 'long_ago',
+    'this_month': 'this_month',
+    'never': 'never',
+    'Hôm nay': 'recently',
     'Tuần này': 'this_week',
-    '1 tháng trước': 'longer_ago',
-    'Lâu hơn': 'longer_ago',
+    '1 tháng trước': 'this_month',
+    'Lâu hơn': 'long_ago',
   };
 
   static const Map<String, String> _healthLimitationApiValues = {
-    'back_pain': 'back_pain',
-    'eye_strain': 'eye_strain',
-    'low_energy': 'low_energy',
-    'busy': 'busy',
     'none': 'none',
+    'back_pain': 'back_pain',
+    'knee_pain': 'knee_pain',
+    'low_energy': 'low_energy',
+    'limited_mobility': 'limited_mobility',
+    'injury_recovery': 'injury_recovery',
+    'other': 'other',
+    'eye_strain': 'other',
+    'busy': 'other',
     'Đau lưng': 'back_pain',
-    'Mỏi mắt': 'eye_strain',
+    'Mỏi mắt': 'other',
     'Ít năng lượng': 'low_energy',
-    'Bận rộn': 'busy',
+    'Bận rộn': 'other',
     'Không có': 'none',
   };
 
@@ -228,24 +261,24 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
   };
 
   static const Map<String, String> _timePreferenceApiValues = {
-    'morning': 'morning',
+    'early_morning': 'early_morning',
     'lunch': 'lunch',
+    'after_work': 'after_work',
     'evening': 'evening',
-    'early_morning': 'morning',
-    'after_work': 'evening',
+    'morning': 'early_morning',
     'before_sleep': 'evening',
-    'Sáng': 'morning',
-    'Sáng sớm': 'morning',
+    'Sáng': 'early_morning',
+    'Sáng sớm': 'early_morning',
     'Nghỉ trưa': 'lunch',
-    'Sau giờ làm': 'evening',
+    'Sau giờ làm': 'after_work',
     'Tối': 'evening',
     'Tối (20-22h)': 'evening',
     'Tối (20–22h)': 'evening',
     'Trước khi ngủ': 'evening',
-    'Morning': 'morning',
-    'Early Morning': 'morning',
+    'Morning': 'early_morning',
+    'Early Morning': 'early_morning',
     'Lunch Break': 'lunch',
-    'After Work': 'evening',
+    'After Work': 'after_work',
     'Evening': 'evening',
     'Before Sleep': 'evening',
   };
@@ -354,7 +387,7 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
     state = state.updateState(
       data: state.data.copyWith(
         preferredFreeTimes: list,
-        freeTimePreference: list.isNotEmpty ? list.join(',') : '',
+        freeTimePreference: list.isNotEmpty ? list.first : '',
       ),
     );
   }
@@ -389,6 +422,14 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
       list.add(value);
     }
     state = state.updateState(data: state.data.copyWith(mainGoals: list));
+  }
+
+  void updateLearningTopic(String value) {
+    state = state.updateState(
+      data: state.data.copyWith(
+        learningTopic: value.trim().isEmpty ? null : value.trim(),
+      ),
+    );
   }
 
   // Step 5 - Schedule
@@ -447,7 +488,7 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
     state = state.updateState(
       data: state.data.copyWith(
         movementTimePreferences: selected,
-        movementTimePreference: selected.join(','),
+        movementTimePreference: selected.first,
       ),
     );
   }
@@ -494,6 +535,7 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
 
   Future<bool> completeOnboarding() async {
     if (!state.canContinue) return false;
+    if (_generateTodayAttempted) return false;
 
     final payload = _buildOnboardingPayload();
 
@@ -508,13 +550,21 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
       await questRuleService.updateDailyQuestLimit(6);
 
       if (kDebugMode) {
-        debugPrint(
-          '[ONBOARDING] POST /api/onboarding '
-          'work_schedule_type=${payload['work_schedule_type']} '
-          'preferred_free_times=${payload['preferred_free_times']} '
-          'activity_level=${payload['activity_level']} '
-          'last_workout=${payload['last_workout']}',
-        );
+        debugPrint('[ONBOARDING] Submitting payload:');
+        debugPrint('  work_schedule_type: ${payload['work_schedule_type']}');
+        debugPrint('  work_weekdays: ${payload['work_weekdays']}');
+        debugPrint('  work_start_time: ${payload['work_start_time']}');
+        debugPrint('  work_end_time: ${payload['work_end_time']}');
+        debugPrint('  preferred_free_times: ${payload['preferred_free_times']}');
+        debugPrint('  main_goals: ${payload['main_goals']}');
+        debugPrint('  health_limitations: ${payload['health_limitations']}');
+        debugPrint('  learning_topic: ${payload['learning_topic']}');
+        debugPrint('  learning_time_preference: ${payload['learning_time_preference']}');
+        debugPrint('  learning_time_preferences: ${payload['learning_time_preferences']}');
+        debugPrint('  movement_time_preference: ${payload['movement_time_preference']}');
+        debugPrint('  movement_time_preferences: ${payload['movement_time_preferences']}');
+        debugPrint('  sleep_time_preference: ${payload['sleep_time_preference']}');
+        debugPrint('  nutrition_time_preference: ${payload['nutrition_time_preference']}');
       }
 
       await _userApiService.saveOnboarding(payload);
@@ -539,7 +589,24 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
         ),
       );
 
-      state = state.updateState(isLockedPage: false);
+      // ── Post-onboarding: AI generate today's quests ──
+      _generateTodayAttempted = true;
+      state = state.updateState(
+        isLockedPage: false,
+        isGeneratingQuests: true,
+      );
+
+      final genSuccess = await _performPostOnboardingGeneration();
+
+      if (!genSuccess) {
+        state = state.updateState(
+          isGeneratingQuests: false,
+          postOnboardingFallbackMessage: 'generate_failed',
+        );
+      } else {
+        state = state.updateState(isGeneratingQuests: false);
+      }
+
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -547,8 +614,28 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
       }
       state = state.updateState(
         isLockedPage: false,
+        isGeneratingQuests: false,
         errorMessage: e.toString(),
       );
+      return false;
+    }
+  }
+
+  /// Calls the AI generate-today endpoint and refreshes today's quests.
+  /// Returns true on success, false if generation failed.
+  Future<bool> _performPostOnboardingGeneration() async {
+    try {
+      final result = await _aiApiService.generateTodayQuests();
+      if (result != null) {
+        // Refresh quests so Home has data immediately
+        await questService.getTodayQuests();
+        return true;
+      }
+      return false;
+    } catch (_) {
+      if (kDebugMode) {
+        debugPrint('[ONBOARDING] generateTodayQuests threw, proceeding');
+      }
       return false;
     }
   }
@@ -580,6 +667,12 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
         .toSet()
         .toList();
 
+    final workScheduleTypeNormalized = _normalizeRequiredValue(
+      state.data.workScheduleType,
+      values: _workScheduleTypeApiValues,
+      fallback: 'weekdays',
+    );
+
     return {
       'display_name': state.data.displayName,
       'age': state.data.age,
@@ -595,35 +688,35 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
         values: _mainActivityApiValues,
         fallback: 'software_engineer',
       ),
-      'work_schedule_type': _normalizeRequiredValue(
-        state.data.workScheduleType,
-        values: _workScheduleTypeApiValues,
-        fallback: 'weekdays',
-      ),
+      'work_schedule_type': workScheduleTypeNormalized,
+      'work_weekdays': _calculateWorkWeekdays(workScheduleTypeNormalized),
       'work_start_time': state.data.workStartTime,
       'work_end_time': state.data.workEndTime,
-      'free_time_preference': preferredFreeTimes.join(','),
+      'free_time_preference': preferredFreeTimes.isNotEmpty ? preferredFreeTimes.first : 'evening',
       'preferred_free_times': preferredFreeTimes,
       'activity_level': _normalizeRequiredValue(
         state.data.activityLevel,
         values: _activityLevelApiValues,
-        fallback: 'very_little',
+        fallback: 'sedentary',
       ),
       'last_workout': _normalizeRequiredValue(
         state.data.lastWorkout,
         values: _lastWorkoutApiValues,
-        fallback: 'longer_ago',
+        fallback: 'long_ago',
       ),
       'health_limitations': normalizedHealthLimitations,
       'main_goals': normalizedMainGoals,
+      'learning_topic': null,
       'wake_up_time': state.data.wakeUpTime,
       'target_sleep_time': state.data.targetSleepTime,
       'free_time_start': state.data.freeTimeStart,
       'free_time_end': state.data.freeTimeEnd,
       'learning_time_preference': learningTimePreferences.first,
       'learning_time_preferences': learningTimePreferences,
-      'movement_time_preference': movementTimePreferences.join(','),
+      'movement_time_preference': movementTimePreferences.first,
       'movement_time_preferences': movementTimePreferences,
+      'sleep_time_preference': 'evening',
+      'nutrition_time_preference': 'flexible',
       // Note: Omitted from active onboarding UI (reminders step is skipped),
       // these use default state values.
       'break_reminder_interval': state.data.breakReminderInterval,
@@ -643,6 +736,24 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
       ),
       'completed': true,
     };
+  }
+
+  static List<int> _calculateWorkWeekdays(String type) {
+    switch (type) {
+      case 'weekdays':
+        return const [1, 2, 3, 4, 5];
+      case 'monday_to_saturday':
+        return const [1, 2, 3, 4, 5, 6];
+      case 'full_week':
+        return const [1, 2, 3, 4, 5, 6, 7];
+      case 'flexible':
+        return const [];
+      case 'night_shift':
+        return const [1, 2, 3, 4, 5];
+      case 'custom':
+      default:
+        return const [];
+    }
   }
 
   static String _calculatePreferredReviewTime({
@@ -687,7 +798,7 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
               .map((value) => value.trim())
               .where((value) => value.isNotEmpty);
 
-    return sourceValues
+    final normalized = sourceValues
         .map((value) {
           final trimmed = value.trim();
           return _preferredFreeTimeApiValues[trimmed] ?? trimmed;
@@ -695,6 +806,9 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
         .where((value) => value.isNotEmpty)
         .toSet()
         .toList();
+
+    if (normalized.isEmpty) return const ['evening'];
+    return normalized;
   }
 
   static List<String> _normalizeTimePreferences(
@@ -716,14 +830,17 @@ class OnboardingPageModel extends BasePageModel<OnboardingPageState> {
         .where((value) => value.isNotEmpty)
         .where(
           (value) =>
-              value == 'morning' || value == 'lunch' || value == 'evening',
+              value == 'early_morning' ||
+              value == 'lunch' ||
+              value == 'after_work' ||
+              value == 'evening',
         )
         .toSet()
         .toList();
 
     if (normalized.isEmpty) return const ['evening'];
 
-    const order = ['morning', 'lunch', 'evening'];
+    const order = ['early_morning', 'lunch', 'after_work', 'evening'];
     normalized.sort((a, b) => order.indexOf(a).compareTo(order.indexOf(b)));
     return normalized;
   }
@@ -736,6 +853,7 @@ final onboardingPageProvider =
         localStorageService: ref.read(localStorageServiceProvider),
         questRuleService: ref.read(questRuleServiceProvider),
         logService: ref.read(logServiceProvider),
+        questService: ref.read(questServiceProvider),
         userApiService: ref.read(userApiServiceProvider),
       );
     });

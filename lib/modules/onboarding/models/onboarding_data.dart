@@ -21,6 +21,7 @@ class OnboardingData {
 
   // Step 4 - Goals
   final List<String> mainGoals;
+  final String? learningTopic;
 
   // Step 5 - Schedule
   final String wakeUpTime;
@@ -49,22 +50,23 @@ class OnboardingData {
     this.weightKg,
     this.mainActivity = 'software_engineer',
     this.workScheduleType = 'weekdays',
-    this.workStartTime = '08:30',
-    this.workEndTime = '17:30',
-    this.freeTimePreference = '',
-    this.preferredFreeTimes = const [],
-    this.activityLevel = 'very_little',
-    this.lastWorkout = 'longer_ago',
+    this.workStartTime = '09:00',
+    this.workEndTime = '18:00',
+    this.freeTimePreference = 'evening',
+    this.preferredFreeTimes = const ['evening'],
+    this.activityLevel = 'sedentary',
+    this.lastWorkout = 'long_ago',
     this.healthLimitations = const [],
-    this.mainGoals = const [],
+    this.mainGoals = const ['movement', 'learning', 'sleep', 'health'],
+    this.learningTopic,
     this.wakeUpTime = '07:00',
     this.targetSleepTime = '23:00',
     this.freeTimeStart = '20:00',
     this.freeTimeEnd = '22:00',
     this.learningTimePreference = 'evening',
     this.learningTimePreferences = const ['evening'],
-    this.movementTimePreference = 'evening',
-    this.movementTimePreferences = const ['evening'],
+    this.movementTimePreference = 'after_work',
+    this.movementTimePreferences = const ['after_work'],
     this.breakReminderInterval = 90,
     this.breakDuration = '5',
     this.waterReminderMode = 'optimal',
@@ -88,6 +90,7 @@ class OnboardingData {
     String? lastWorkout,
     List<String>? healthLimitations,
     List<String>? mainGoals,
+    String? learningTopic,
     String? wakeUpTime,
     String? targetSleepTime,
     String? freeTimeStart,
@@ -118,6 +121,7 @@ class OnboardingData {
       lastWorkout: lastWorkout ?? this.lastWorkout,
       healthLimitations: healthLimitations ?? this.healthLimitations,
       mainGoals: mainGoals ?? this.mainGoals,
+      learningTopic: learningTopic ?? this.learningTopic,
       wakeUpTime: wakeUpTime ?? this.wakeUpTime,
       targetSleepTime: targetSleepTime ?? this.targetSleepTime,
       freeTimeStart: freeTimeStart ?? this.freeTimeStart,
