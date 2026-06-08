@@ -11,8 +11,8 @@ import '../../widgets/app_scaffold/app_scaffold.dart';
 import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
+import '../../extensions/localization_extension.dart';
 import 'weekly_summary_page_model.dart';
-import 'constants/weekly_summary_constants.dart';
 import 'widgets/weekly_summary_header.dart';
 import 'widgets/weekly_score_card.dart';
 import 'widgets/weekly_stats_grid.dart';
@@ -46,21 +46,22 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
   @override
   Widget renderPage(BuildContext context) {
     final state = read;
+    final l10n = context.l10n;
 
     if (state.loadState == AppLoadState.loading) {
       return AppScaffold(
-        title: WeeklySummaryConstants.pageTitle,
+        title: l10n.weeklySummaryPageTitle,
         showBackButton: true,
-        body: const AppLoading(message: 'Đang tải dữ liệu tuần...'),
+        body: AppLoading(message: l10n.weeklySummaryLoading),
       );
     }
 
     if (state.loadState == AppLoadState.error) {
       return AppScaffold(
-        title: WeeklySummaryConstants.pageTitle,
+        title: l10n.weeklySummaryPageTitle,
         showBackButton: true,
         body: AppErrorState(
-          message: state.errorMessage ?? 'Không thể tải dữ liệu',
+          message: state.errorMessage ?? l10n.weeklySummaryError,
           onRetry: pageModel.loadWeeklySummary,
         ),
       );
@@ -69,9 +70,9 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
     final summary = state.summary;
     if (summary == null) {
       return AppScaffold(
-        title: WeeklySummaryConstants.pageTitle,
+        title: l10n.weeklySummaryPageTitle,
         showBackButton: true,
-        body: const Center(child: Text('Không có dữ liệu')),
+        body: Center(child: Text(l10n.weeklySummaryNoData)),
       );
     }
 
@@ -121,6 +122,8 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
   }
 
   Widget _buildApplyButton(BuildContext context, WeeklySummaryPageState state) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: GestureDetector(
@@ -146,7 +149,7 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
           ),
           alignment: Alignment.center,
           child: Text(
-            '${WeeklySummaryConstants.ctaApply} (${state.enabledSuggestionCount})',
+            '${l10n.weeklySummaryCtaApply} (${state.enabledSuggestionCount})',
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -159,6 +162,8 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
   }
 
   Widget _buildManualButton(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: GestureDetector(
@@ -173,9 +178,9 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
             borderRadius: BorderRadius.circular(20),
           ),
           alignment: Alignment.center,
-          child: const Text(
-            WeeklySummaryConstants.ctaManual,
-            style: TextStyle(
+          child: Text(
+            l10n.weeklySummaryCtaManual,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColor.fg,

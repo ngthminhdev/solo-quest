@@ -117,17 +117,34 @@ class OnboardingStatusDto {
 class DailyStatusDto {
   final bool hasCheckedIn;
   final bool hasReviewed;
-  final int todayCompletedQuests;
-  final int todayPlannedQuests;
-  final int todayEarnedExp;
+  final int totalCount;
+  final int completedCount;
+  final int skippedCount;
+  final int pendingCount;
+  final int activeCount;
+  final int snoozedCount;
+  final double completionRate;
+  final int earnedExpToday;
+  final int streakDays;
 
   DailyStatusDto({
     required this.hasCheckedIn,
     required this.hasReviewed,
-    required this.todayCompletedQuests,
-    required this.todayPlannedQuests,
-    required this.todayEarnedExp,
+    required this.totalCount,
+    required this.completedCount,
+    required this.skippedCount,
+    required this.pendingCount,
+    required this.activeCount,
+    required this.snoozedCount,
+    required this.completionRate,
+    required this.earnedExpToday,
+    required this.streakDays,
   });
+
+  // Legacy getters for backward compatibility
+  int get todayCompletedQuests => completedCount;
+  int get todayPlannedQuests => totalCount;
+  int get todayEarnedExp => earnedExpToday;
 
   factory DailyStatusDto.fromJson(Map<String, dynamic> json) {
     return DailyStatusDto(
@@ -139,9 +156,15 @@ class DailyStatusDto {
           json['has_reviewed'] as bool? ??
           json['has_reviewed_today'] as bool? ??
           false,
-      todayCompletedQuests: json['today_completed_quests'] as int? ?? 0,
-      todayPlannedQuests: json['today_planned_quests'] as int? ?? 0,
-      todayEarnedExp: json['today_earned_exp'] as int? ?? 0,
+      totalCount: json['total_count'] as int? ?? 0,
+      completedCount: json['completed_count'] as int? ?? 0,
+      skippedCount: json['skipped_count'] as int? ?? 0,
+      pendingCount: json['pending_count'] as int? ?? 0,
+      activeCount: json['active_count'] as int? ?? 0,
+      snoozedCount: json['snoozed_count'] as int? ?? 0,
+      completionRate: (json['completion_rate'] as num?)?.toDouble() ?? 0.0,
+      earnedExpToday: json['earned_exp_today'] as int? ?? 0,
+      streakDays: json['streak_days'] as int? ?? 0,
     );
   }
 
@@ -149,9 +172,15 @@ class DailyStatusDto {
     return {
       'has_checked_in': hasCheckedIn,
       'has_reviewed': hasReviewed,
-      'today_completed_quests': todayCompletedQuests,
-      'today_planned_quests': todayPlannedQuests,
-      'today_earned_exp': todayEarnedExp,
+      'total_count': totalCount,
+      'completed_count': completedCount,
+      'skipped_count': skippedCount,
+      'pending_count': pendingCount,
+      'active_count': activeCount,
+      'snoozed_count': snoozedCount,
+      'completion_rate': completionRate,
+      'earned_exp_today': earnedExpToday,
+      'streak_days': streakDays,
     };
   }
 }

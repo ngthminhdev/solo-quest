@@ -4,7 +4,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/weekly_summary_model.dart';
-import '../constants/weekly_summary_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class WeeklyCompletionChart extends StatelessWidget {
   final WeeklySummaryModel summary;
@@ -13,6 +13,7 @@ class WeeklyCompletionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final dayLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
     // Use daily breakdown from model if available, otherwise show empty
@@ -31,9 +32,9 @@ class WeeklyCompletionChart extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                WeeklySummaryConstants.chartTitle,
-                style: TextStyle(
+              Text(
+                l10n.weeklySummaryChartTitle,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fgSecondary,
@@ -71,9 +72,9 @@ class WeeklyCompletionChart extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              WeeklySummaryConstants.chartTitle,
-              style: TextStyle(
+            Text(
+              l10n.weeklySummaryChartTitle,
+              style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fgSecondary,

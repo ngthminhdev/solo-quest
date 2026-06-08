@@ -26,6 +26,7 @@ class HomePageState extends BasePageState {
   final List<QuestModel> upcomingQuests;
   final List<QuestModel> snoozedQuests;
   final List<QuestModel> completedQuests;
+  final List<QuestModel> skippedQuests;
   final ProgressModel? progress;
   final DailyStatusDto? dailyStatus;
   final String? userDisplayName;
@@ -40,6 +41,7 @@ class HomePageState extends BasePageState {
     this.upcomingQuests = const [],
     this.snoozedQuests = const [],
     this.completedQuests = const [],
+    this.skippedQuests = const [],
     this.progress,
     this.dailyStatus,
     this.userDisplayName,
@@ -51,24 +53,56 @@ class HomePageState extends BasePageState {
   });
 
   int get totalTodayQuestCount {
+    // Use BE daily status if available for accurate count
+    if (dailyStatus != null) {
+      return dailyStatus!.totalCount;
+    }
+    // Fallback to counting visible quests
     return activeQuests.length +
         upcomingQuests.length +
         snoozedQuests.length +
-        completedQuests.length;
+        completedQuests.length +
+        skippedQuests.length;
   }
 
-  int get completedTodayQuestCount => completedQuests.length;
+  int get completedTodayQuestCount {
+    // Use BE daily status if available
+    if (dailyStatus != null) {
+      return dailyStatus!.completedCount;
+    }
+    return completedQuests.length;
+  }
 
   double get todayCompletionRate {
+    // Use BE daily status if available
+    if (dailyStatus != null) {
+      return dailyStatus!.completionRate;
+    }
     if (totalTodayQuestCount == 0) return 0.0;
     return completedTodayQuestCount / totalTodayQuestCount;
+  }
+
+  int get earnedExpToday {
+    // Use BE daily status if available
+    if (dailyStatus != null) {
+      return dailyStatus!.earnedExpToday;
+    }
+    return 0;
+  }
+
+  int get streakDays {
+    if (dailyStatus != null) {
+      return dailyStatus!.streakDays;
+    }
+    return progress?.streakDays ?? 0;
   }
 
   bool get hasAnyQuest =>
       activeQuests.isNotEmpty ||
       upcomingQuests.isNotEmpty ||
       snoozedQuests.isNotEmpty ||
-      completedQuests.isNotEmpty;
+      completedQuests.isNotEmpty ||
+      skippedQuests.isNotEmpty;
 
   bool get allCompleted =>
       completedQuests.isNotEmpty &&
@@ -112,6 +146,7 @@ class HomePageState extends BasePageState {
     List<QuestModel>? upcomingQuests,
     List<QuestModel>? snoozedQuests,
     List<QuestModel>? completedQuests,
+    List<QuestModel>? skippedQuests,
     ProgressModel? progress,
     DailyStatusDto? dailyStatus,
     String? userDisplayName,
@@ -127,6 +162,7 @@ class HomePageState extends BasePageState {
       upcomingQuests: upcomingQuests ?? this.upcomingQuests,
       snoozedQuests: snoozedQuests ?? this.snoozedQuests,
       completedQuests: completedQuests ?? this.completedQuests,
+      skippedQuests: skippedQuests ?? this.skippedQuests,
       progress: progress ?? this.progress,
       dailyStatus: dailyStatus ?? this.dailyStatus,
       userDisplayName: userDisplayName ?? this.userDisplayName,
@@ -252,7 +288,15 @@ class HomePageModel extends BasePageModel<HomePageState> {
     // Separate snoozed quests
     final snoozed = allQuests.where((q) => q.isSnoozed).toList();
 
+    // Separate completed quests
     final completed = allQuests.where((q) => q.isCompleted).toList();
+
+    // Separate skipped quests
+    final skipped = allQuests.where((q) => q.isSkipped).toList();
+
+    developer.log('[HOME] Quest breakdown: total=${allQuests.length}, '
+        'active=${featuredQuest != null ? 1 : 0}, upcoming=${upcoming.length}, '
+        'snoozed=${snoozed.length}, completed=${completed.length}, skipped=${skipped.length}');
 
     state = state.updateState(
       loadState: AppLoadState.ready,
@@ -260,6 +304,7 @@ class HomePageModel extends BasePageModel<HomePageState> {
       upcomingQuests: upcoming,
       snoozedQuests: snoozed,
       completedQuests: completed,
+      skippedQuests: skipped,
       progress: progress,
       dailyStatus: dailyStatus,
       userDisplayName: userName,

@@ -30,6 +30,7 @@ import 'widgets/active_quest_section.dart';
 import 'widgets/upcoming_quest_section.dart';
 import 'widgets/snoozed_quest_section.dart';
 import 'widgets/completed_quest_section.dart';
+import 'widgets/skipped_quest_section.dart';
 import 'widgets/daily_review_cta_card.dart';
 import 'widgets/home_summary_footer.dart';
 import 'widgets/home_empty_quest_view.dart';
@@ -161,6 +162,10 @@ class _HomePageState
                 quests: state.completedQuests,
                 onTap: _openQuestDetail,
               ),
+              SkippedQuestSection(
+                quests: state.skippedQuests,
+                onTap: _openQuestDetail,
+              ),
               if (state.shouldShowDailyReviewCta)
                 DailyReviewCtaCard(
                   hasReviewed: false,
@@ -171,8 +176,8 @@ class _HomePageState
               HomeSummaryFooter(
                 completedCount: state.completedTodayQuestCount,
                 totalCount: state.totalTodayQuestCount,
-                earnedExp: state.dailyStatus?.todayEarnedExp ?? 0,
-                streakDays: state.progress?.streakDays ?? 0,
+                earnedExp: state.earnedExpToday,
+                streakDays: state.streakDays,
               ),
             ],
           ),

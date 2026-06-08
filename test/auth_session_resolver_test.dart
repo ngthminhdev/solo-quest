@@ -60,9 +60,15 @@ class FakeUserApiService extends Fake implements UserApiService {
     return DailyStatusDto(
       hasCheckedIn: hasCheckedIn,
       hasReviewed: false,
-      todayCompletedQuests: 0,
-      todayPlannedQuests: 0,
-      todayEarnedExp: 0,
+      totalCount: 0,
+      completedCount: 0,
+      skippedCount: 0,
+      pendingCount: 0,
+      activeCount: 0,
+      snoozedCount: 0,
+      completionRate: 0.0,
+      earnedExpToday: 0,
+      streakDays: 0,
     );
   }
 }

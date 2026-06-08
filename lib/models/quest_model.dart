@@ -48,6 +48,7 @@ class QuestModel {
   bool get isActive => status == QuestStatus.active;
   bool get isPending => status == QuestStatus.pending;
   bool get isSnoozed => status == QuestStatus.snoozed;
+  bool get isSkipped => status == QuestStatus.skipped;
 
   /// Returns quest display time label with prefix.
   /// Priority:

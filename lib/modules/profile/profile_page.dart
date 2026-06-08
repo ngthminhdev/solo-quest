@@ -14,7 +14,6 @@ import '../../widgets/app_toast/app_toast_service.dart';
 import '../main/main_page_model.dart';
 import 'profile_page_model.dart';
 import 'widgets/profile_header_card.dart';
-import 'widgets/profile_stats_grid.dart';
 import 'widgets/profile_quick_actions_section.dart';
 import 'widgets/profile_account_card.dart';
 import 'widgets/profile_settings_section.dart';
@@ -106,14 +105,6 @@ class _ProfilePageState
 
           const SizedBox(height: AppSpacing.s20),
 
-          // Stats Grid
-          ProfileStatsGrid(
-            totalCompletedQuests: state.totalCompletedQuests,
-            streakDays: state.streakDays,
-            currentLevelExp: state.currentLevelExp,
-            level: state.level,
-          ),
-
           // Main Goals
           // ProfileGoalSection(
           //   goals: profile.mainGoals,
@@ -127,7 +118,6 @@ class _ProfilePageState
             hasReviewedToday: state.hasReviewedToday,
             onMorningCheckinTap: _goToMorningCheckin,
             onDailyReviewTap: _goToDailyReview,
-            onWeeklySummaryTap: _goToWeeklySummary,
           ),
 
           const SizedBox(height: AppSpacing.s20),
@@ -160,10 +150,6 @@ class _ProfilePageState
 
   void _goToDailyReview() {
     Navigator.pushNamed(context, RoutesConfig.dailyReview);
-  }
-
-  void _goToWeeklySummary() {
-    Navigator.pushNamed(context, RoutesConfig.weeklySummary);
   }
 
   void _goToScheduleEditor() {

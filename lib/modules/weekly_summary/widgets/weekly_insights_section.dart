@@ -5,7 +5,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_radius.dart';
 import '../../../models/weekly_summary_model.dart';
-import '../constants/weekly_summary_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class WeeklyInsightsSection extends StatelessWidget {
   final WeeklySummaryModel summary;
@@ -16,12 +16,14 @@ class WeeklyInsightsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     if (summary.insights.isEmpty) return const SizedBox.shrink();
 
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeader(WeeklySummaryConstants.sectionInsights),
+          _SectionHeader(l10n.weeklySummarySectionInsights),
           const SizedBox(height: AppSpacing.s12),
           ...summary.insights.asMap().entries.map((entry) {
             return _InsightCard(

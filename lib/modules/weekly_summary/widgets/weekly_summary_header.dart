@@ -4,7 +4,7 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../helpers/date_helper.dart';
 import '../../../models/weekly_summary_model.dart';
-import '../constants/weekly_summary_constants.dart';
+import '../../../extensions/localization_extension.dart';
 
 class WeeklySummaryHeader extends StatelessWidget {
   final WeeklySummaryModel summary;
@@ -13,6 +13,8 @@ class WeeklySummaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.s20,
@@ -22,9 +24,9 @@ class WeeklySummaryHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            WeeklySummaryConstants.headerLabel,
-            style: TextStyle(
+          Text(
+            l10n.weeklySummaryHeaderLabel,
+            style: const TextStyle(
               fontFamily: 'JetBrains Mono',
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -33,9 +35,9 @@ class WeeklySummaryHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.s4),
-          const Text(
-            WeeklySummaryConstants.headerTitle,
-            style: TextStyle(
+          Text(
+            l10n.weeklySummaryHeaderTitle,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -51,10 +53,10 @@ class WeeklySummaryHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.s8),
-          const Text(
-            WeeklySummaryConstants.headerDesc,
+          Text(
+            l10n.weeklySummaryHeaderDesc,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColor.fgMuted,
               height: 1.5,

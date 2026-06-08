@@ -11,7 +11,6 @@ class ProfileQuickActionsSection extends StatelessWidget {
   final bool hasReviewedToday;
   final VoidCallback onMorningCheckinTap;
   final VoidCallback onDailyReviewTap;
-  final VoidCallback onWeeklySummaryTap;
 
   const ProfileQuickActionsSection({
     super.key,
@@ -19,7 +18,6 @@ class ProfileQuickActionsSection extends StatelessWidget {
     required this.hasReviewedToday,
     required this.onMorningCheckinTap,
     required this.onDailyReviewTap,
-    required this.onWeeklySummaryTap,
   });
 
   @override
@@ -52,16 +50,6 @@ class ProfileQuickActionsSection extends StatelessWidget {
             badgeText: hasReviewedToday ? 'Đã xong' : 'Chưa làm',
             badgeColor: hasReviewedToday ? AppColor.success : AppColor.warn,
             onTap: onDailyReviewTap,
-          ),
-
-          const SizedBox(height: AppSpacing.s12),
-
-          // Weekly Summary
-          ProfileMenuTile(
-            icon: RemixIcons.bar_chart_box_line,
-            title: 'Tổng kết tuần',
-            subtitle: 'Xem insight và điều chỉnh tuần sau',
-            onTap: onWeeklySummaryTap,
           ),
         ],
       ),
