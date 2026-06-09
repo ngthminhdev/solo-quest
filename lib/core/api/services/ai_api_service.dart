@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../network/api_client.dart';
 import '../../network/api_response_parser.dart';
-import '../dto/ai_generate_today_dto.dart';
+import '../../utils/app_time_formatter.dart';
+import '../dto/daily_quest_generation_dto.dart';
 
 class AiApiService {
   final ApiClient _client;
@@ -12,50 +13,108 @@ class AiApiService {
 
   /// POST /api/quests/generate-today
   ///
-  /// Triggers AI quest generation for today's date using the user's
-  /// current preferences, schedule, and quest rules.
+  /// Triggers daily quest generation. The backend may respond:
   ///
-  /// Backend response envelope:
-  /// {
-  ///   "code": 200,
-  ///   "data": {
-  ///     "date": "yyyy-MM-dd",
-  ///     "mode": "ai",
-  ///     "inserted": true/false,
-  ///     "generated_count": 8,
-  ///     "quests": [...]
-  ///   }
-  /// }
+  /// - **200** when quests already exist (force=false) or when prefer_ai=false
+  ///   runs rule-based generation synchronously. The `data` carries `quests`.
+  /// - **202** when prefer_ai=true and a background generation job is started.
+  ///   The `data` carries `status: "generating"`, `job_id`, `estimated_seconds`.
   ///
-  /// Returns null on HTTP-level failure (4xx/5xx/network error).
-  /// Returns the result on success, even if [inserted] is false
-  /// (quests already existed — not an error).
-  Future<AiGenerateTodayResultDto?> generateTodayQuests() async {
+  /// Both are success (2xx); 202 is NOT an error. Returns a
+  /// [GenerateTodayOutcome] distinguishing the two cases, or `null` on a
+  /// real HTTP/network failure (4xx/5xx).
+  Future<GenerateTodayOutcome?> generateTodayQuests({
+    bool preferAI = true,
+    bool force = false,
+    bool replacePendingOnly = true,
+    String? date,
+  }) async {
     try {
-      final result = await _client.post(
+      final body = <String, dynamic>{
+        'prefer_ai': preferAI,
+        'force': force,
+        'replace_pending_only': replacePendingOnly,
+      };
+      if (date != null && date.isNotEmpty) {
+        body['date'] = date;
+      }
+
+      final outcome = await _client.post<GenerateTodayOutcome>(
         'quests/generate-today',
+        body: body,
         fromJson: (json) {
           final data = ApiResponseParser.extractObject(
             json,
             preferredKeys: ['data', 'result'],
             context: 'AiApiService.generateTodayQuests',
           );
-          return AiGenerateTodayResultDto.fromJson(data);
+          return GenerateTodayOutcome.fromData(data);
+        },
+      );
+
+      if (kDebugMode) {
+        if (outcome.isGenerating) {
+          developer.log(
+            '[AI] generateTodayQuests started job: '
+            'date=${outcome.job!.date}, status=${outcome.job!.status}, '
+            'jobId=${outcome.job!.jobId}, eta=${outcome.job!.estimatedSeconds}s',
+          );
+        } else {
+          final r = outcome.result!;
+          developer.log(
+            '[AI] generateTodayQuests success: '
+            'date=${r.date}, mode=${r.mode}, inserted=${r.inserted}, '
+            'count=${r.generatedCount}',
+          );
+        }
+      }
+
+      return outcome;
+    } catch (e) {
+      if (kDebugMode) {
+        developer.log('[AI] generateTodayQuests failed: $e');
+      }
+      return null;
+    }
+  }
+
+  /// GET /api/quests/generate-today/status?date=YYYY-MM-DD
+  ///
+  /// Polls the status of the async generation job for [date] (defaults to
+  /// today). Returns `null` on a real HTTP/network failure so callers can
+  /// keep polling instead of treating a transient error as terminal.
+  Future<DailyQuestGenerationStatusDto?> getTodayGenerationStatus({
+    String? date,
+  }) async {
+    final dateStr = (date != null && date.isNotEmpty)
+        ? date
+        : AppTimeFormatter.todayLocalDateQuery();
+    try {
+      final status = await _client.get<DailyQuestGenerationStatusDto>(
+        'quests/generate-today/status',
+        queryParams: {'date': dateStr},
+        fromJson: (json) {
+          final data = ApiResponseParser.extractObject(
+            json,
+            preferredKeys: ['data', 'result'],
+            context: 'AiApiService.getTodayGenerationStatus',
+          );
+          return DailyQuestGenerationStatusDto.fromJson(data);
         },
       );
 
       if (kDebugMode) {
         developer.log(
-          '[AI] generateTodayQuests success: '
-          'date=${result.date}, mode=${result.mode}, '
-          'inserted=${result.inserted}, count=${result.generatedCount}',
+          '[AI] generationStatus: date=$dateStr, status=${status.status}, '
+          'questCount=${status.questCount}, source=${status.source}, '
+          'fallbackUsed=${status.fallbackUsed}',
         );
       }
 
-      return result;
+      return status;
     } catch (e) {
       if (kDebugMode) {
-        developer.log('[AI] generateTodayQuests failed: $e');
+        developer.log('[AI] getTodayGenerationStatus failed: $e');
       }
       return null;
     }

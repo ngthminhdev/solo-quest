@@ -3,8 +3,8 @@ import 'package:remixicon/remixicon.dart';
 
 import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
+import '../../../constants/app_spacing.dart';
 import '../../../models/progress_model.dart';
-import '../../../widgets/app_progress/app_progress_bar.dart';
 
 class DailyProgressCard extends StatelessWidget {
   final ProgressModel? progress;
@@ -25,12 +25,12 @@ class DailyProgressCard extends StatelessWidget {
     final p = progress;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 14),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(AppSpacing.s16, AppSpacing.s16, AppSpacing.s16, AppSpacing.s14),
+      padding: const EdgeInsets.all(AppSpacing.s16),
       decoration: BoxDecoration(
         color: AppColor.surface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColor.border),
+        border: Border.all(color: AppColor.borderGlowCyan),
       ),
       child: Column(
         children: [
@@ -66,14 +66,6 @@ class DailyProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          // EXP progress bar
-          if (p != null)
-            AppProgressBar(
-              progress: p.levelProgress,
-              label: 'Level EXP',
-              valueText: '${p.currentLevelExp} / ${p.nextLevelExp}',
-            ),
         ],
       ),
     );

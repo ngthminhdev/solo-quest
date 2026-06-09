@@ -1839,7 +1839,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingStep8QuestWater => 'Drink 250ml water';
 
   @override
-  String get onboardingStep8QuestBreak => 'Take a 5-minute break';
+  String get onboardingStep8QuestBreak => 'Take a 1-minute break';
 
   @override
   String get onboardingStep8QuestWalk => 'Walk for 15 minutes';

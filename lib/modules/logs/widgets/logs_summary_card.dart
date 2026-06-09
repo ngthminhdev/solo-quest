@@ -23,15 +23,12 @@ class LogsSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.s16,
-        vertical: AppSpacing.s8,
-      ),
+      margin: const EdgeInsets.fromLTRB(AppSpacing.s16, AppSpacing.s16, AppSpacing.s16, AppSpacing.s8),
       padding: const EdgeInsets.all(AppSpacing.s16),
       decoration: BoxDecoration(
         color: AppColor.surface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColor.border),
+        border: Border.all(color: AppColor.borderGlowCyan),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,19 +47,19 @@ class LogsSummaryCard extends StatelessWidget {
                 label: context.l10n.logsSummaryActivities,
                 color: AppColor.cyan,
               ),
-              _buildDivider(),
+              const SizedBox(width: AppSpacing.s8),
               _buildStat(
                 value: completedQuests.toString(),
                 label: context.l10n.logsSummaryCompleted,
                 color: AppColor.success,
               ),
-              _buildDivider(),
+              const SizedBox(width: AppSpacing.s8),
               _buildStat(
                 value: skippedQuests.toString(),
                 label: context.l10n.logsSummarySkipped,
                 color: AppColor.warn,
               ),
-              _buildDivider(),
+              const SizedBox(width: AppSpacing.s8),
               _buildStat(
                 value: '+$earnedExp',
                 label: 'EXP',
@@ -81,36 +78,36 @@ class LogsSummaryCard extends StatelessWidget {
     required Color color,
   }) {
     return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'JetBrains Mono',
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: color,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        decoration: BoxDecoration(
+          color: AppColor.surface,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: AppColor.border),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.s4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: AppColor.fgMuted,
+            const SizedBox(height: AppSpacing.s4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColor.fgMuted,
+                letterSpacing: 0.04,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Container(
-      width: 1,
-      height: 32,
-      color: AppColor.border,
     );
   }
 }

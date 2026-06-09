@@ -34,6 +34,7 @@ import 'widgets/skipped_quest_section.dart';
 import 'widgets/daily_review_cta_card.dart';
 import 'widgets/home_summary_footer.dart';
 import 'widgets/home_empty_quest_view.dart';
+import 'widgets/home_generation_view.dart';
 
 class HomePage extends BasePage<HomePageModel, HomePageState> {
   HomePage({super.key}) : super(provider: homePageProvider);
@@ -105,6 +106,37 @@ class _HomePageState
       );
     }
 
+    // No quests yet, but an async generation job is running / failed / slow.
+    // Show a dedicated state instead of an empty/error screen.
+    if (!state.hasAnyQuest &&
+        state.generationPhase != HomeGenerationPhase.idle) {
+      return AppScaffold(
+        showBottomNav: false,
+        body: RefreshIndicator(
+          backgroundColor: AppColor.surface,
+          color: AppColor.cyan,
+          onRefresh: () async {
+            if (state.loadState == AppLoadState.loading) return;
+            await pageModel.refresh();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: HomeGenerationView(
+                phase: state.generationPhase,
+                message: state.generationMessage,
+                // Only generating has no retry; slow/failed expose retry.
+                onRetry: state.isGeneratingQuests
+                    ? null
+                    : pageModel.retryGeneration,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (!state.hasAnyQuest && state.loadState == AppLoadState.ready) {
       return AppScaffold(
         showBottomNav: false,
@@ -120,7 +152,7 @@ class _HomePageState
         color: AppColor.cyan,
         onRefresh: () async {
           if (state.loadState == AppLoadState.loading) return;
-          await pageModel.loadHomeData();
+          await pageModel.refresh();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -128,7 +160,6 @@ class _HomePageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 14),
               DailyProgressCard(
                 progress: state.progress,
                 completedToday: state.completedTodayQuestCount,

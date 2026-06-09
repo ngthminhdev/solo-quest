@@ -18,19 +18,12 @@ class SummaryHeroCard extends StatelessWidget {
     final clampedProgress = progress.levelProgress.clamp(0.0, 1.0);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+      margin: const EdgeInsets.fromLTRB(AppSpacing.s16, AppSpacing.s16, AppSpacing.s16, 0),
       padding: const EdgeInsets.all(AppSpacing.s20),
       decoration: BoxDecoration(
-        gradient: AppColor.heroCardGradient,
+        color: AppColor.surface,
         border: Border.all(color: AppColor.borderGlowCyan),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primarySubtleOverlay,
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

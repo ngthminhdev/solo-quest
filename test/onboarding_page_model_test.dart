@@ -18,6 +18,7 @@ import 'package:solo_quest/core/api/services/user_api_service.dart';
 import 'package:solo_quest/core/api/services/quest_api_service.dart';
 import 'package:solo_quest/core/api/services/ai_api_service.dart';
 import 'package:solo_quest/core/api/dto/ai_generate_today_dto.dart';
+import 'package:solo_quest/core/api/dto/daily_quest_generation_dto.dart';
 import 'package:solo_quest/core/api/dto/user_dto.dart';
 import 'package:solo_quest/models/user_profile_model.dart';
 import 'package:solo_quest/modules/onboarding/constants/onboarding_codes.dart';
@@ -98,15 +99,22 @@ class FakeAiApiService extends AiApiService {
   FakeAiApiService() : super(client: ApiClient(baseUrl: 'http://localhost'));
 
   @override
-  Future<AiGenerateTodayResultDto?> generateTodayQuests() async {
+  Future<GenerateTodayOutcome?> generateTodayQuests({
+    bool preferAI = true,
+    bool force = false,
+    bool replacePendingOnly = true,
+    String? date,
+  }) async {
     generateCallCount++;
     if (!shouldSucceed) return null;
-    return AiGenerateTodayResultDto(
-      date: DateTime.now().toIso8601String().substring(0, 10),
-      mode: 'ai',
-      inserted: true,
-      generatedCount: 6,
-      quests: [],
+    return GenerateTodayOutcome(
+      result: AiGenerateTodayResultDto(
+        date: DateTime.now().toIso8601String().substring(0, 10),
+        mode: 'ai',
+        inserted: true,
+        generatedCount: 6,
+        quests: const [],
+      ),
     );
   }
 }

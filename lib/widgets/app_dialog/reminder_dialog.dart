@@ -57,7 +57,7 @@ class ReminderDialog extends StatelessWidget {
       iconBgColor = AppColor.cyanDim;
     } else if (type == 'break_time' || action == 'start_break_timer') {
       title = l10n.reminderBreakTitle;
-      final minutes = payload.countdownMinutes > 0 ? payload.countdownMinutes : 5;
+      final minutes = payload.countdownMinutes > 0 ? payload.countdownMinutes : 1;
       body = l10n.reminderBreakBody;
       confirmLabel = l10n.reminderBreakBtn(minutes);
       onConfirm = () {
@@ -130,12 +130,12 @@ class ReminderDialog extends StatelessWidget {
           content: Text(l10n.timerConfirmReplace),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
+              onPressed: () => Navigator.of(ctx, rootNavigator: true).pop(),
               child: Text(l10n.commonCancel),
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.of(ctx).pop();
+                Navigator.of(ctx, rootNavigator: true).pop();
                 await timerService.cancelSession();
                 await timerService.startReminderSession(
                   title: l10n.reminderBreakTitle,
@@ -252,7 +252,7 @@ class ReminderDialog extends StatelessWidget {
             if (onConfirm != null) ...[
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                   onConfirm!();
                 },
                 style: ElevatedButton.styleFrom(
@@ -273,24 +273,42 @@ class ReminderDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-            ],
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                foregroundColor: AppColor.fgSecondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+              TextButton(
+                onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  foregroundColor: AppColor.fgSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                ),
+                child: Text(
+                  cancelLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              child: Text(
-                onConfirm == null ? confirmLabel : cancelLabel,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+            ] else
+              OutlinedButton(
+                onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  foregroundColor: iconColor,
+                  side: BorderSide(color: iconColor, width: 1.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                ),
+                child: Text(
+                  confirmLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

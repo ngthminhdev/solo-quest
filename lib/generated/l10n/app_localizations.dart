@@ -3527,7 +3527,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingStep8QuestBreak.
   ///
   /// In vi, this message translates to:
-  /// **'Rời khỏi màn hình 5 phút'**
+  /// **'Rời khỏi màn hình 1 phút'**
   String get onboardingStep8QuestBreak;
 
   /// No description provided for @onboardingStep8QuestWalk.

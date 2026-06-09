@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../constants/app_color.dart';
 import '../../constants/app_radius.dart';
-import '../../constants/app_shadow.dart';
 
 class AppGlowCard extends StatelessWidget {
   final Widget child;
@@ -35,7 +34,6 @@ class AppGlowCard extends StatelessWidget {
           border: Border.all(
             color: isCyan ? AppColor.borderGlowCyan : AppColor.borderGlowViolet,
           ),
-          boxShadow: isCyan ? AppShadow.glowCyan : AppShadow.glowViolet,
         ),
         child: child,
       ),

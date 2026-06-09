@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer' as developer;
@@ -12,13 +13,31 @@ import '../../models/progress_model.dart';
 import '../../models/reminder_setting_model.dart';
 import '../../models/enums/reminder_enums.dart';
 import '../../core/api/dto/user_dto.dart';
+import '../../core/api/dto/daily_quest_generation_dto.dart';
 import '../../services/quest_service.dart';
 import '../../services/progress_service.dart';
 import '../../services/log_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/reminder_service.dart';
 import '../../core/api/services/user_api_service.dart';
+import '../../core/api/services/ai_api_service.dart';
 import '../../services/service_providers.dart';
+
+/// Async daily-quest generation phase shown on Home.
+enum HomeGenerationPhase {
+  /// No generation in progress; show quests or the normal empty view.
+  idle,
+
+  /// A background generation job is running; show the generating card and poll.
+  generating,
+
+  /// Polling exceeded the client budget while still generating; show a light
+  /// "try again / pull to refresh" message. Not an error.
+  slow,
+
+  /// Generation failed or the job went stale; show a retry action.
+  failed,
+}
 
 class HomePageState extends BasePageState {
   final AppLoadState loadState;
@@ -35,6 +54,11 @@ class HomePageState extends BasePageState {
   final Map<String, QuestActionType> pendingActions;
   final ReminderSettingModel? dailyReviewReminder;
 
+  // ── Async quest generation ──
+  final HomeGenerationPhase generationPhase;
+  final String? generationJobId;
+  final String? generationMessage;
+
   HomePageState({
     this.loadState = AppLoadState.loading,
     this.activeQuests = const [],
@@ -49,8 +73,17 @@ class HomePageState extends BasePageState {
     this.todayInsight,
     this.pendingActions = const {},
     this.dailyReviewReminder,
+    this.generationPhase = HomeGenerationPhase.idle,
+    this.generationJobId,
+    this.generationMessage,
     super.isLockedPage,
   });
+
+  /// True while a background generation job is being polled.
+  bool get isGeneratingQuests =>
+      generationPhase == HomeGenerationPhase.generating;
+  bool get isGenerationSlow => generationPhase == HomeGenerationPhase.slow;
+  bool get isGenerationFailed => generationPhase == HomeGenerationPhase.failed;
 
   int get totalTodayQuestCount {
     // Use BE daily status if available for accurate count
@@ -155,6 +188,9 @@ class HomePageState extends BasePageState {
     bool? isLockedPage,
     Map<String, QuestActionType>? pendingActions,
     ReminderSettingModel? dailyReviewReminder,
+    HomeGenerationPhase? generationPhase,
+    String? generationJobId,
+    String? generationMessage,
   }) {
     return HomePageState(
       loadState: loadState ?? this.loadState,
@@ -171,6 +207,9 @@ class HomePageState extends BasePageState {
       isLockedPage: isLockedPage ?? this.isLockedPage,
       pendingActions: pendingActions ?? this.pendingActions,
       dailyReviewReminder: dailyReviewReminder ?? this.dailyReviewReminder,
+      generationPhase: generationPhase ?? this.generationPhase,
+      generationJobId: generationJobId ?? this.generationJobId,
+      generationMessage: generationMessage ?? this.generationMessage,
     );
   }
 }
@@ -183,7 +222,13 @@ class HomePageModel extends BasePageModel<HomePageState> {
     required this.authService,
     required this.reminderService,
     UserApiService? userApiService,
+    AiApiService? aiApiService,
+    Duration pollInterval = const Duration(seconds: 10),
+    int maxPolls = 10,
   }) : _userApiService = userApiService ?? UserApiService(),
+       _aiApiService = aiApiService ?? AiApiService(),
+       _pollInterval = pollInterval,
+       _maxPolls = maxPolls,
        super(HomePageState());
 
   final QuestService questService;
@@ -192,8 +237,32 @@ class HomePageModel extends BasePageModel<HomePageState> {
   final AuthService authService;
   final ReminderService reminderService;
   final UserApiService _userApiService;
+  final AiApiService _aiApiService;
 
   String? _lastLoadedDate;
+
+  // ── Async generation polling ──
+  // Poll status every [_pollInterval] (10s) up to [_maxPolls] (10) times,
+  // i.e. ~100s of automatic polling. After that, stop and let the user
+  // pull-to-refresh; the backend may keep working (AI up to ~600s).
+  final Duration _pollInterval;
+  final int _maxPolls;
+  Timer? _pollTimer;
+  int _pollCount = 0;
+  bool _isPolling = false;
+  bool _disposed = false;
+  bool _starting = false; // a generate-today POST is in flight
+
+  static const String _generatingMessage =
+      'Solo đang cá nhân hóa nhiệm vụ cho bạn.';
+  static const String _slowMessage =
+      'Quest vẫn đang được tạo. Bạn có thể kéo để làm mới sau.';
+  static const String _failedMessage =
+      'Không thể tạo quest hôm nay. Hãy thử lại nhé.';
+
+  /// Test-only: whether the polling timer is currently active.
+  @visibleForTesting
+  bool get isPolling => _isPolling;
 
   Future<void> loadHomeData() async {
     final todayStr = AppTimeFormatter.todayLocalDateQuery();
@@ -298,6 +367,8 @@ class HomePageModel extends BasePageModel<HomePageState> {
         'active=${featuredQuest != null ? 1 : 0}, upcoming=${upcoming.length}, '
         'snoozed=${snoozed.length}, completed=${completed.length}, skipped=${skipped.length}');
 
+    final hasQuests = allQuests.isNotEmpty;
+
     state = state.updateState(
       loadState: AppLoadState.ready,
       activeQuests: featuredQuest != null ? [featuredQuest] : [],
@@ -310,7 +381,205 @@ class HomePageModel extends BasePageModel<HomePageState> {
       userDisplayName: userName,
       todayInsight: _buildInsight(dailyStatus),
       dailyReviewReminder: dailyReviewReminder,
+      // Quests are present → clear any generation UI.
+      generationPhase: hasQuests ? HomeGenerationPhase.idle : null,
     );
+
+    // When today has no quests, find out whether a generation job is running
+    // (e.g. started right after onboarding) and resume polling, or kick one
+    // off. Skip if we are already generating/polling so we don't double-run.
+    if (!hasQuests &&
+        !_isPolling &&
+        state.generationPhase != HomeGenerationPhase.generating) {
+      await _resumeOrStartGeneration(todayStr);
+    } else if (hasQuests) {
+      _stopPolling();
+    }
+  }
+
+  /// Pull-to-refresh entry point: cancels any in-flight polling, resets the
+  /// poll counter, then reloads. If a job is still generating it restarts
+  /// polling from the first attempt.
+  Future<void> refresh() async {
+    _stopPolling();
+    await loadHomeData();
+  }
+
+  /// Inspects the generation job status for [date] and either resumes polling,
+  /// shows a retry/failed state, or starts a fresh generation when none exists.
+  Future<void> _resumeOrStartGeneration(String date) async {
+    if (_isPolling) return;
+
+    // Optimistically show the generating state so we never flash the empty
+    // view while probing the job status.
+    state = state.updateState(
+      generationPhase: HomeGenerationPhase.generating,
+      generationMessage: _generatingMessage,
+    );
+
+    final status = await _aiApiService.getTodayGenerationStatus(date: date);
+    if (_disposed) return;
+    final s = status?.status;
+
+    if (s == DailyQuestGenerationStatus.generating) {
+      _startGenerationPolling(date);
+      return;
+    }
+    if (s == DailyQuestGenerationStatus.failed ||
+        s == DailyQuestGenerationStatus.stale) {
+      _setGenerationFailed();
+      return;
+    }
+    if (s == DailyQuestGenerationStatus.completed) {
+      // Job finished (possibly with 0 quests for a genuinely empty day).
+      // Leave the normal empty view.
+      _setGenerationIdle();
+      return;
+    }
+
+    // not_started or status unavailable → start a generation job.
+    await generateTodayQuests();
+  }
+
+  /// Starts (or restarts on retry) daily quest generation.
+  ///
+  /// - 200 → quests are ready/existed; reloads Home.
+  /// - 202 → a background job started; begins polling.
+  /// - null → hard failure; shows the retry state.
+  Future<void> generateTodayQuests({bool force = false}) async {
+    // Guard double-tap / concurrent starts.
+    if (_isPolling || _starting) return;
+    _starting = true;
+
+    try {
+      final date = AppTimeFormatter.todayLocalDateQuery();
+      state = state.updateState(
+        generationPhase: HomeGenerationPhase.generating,
+        generationMessage: _generatingMessage,
+      );
+
+      final outcome = await _aiApiService.generateTodayQuests(
+        preferAI: true,
+        force: force,
+        replacePendingOnly: true,
+        date: date,
+      );
+
+      if (_disposed) return;
+
+      if (outcome == null) {
+        _setGenerationFailed();
+        return;
+      }
+
+      if (outcome.isGenerating) {
+        state = state.updateState(generationJobId: outcome.job!.jobId);
+        _startGenerationPolling(date);
+        return;
+      }
+
+      // 200: quests ready or already existed → reload Home data.
+      _setGenerationIdle();
+      await loadHomeData();
+    } finally {
+      _starting = false;
+    }
+  }
+
+  /// Retry after a failed/stale/slow generation (MVP: prefer_ai + force).
+  Future<void> retryGeneration() async {
+    _stopPolling();
+    // Allow retry even from the generating-stuck UI.
+    state = state.updateState(generationPhase: HomeGenerationPhase.idle);
+    await generateTodayQuests(force: true);
+  }
+
+  // ── Polling ──
+
+  void _startGenerationPolling(String date) {
+    _stopPolling();
+    _isPolling = true;
+    _pollCount = 0;
+    state = state.updateState(
+      generationPhase: HomeGenerationPhase.generating,
+      generationMessage: _generatingMessage,
+    );
+    _pollTimer = Timer.periodic(_pollInterval, (_) => _onPollTick(date));
+  }
+
+  Future<void> _onPollTick(String date) async {
+    if (_disposed) {
+      _stopPolling();
+      return;
+    }
+
+    _pollCount++;
+    if (_pollCount > _maxPolls) {
+      // Auto-poll budget exhausted; stop but keep Home usable (pull-to-refresh).
+      _stopPolling();
+      if (!_disposed) {
+        state = state.updateState(
+          generationPhase: HomeGenerationPhase.slow,
+          generationMessage: _slowMessage,
+        );
+      }
+      return;
+    }
+
+    final status = await _aiApiService.getTodayGenerationStatus(date: date);
+    if (_disposed) {
+      _stopPolling();
+      return;
+    }
+    // Transient status error → keep polling on the next tick.
+    if (status == null) return;
+
+    switch (status.status) {
+      case DailyQuestGenerationStatus.completed:
+        _stopPolling();
+        _setGenerationIdle();
+        await loadHomeData();
+        break;
+      case DailyQuestGenerationStatus.failed:
+      case DailyQuestGenerationStatus.stale:
+        _setGenerationFailed();
+        break;
+      case DailyQuestGenerationStatus.notStarted:
+        // Job vanished; stop without looping forever.
+        _stopPolling();
+        _setGenerationIdle();
+        break;
+      case DailyQuestGenerationStatus.generating:
+      default:
+        // Keep polling until completion or the poll budget is reached.
+        break;
+    }
+  }
+
+  void _stopPolling() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
+    _isPolling = false;
+    _pollCount = 0;
+  }
+
+  void _setGenerationIdle() {
+    state = state.updateState(generationPhase: HomeGenerationPhase.idle);
+  }
+
+  void _setGenerationFailed() {
+    _stopPolling();
+    state = state.updateState(
+      generationPhase: HomeGenerationPhase.failed,
+      generationMessage: _failedMessage,
+    );
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _stopPolling();
+    super.dispose();
   }
 
   Future<List<QuestModel>> _loadQuests() async {

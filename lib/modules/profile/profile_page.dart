@@ -86,10 +86,7 @@ class _ProfilePageState
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(
-        top: AppSpacing.s16,
-        bottom: AppSpacing.s16,
-      ),
+      padding: const EdgeInsets.only(bottom: AppSpacing.s16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -97,13 +94,11 @@ class _ProfilePageState
           ProfileHeaderCard(
             profile: profile,
             level: state.level,
-            currentLevelExp: state.currentLevelExp,
-            nextLevelExp: state.nextLevelExp,
-            levelProgress: state.levelProgress,
             streakDays: state.streakDays,
+            provider: state.authUser?.provider,
           ),
 
-          const SizedBox(height: AppSpacing.s20),
+          // const SizedBox(height: AppSpacing.s20),
 
           // Main Goals
           // ProfileGoalSection(
@@ -135,7 +130,6 @@ class _ProfilePageState
 
           // Account
           ProfileAccountCard(
-            user: state.authUser,
             isLoading: state.isLockedPage,
             onSignOut: _handleSignOut,
           ),

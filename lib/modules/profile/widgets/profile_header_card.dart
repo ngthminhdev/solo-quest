@@ -11,19 +11,15 @@ import '../../../widgets/gamification/level_badge.dart';
 class ProfileHeaderCard extends StatelessWidget {
   final UserProfileModel profile;
   final int level;
-  final int currentLevelExp;
-  final int nextLevelExp;
-  final double levelProgress;
   final int streakDays;
+  final String? provider;
 
   const ProfileHeaderCard({
     super.key,
     required this.profile,
     required this.level,
-    required this.currentLevelExp,
-    required this.nextLevelExp,
-    required this.levelProgress,
     required this.streakDays,
+    this.provider,
   });
 
   Widget _buildFallbackAvatar() {
@@ -42,6 +38,7 @@ class ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppGlowCard(
+      margin: const EdgeInsets.fromLTRB(AppSpacing.s16, AppSpacing.s16, AppSpacing.s16, 0),
       padding: const EdgeInsets.all(AppSpacing.s20),
       child: Column(
         children: [
@@ -100,7 +97,43 @@ class ProfileHeaderCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.s4),
-                    LevelBadge(level: level),
+                    Row(
+                      children: [
+                        LevelBadge(level: level),
+                        if (provider != null) ...[
+                          const SizedBox(width: AppSpacing.s8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.s8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColor.surfaceHover,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  RemixIcons.google_line,
+                                  size: 11,
+                                  color: AppColor.fgSecondary,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  provider![0].toUpperCase() + provider!.substring(1),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColor.fgSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -140,58 +173,6 @@ class ProfileHeaderCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: AppSpacing.s16),
-
-          // EXP Progress
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Level EXP',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.fgSecondary,
-                    ),
-                  ),
-                  Text(
-                    '$currentLevelExp / $nextLevelExp',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.cyan,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.s8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: levelProgress,
-                  minHeight: 8,
-                  backgroundColor: AppColor.surface,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColor.cyan),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.s12),
-
-          // Subtitle
-          Text(
-            'Tiếp tục giữ nhịp nhỏ mỗi ngày.',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColor.fgMuted,
-              fontStyle: FontStyle.italic,
-            ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );

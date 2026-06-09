@@ -1831,7 +1831,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingStep8QuestWater => 'Uống 250ml nước';
 
   @override
-  String get onboardingStep8QuestBreak => 'Rời khỏi màn hình 5 phút';
+  String get onboardingStep8QuestBreak => 'Rời khỏi màn hình 1 phút';
 
   @override
   String get onboardingStep8QuestWalk => 'Đi bộ 15 phút';

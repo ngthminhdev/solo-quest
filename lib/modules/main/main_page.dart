@@ -31,6 +31,7 @@ class _MainPageState
     extends BasePageConsumerState<MainPage, MainPageModel, MainPageState> {
   late final PageController _pageController;
   DateTime? _lastNavTime;
+  bool _pendingReminderScheduled = false;
 
   @override
   void initState() {
@@ -55,10 +56,12 @@ class _MainPageState
   void onBuild() {
     super.onBuild();
     
-    // Check initial pending reminder
+    // Check initial pending reminder — guard with flag to avoid duplicate dialogs on rebuild
     final initialPending = ref.read(pendingReminderProvider);
-    if (initialPending != null) {
+    if (initialPending != null && !_pendingReminderScheduled) {
+      _pendingReminderScheduled = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pendingReminderScheduled = false;
         if (mounted) {
           _showReminderPrompt(context, initialPending);
           ref.read(pendingReminderProvider.notifier).state = null;
@@ -83,7 +86,9 @@ class _MainPageState
 
     ref.listen<CountdownSession?>(countdownTimerServiceProvider, (previous, next) {
       if (next != null && next.status == CountdownStatus.expired && previous?.status != CountdownStatus.expired) {
-        _showTimerCompletionDialog(next);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _showTimerCompletionDialog(next);
+        });
       }
     });
   }
@@ -100,7 +105,7 @@ class _MainPageState
           actions: [
             TextButton(
               onPressed: () async {
-                Navigator.of(ctx).pop();
+                Navigator.of(ctx, rootNavigator: true).pop();
                 await ref.read(countdownTimerServiceProvider.notifier).completeSession();
               },
               child: Text(l10n.commonClose),
@@ -302,14 +307,6 @@ class _MainPageState
     return PageHeader(
       icon: icon,
       title: title,
-      titleStyle: selectedIndex == 2
-          ? const TextStyle(
-              fontFamily: 'Roboto',
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: AppColor.white,
-            )
-          : null,
     );
   }
 

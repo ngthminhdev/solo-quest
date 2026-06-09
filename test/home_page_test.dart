@@ -12,9 +12,12 @@ import 'package:solo_quest/services/auth_service.dart';
 import 'package:solo_quest/services/reminder_service.dart';
 import 'package:solo_quest/core/api/services/user_api_service.dart';
 import 'package:solo_quest/core/api/services/quest_api_service.dart';
+import 'package:solo_quest/core/api/services/ai_api_service.dart';
 import 'package:solo_quest/core/network/api_client.dart';
 import 'package:solo_quest/models/auth_user_model.dart';
 import 'package:solo_quest/core/api/dto/user_dto.dart';
+import 'package:solo_quest/core/api/dto/ai_generate_today_dto.dart';
+import 'package:solo_quest/core/api/dto/daily_quest_generation_dto.dart';
 
 class FakeQuestService extends Fake implements QuestService {
   List<QuestModel> quests = [];
@@ -156,12 +159,54 @@ class FakeUserApiService extends Fake implements UserApiService {
 class FakeReminderService extends Fake implements ReminderService {
   @override
   Future<List<ReminderSettingModel>> getReminderSettings() async => [];
+}
+
+class FakeAiApiService extends Fake implements AiApiService {
+  // generate-today
+  GenerateTodayOutcome? generateOutcome;
+  int generateCallCount = 0;
+  bool? lastPreferAI;
+  bool? lastForce;
+  bool? lastReplacePendingOnly;
+
+  // status
+  DailyQuestGenerationStatusDto? statusResult;
+  List<DailyQuestGenerationStatusDto?>? statusQueue;
+  int statusCallCount = 0;
 
   @override
-  Future<List<ReminderSettingModel>> getReminders() async => [];
+  Future<GenerateTodayOutcome?> generateTodayQuests({
+    bool preferAI = true,
+    bool force = false,
+    bool replacePendingOnly = true,
+    String? date,
+  }) async {
+    generateCallCount++;
+    lastPreferAI = preferAI;
+    lastForce = force;
+    lastReplacePendingOnly = replacePendingOnly;
+    return generateOutcome;
+  }
 
   @override
-  Future<ReminderSettingModel?> getDailyReviewReminder() async => null;
+  Future<DailyQuestGenerationStatusDto?> getTodayGenerationStatus({
+    String? date,
+  }) async {
+    statusCallCount++;
+    if (statusQueue != null && statusQueue!.isNotEmpty) {
+      return statusQueue!.removeAt(0);
+    }
+    return statusResult;
+  }
+}
+
+DailyQuestGenerationStatusDto _status(String status, {int questCount = 0}) {
+  return DailyQuestGenerationStatusDto(
+    date: '2026-06-09',
+    status: status,
+    jobId: 'job-1',
+    questCount: questCount,
+  );
 }
 
 class FakeApiClient extends Fake implements ApiClient {
@@ -192,7 +237,22 @@ void main() {
   late FakeLogService fakeLogService;
   late FakeAuthService fakeAuthService;
   late FakeUserApiService fakeUserApiService;
+  late FakeAiApiService fakeAiApiService;
   late HomePageModel homePageModel;
+
+  HomePageModel buildModel({Duration? pollInterval, int maxPolls = 10}) {
+    return HomePageModel(
+      questService: fakeQuestService,
+      progressService: fakeProgressService,
+      logService: fakeLogService,
+      authService: fakeAuthService,
+      reminderService: FakeReminderService(),
+      userApiService: fakeUserApiService,
+      aiApiService: fakeAiApiService,
+      pollInterval: pollInterval ?? const Duration(seconds: 10),
+      maxPolls: maxPolls,
+    );
+  }
 
   setUp(() {
     fakeQuestService = FakeQuestService();
@@ -200,15 +260,14 @@ void main() {
     fakeLogService = FakeLogService();
     fakeAuthService = FakeAuthService();
     fakeUserApiService = FakeUserApiService();
-
-    homePageModel = HomePageModel(
-      questService: fakeQuestService,
-      progressService: fakeProgressService,
-      logService: fakeLogService,
-      authService: fakeAuthService,
-      reminderService: FakeReminderService(),
-      userApiService: fakeUserApiService,
+    fakeAiApiService = FakeAiApiService();
+    // Default: no in-flight generation job (empty days resolve to idle without
+    // hitting the network or starting timers).
+    fakeAiApiService.statusResult = _status(
+      DailyQuestGenerationStatus.completed,
     );
+
+    homePageModel = buildModel();
   });
 
   group('Featured Quest Selection', () {
@@ -493,6 +552,268 @@ void main() {
       expect(result.id, 'q-std-1');
       expect(result.title, 'Standardized Start');
       expect(result.status, QuestStatus.active);
+    });
+  });
+
+  group('Async Quest Generation', () {
+    const result200 = AiGenerateTodayResultDto(
+      date: '2026-06-09',
+      mode: 'rule_based',
+      inserted: true,
+      generatedCount: 1,
+      quests: [],
+    );
+
+    test('200 outcome reloads quests without entering generating state', () async {
+      fakeQuestService.quests = [
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+        ),
+      ];
+      fakeAiApiService.generateOutcome =
+          const GenerateTodayOutcome(result: result200);
+
+      await homePageModel.generateTodayQuests();
+
+      expect(homePageModel.state.isGeneratingQuests, isFalse);
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.activeQuests.length, 1);
+      expect(fakeAiApiService.generateCallCount, 1);
+    });
+
+    test('202 outcome enters generating state and starts polling', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-202',
+          estimatedSeconds: 15,
+        ),
+      );
+      // Keep it generating so the test can observe the polling state.
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+
+      await homePageModel.generateTodayQuests();
+
+      expect(homePageModel.state.isGeneratingQuests, isTrue);
+      expect(homePageModel.state.generationJobId, 'job-202');
+      expect(homePageModel.isPolling, isTrue);
+      expect(homePageModel.state.isGenerationFailed, isFalse);
+
+      homePageModel.dispose();
+    });
+
+    test('retry sends prefer_ai + force + replace_pending_only', () async {
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-r',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+
+      await homePageModel.retryGeneration();
+
+      expect(fakeAiApiService.lastPreferAI, isTrue);
+      expect(fakeAiApiService.lastForce, isTrue);
+      expect(fakeAiApiService.lastReplacePendingOnly, isTrue);
+
+      homePageModel.dispose();
+    });
+
+    test('polling completed stops polling, reloads, clears generating', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-c',
+          estimatedSeconds: 15,
+        ),
+      );
+      // First the job is generating, then completes; on reload quests appear.
+      fakeAiApiService.statusQueue = [
+        _status(DailyQuestGenerationStatus.completed, questCount: 1),
+      ];
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.completed, questCount: 1);
+
+      await homePageModel.generateTodayQuests();
+      expect(homePageModel.isPolling, isTrue);
+
+      // Quests are available on the next reload.
+      fakeQuestService.quests = [
+        const QuestModel(
+          id: 'qc',
+          title: 'Generated',
+          type: QuestType.learning,
+          status: QuestStatus.pending,
+        ),
+      ];
+
+      await Future.delayed(const Duration(milliseconds: 80));
+
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.isGeneratingQuests, isFalse);
+      expect(homePageModel.state.activeQuests.length, 1);
+
+      homePageModel.dispose();
+    });
+
+    test('polling failed stops polling and shows retry/failed state', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-f',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.failed);
+
+      await homePageModel.generateTodayQuests();
+      await Future.delayed(const Duration(milliseconds: 60));
+
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.isGeneratingQuests, isFalse);
+      expect(homePageModel.state.isGenerationFailed, isTrue);
+
+      homePageModel.dispose();
+    });
+
+    test('polling stale stops polling and shows retry/failed state', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-s',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.stale);
+
+      await homePageModel.generateTodayQuests();
+      await Future.delayed(const Duration(milliseconds: 60));
+
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.isGenerationFailed, isTrue);
+
+      homePageModel.dispose();
+    });
+
+    test('poll budget exhausted stops polling and shows slow message', () async {
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 15),
+        maxPolls: 2,
+      );
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-slow',
+          estimatedSeconds: 15,
+        ),
+      );
+      // Always still generating → poll budget runs out.
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+
+      await homePageModel.generateTodayQuests();
+      await Future.delayed(const Duration(milliseconds: 120));
+
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.isGenerationSlow, isTrue);
+      expect(homePageModel.state.isGeneratingQuests, isFalse);
+
+      homePageModel.dispose();
+    });
+
+    test('dispose cancels the polling timer', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-d',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+
+      await homePageModel.generateTodayQuests();
+      expect(homePageModel.isPolling, isTrue);
+
+      homePageModel.dispose();
+      expect(homePageModel.isPolling, isFalse);
+    });
+
+    test('concurrent generate calls do not start two timers', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-x',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+
+      await homePageModel.generateTodayQuests();
+      await homePageModel.generateTodayQuests(); // guarded — should no-op
+
+      expect(homePageModel.isPolling, isTrue);
+      expect(fakeAiApiService.generateCallCount, 1);
+
+      homePageModel.dispose();
+    });
+
+    test('empty day with a running job resumes polling on load', () async {
+      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeQuestService.quests = []; // empty day
+      fakeAiApiService.statusResult =
+          _status(DailyQuestGenerationStatus.generating);
+
+      await homePageModel.loadHomeData();
+
+      expect(homePageModel.state.isGeneratingQuests, isTrue);
+      expect(homePageModel.isPolling, isTrue);
+      // No new job started; we resumed the existing one.
+      expect(fakeAiApiService.generateCallCount, 0);
+
+      homePageModel.dispose();
+    });
+
+    test('non-empty day clears generation state and does not poll', () async {
+      fakeQuestService.quests = [
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+        ),
+      ];
+
+      await homePageModel.loadHomeData();
+
+      expect(homePageModel.state.isGeneratingQuests, isFalse);
+      expect(homePageModel.isPolling, isFalse);
+      expect(fakeAiApiService.statusCallCount, 0);
     });
   });
 }
