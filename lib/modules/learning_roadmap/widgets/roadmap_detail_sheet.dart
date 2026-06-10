@@ -18,13 +18,18 @@ class RoadmapDetailSheet {
       bool completed,
     )
     onToggleStep,
+    required Future<bool> Function() onDeleteRoadmap,
   }) async {
     await showModalBottomSheet(
       context: context,
       backgroundColor: AppColor.transparent,
       isScrollControlled: true,
       builder: (ctx) =>
-          _RoadmapDetailContent(roadmap: roadmap, onToggleStep: onToggleStep),
+          _RoadmapDetailContent(
+            roadmap: roadmap,
+            onToggleStep: onToggleStep,
+            onDeleteRoadmap: onDeleteRoadmap,
+          ),
     );
   }
 }
@@ -33,10 +38,12 @@ class _RoadmapDetailContent extends StatefulWidget {
   final LearningRoadmapModel roadmap;
   final Future<bool> Function(LearningRoadmapStepModel step, bool completed)
   onToggleStep;
+  final Future<bool> Function() onDeleteRoadmap;
 
   const _RoadmapDetailContent({
     required this.roadmap,
     required this.onToggleStep,
+    required this.onDeleteRoadmap,
   });
 
   @override
@@ -97,6 +104,15 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                           color: AppColor.fg,
                         ),
                       ),
+                    ),
+                    IconButton(
+                      onPressed: () => _confirmDelete(context),
+                      icon: const Icon(
+                        RemixIcons.delete_bin_6_line,
+                        size: 20,
+                        color: AppColor.danger,
+                      ),
+                      tooltip: 'Xoá lộ trình',
                     ),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -203,5 +219,57 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
     final steps = List<LearningRoadmapStepModel>.from(_roadmap.steps);
     steps[index] = steps[index].copyWith(completed: completed);
     return _roadmap.copyWith(steps: steps);
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColor.bgRaised,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text(
+          'Xoá lộ trình học',
+          style: TextStyle(
+            color: AppColor.fg,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn xoá lộ trình "${_roadmap.title}" không? Hành động này không thể hoàn tác.',
+          style: const TextStyle(color: AppColor.fgSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text(
+              'Hủy',
+              style: TextStyle(color: AppColor.fgMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColor.danger,
+              foregroundColor: AppColor.bgDeep,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Xoá'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final deleted = await widget.onDeleteRoadmap();
+      if (!mounted || !context.mounted) return;
+      if (deleted) {
+        Navigator.of(context).pop(); // Close detail sheet
+      }
+    }
   }
 }

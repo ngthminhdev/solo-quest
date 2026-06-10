@@ -1,7 +1,7 @@
-import '../models/learning_goal_model.dart';
 import '../models/learning_roadmap_model.dart';
 import '../core/api/services/learning_roadmap_api_service.dart';
 import '../core/api/dto/roadmap_suggestion_dto.dart';
+import '../core/api/dto/learning_roadmap_dto.dart';
 import '../core/network/api_exception.dart';
 
 class LearningService {
@@ -9,101 +9,6 @@ class LearningService {
 
   LearningService({LearningRoadmapApiService? roadmapApiService})
       : _roadmapApiService = roadmapApiService ?? LearningRoadmapApiService();
-  static final List<LearningGoalModel> _goals = [
-    LearningGoalModel(
-      id: '1',
-      title: 'Học Flutter Architecture',
-      description: 'Nắm vững MVVM, Clean Architecture và State Management',
-      category: 'Flutter',
-      targetMinutesPerDay: 30,
-      deadline: DateTime.now().add(const Duration(days: 60)),
-      progress: 0.45,
-      isActive: true,
-    ),
-    LearningGoalModel(
-      id: '2',
-      title: 'Ôn Dart Async/Await',
-      description: 'Hiểu rõ Future, Stream, async/await patterns',
-      category: 'Dart',
-      targetMinutesPerDay: 20,
-      deadline: DateTime.now().add(const Duration(days: 30)),
-      progress: 0.7,
-      isActive: true,
-    ),
-    LearningGoalModel(
-      id: '3',
-      title: 'Xây app SoloQuest MVP',
-      description: 'Hoàn thành MVP với đầy đủ tính năng core',
-      category: 'Project',
-      targetMinutesPerDay: 45,
-      deadline: DateTime.now().add(const Duration(days: 90)),
-      progress: 0.25,
-      isActive: true,
-    ),
-    LearningGoalModel(
-      id: '4',
-      title: 'Học UI/UX Design',
-      description: 'Nắm vững design principles và Figma',
-      category: 'Design',
-      targetMinutesPerDay: 25,
-      progress: 0.15,
-      isActive: true,
-    ),
-    LearningGoalModel(
-      id: '5',
-      title: 'Cải thiện English Speaking',
-      description: 'Luyện nói tiếng Anh mỗi ngày',
-      category: 'English',
-      targetMinutesPerDay: 15,
-      deadline: DateTime.now().add(const Duration(days: 180)),
-      progress: 0.9,
-      isActive: true,
-    ),
-  ];
-
-  Future<List<LearningGoalModel>> getLearningGoals() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return List.from(_goals);
-  }
-
-  Future<LearningGoalModel> addLearningGoal(LearningGoalModel goal) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final newGoal = goal.copyWith(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    _goals.add(newGoal);
-    return newGoal;
-  }
-
-  Future<LearningGoalModel> updateLearningGoal(LearningGoalModel goal) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _goals.indexWhere((g) => g.id == goal.id);
-    if (index != -1) {
-      _goals[index] = goal;
-      return goal;
-    }
-    throw Exception('Goal not found');
-  }
-
-  Future<void> deleteLearningGoal(String goalId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _goals.removeWhere((g) => g.id == goalId);
-  }
-
-  Future<LearningGoalModel> updateGoalProgress(
-    String goalId,
-    double progress,
-  ) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _goals.indexWhere((g) => g.id == goalId);
-    if (index != -1) {
-      final clampedProgress = progress.clamp(0.0, 1.0);
-      final updatedGoal = _goals[index].copyWith(progress: clampedProgress);
-      _goals[index] = updatedGoal;
-      return updatedGoal;
-    }
-    throw Exception('Goal not found');
-  }
 
   // ── Roadmap methods (API-backed) ──
 
@@ -236,6 +141,86 @@ class LearningService {
       rethrow;
     } catch (e) {
       throw Exception('Failed to create roadmap from template: $e');
+    }
+  }
+
+  /// Generate roadmap with AI
+  Future<GenerateLearningRoadmapResult> generateRoadmap({
+    required String learningGoal,
+    String? category,
+    String? difficulty,
+    int? maxDuration,
+  }) async {
+    try {
+      final request = GenerateLearningRoadmapRequestDto(
+        learningGoal: learningGoal,
+        category: category,
+        difficulty: difficulty,
+        maxDuration: maxDuration,
+      );
+      return await _roadmapApiService.generateRoadmap(request);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to generate roadmap: $e');
+    }
+  }
+
+  static const Duration roadmapGenerationPollInterval = Duration(seconds: 10);
+  static const int roadmapGenerationMaxAttempts = 10;
+
+  /// Poll roadmap generation status
+  Future<LearningRoadmapModel?> pollRoadmapGeneration({
+    required String jobId,
+    required bool Function() isCancelled,
+  }) async {
+    int attempt = 0;
+    
+    while (attempt < roadmapGenerationMaxAttempts) {
+      attempt++;
+      
+      await Future.delayed(roadmapGenerationPollInterval);
+      
+      if (isCancelled()) {
+        return null;
+      }
+      
+      try {
+        final statusDto = await _roadmapApiService.getGenerateRoadmapStatus(jobId);
+        
+        if (statusDto.isCompleted) {
+          if (statusDto.item != null) {
+            final roadmapDto = LearningRoadmapDto.fromJson(statusDto.item!);
+            return _convertRoadmapDtoToModel(roadmapDto);
+          }
+          throw Exception('Generation completed but no roadmap item found');
+        }
+        
+        if (statusDto.isFailed) {
+          final errorMsg = statusDto.error?.message ?? 'Generation failed';
+          throw Exception(errorMsg);
+        }
+        
+        // Still running, continue polling
+      } on ApiException {
+        rethrow;
+      } catch (e) {
+        throw Exception('Failed to check generation status: $e');
+      }
+    }
+    
+    // Max attempts reached
+    return null;
+  }
+
+  /// Delete learning roadmap
+  Future<void> deleteRoadmap(String roadmapId) async {
+    try {
+      await _roadmapApiService.deleteRoadmap(roadmapId);
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Failed to delete roadmap: $e');
     }
   }
 }

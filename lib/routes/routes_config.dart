@@ -12,7 +12,6 @@ class RoutesConfig {
   static const String weeklySummary = '/weekly-summary';
   static const String profile = '/profile';
   static const String scheduleEditor = '/schedule-editor';
-  static const String learningGoals = '/learning-goals';
   static const String learningRoadmap = '/learning-roadmap';
   static const String reminderSettings = '/reminder-settings';
   static const String questRules = '/quest-rules';

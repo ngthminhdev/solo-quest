@@ -7,15 +7,60 @@ import '../../../extensions/localization_extension.dart';
 
 class CreateRoadmapFab extends StatelessWidget {
   final VoidCallback onPressed;
+  final bool isGenerating;
+  final String? generationMessage;
 
   const CreateRoadmapFab({
     super.key,
     required this.onPressed,
+    this.isGenerating = false,
+    this.generationMessage,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
+    if (isGenerating) {
+      return Container(
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: AppColor.bgRaised,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(color: AppColor.cyan.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.cyan.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColor.cyan),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              generationMessage ?? 'Đang tạo lộ trình...',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColor.cyan,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return FloatingActionButton.extended(
       onPressed: onPressed,

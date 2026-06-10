@@ -42,15 +42,27 @@ class RoadmapPreferences {
 
 class RoadmapPreferenceSheet extends StatefulWidget {
   final Function(RoadmapPreferences preferences) onSubmit;
+  final Function(RoadmapPreferences preferences)? onGenerateWithAI;
+  final bool isGenerating;
+  final String? generationMessage;
+  final String? generationError;
 
   const RoadmapPreferenceSheet({
     super.key,
     required this.onSubmit,
+    this.onGenerateWithAI,
+    this.isGenerating = false,
+    this.generationMessage,
+    this.generationError,
   });
 
   static Future<RoadmapPreferences?> show(
     BuildContext context, {
     required Function(RoadmapPreferences preferences) onSubmit,
+    Function(RoadmapPreferences preferences)? onGenerateWithAI,
+    bool isGenerating = false,
+    String? generationMessage,
+    String? generationError,
   }) {
     return showModalBottomSheet<RoadmapPreferences>(
       context: context,
@@ -58,6 +70,10 @@ class RoadmapPreferenceSheet extends StatefulWidget {
       backgroundColor: AppColor.transparent,
       builder: (context) => RoadmapPreferenceSheet(
         onSubmit: onSubmit,
+        onGenerateWithAI: onGenerateWithAI,
+        isGenerating: isGenerating,
+        generationMessage: generationMessage,
+        generationError: generationError,
       ),
     );
   }
@@ -72,7 +88,6 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
   int? _selectedDuration;
   final TextEditingController _goalController = TextEditingController();
 
-  // Mock categories - should come from backend or constants
   final List<String> _categories = [
     'Backend',
     'Frontend',
@@ -299,38 +314,181 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
             ),
             child: SafeArea(
               top: false,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _goalController.text.trim().isEmpty
-                      ? null
-                      : _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.cyan,
-                    foregroundColor: AppColor.bgDeep,
-                    disabledBackgroundColor: AppColor.bgRaised,
-                    disabledForegroundColor: AppColor.fgMuted,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Error message
+                  if (widget.generationError != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.s12),
+                      decoration: BoxDecoration(
+                        color: AppColor.danger.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        border: Border.all(color: AppColor.danger.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            RemixIcons.error_warning_line,
+                            size: 18,
+                            color: AppColor.danger,
+                          ),
+                          const SizedBox(width: AppSpacing.s8),
+                          Expanded(
+                            child: Text(
+                              widget.generationError!,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: AppColor.danger,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(RemixIcons.search_line, size: 18),
-                      SizedBox(width: AppSpacing.s8),
-                      Text(
-                        'Tìm lộ trình phù hợp',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                    const SizedBox(height: AppSpacing.s12),
+                  ],
+
+                  // AI Generation button (primary)
+                  if (widget.onGenerateWithAI != null)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _goalController.text.trim().isEmpty || widget.isGenerating
+                            ? null
+                            : () => _handleGenerateWithAI(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.cyan,
+                          foregroundColor: AppColor.bgDeep,
+                          disabledBackgroundColor: AppColor.bgRaised,
+                          disabledForegroundColor: AppColor.fgMuted,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                        ),
+                        child: widget.isGenerating
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppColor.bgDeep),
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.s12),
+                                  Text(
+                                    widget.generationMessage ?? 'Đang tạo...',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(RemixIcons.sparkling_2_fill, size: 18),
+                                  SizedBox(width: AppSpacing.s8),
+                                  Text(
+                                    'Tạo lộ trình bằng AI',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+
+                  // Template button (secondary)
+                  if (widget.onGenerateWithAI != null) ...[
+                    const SizedBox(height: AppSpacing.s8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: _goalController.text.trim().isEmpty || widget.isGenerating
+                            ? null
+                            : _handleSubmit,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColor.cyan,
+                          disabledForegroundColor: AppColor.fgMuted,
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(RemixIcons.file_list_3_line, size: 16),
+                            SizedBox(width: AppSpacing.s8),
+                            Text(
+                              'Xem lộ trình mẫu',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  ] else
+                    // Only template button when AI is not available
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _goalController.text.trim().isEmpty
+                            ? null
+                            : _handleSubmit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.cyan,
+                          foregroundColor: AppColor.bgDeep,
+                          disabledBackgroundColor: AppColor.bgRaised,
+                          disabledForegroundColor: AppColor.fgMuted,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(RemixIcons.search_line, size: 18),
+                            SizedBox(width: AppSpacing.s8),
+                            Text(
+                              'Tìm lộ trình phù hợp',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // Generation hint
+                  if (widget.isGenerating && widget.generationMessage != null) ...[
+                    const SizedBox(height: AppSpacing.s12),
+                    Text(
+                      'Việc này có thể mất vài giây.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColor.fgSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -420,6 +578,17 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
 
     widget.onSubmit(preferences);
     Navigator.pop(context, preferences);
+  }
+
+  void _handleGenerateWithAI() {
+    final preferences = RoadmapPreferences(
+      category: _selectedCategory,
+      difficulty: _selectedDifficulty,
+      maxDuration: _selectedDuration,
+      learningGoal: _goalController.text.trim(),
+    );
+
+    widget.onGenerateWithAI?.call(preferences);
   }
 }
 

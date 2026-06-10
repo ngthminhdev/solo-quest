@@ -1,5 +1,3 @@
-// UI reactivated with local/mock data; backend integration pending
-
 import 'package:flutter/material.dart';
 import 'package:remixicon/remixicon.dart';
 

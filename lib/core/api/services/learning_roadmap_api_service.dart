@@ -118,4 +118,66 @@ class LearningRoadmapApiService {
       },
     );
   }
+
+  /// Generate roadmap with AI - POST /api/learning-roadmaps/generate
+  /// Returns either sync (201) or async (202) response
+  Future<GenerateLearningRoadmapResult> generateRoadmap(
+    GenerateLearningRoadmapRequestDto request,
+  ) async {
+    return await _client.post(
+      'learning-roadmaps/generate',
+      body: request.toJson(),
+      timeout: 60,
+      fromJson: (json) {
+        final data = ApiResponseParser.extractObject(
+          json,
+          preferredKeys: ['data'],
+          context: 'LearningRoadmapApiService.generateRoadmap',
+        );
+
+        // Case A: Sync response (201) - roadmap completed immediately
+        if (data.containsKey('item') && data['item'] != null) {
+          return GenerateLearningRoadmapResult.completed(
+            roadmapItem: data['item'] as Map<String, dynamic>,
+          );
+        }
+
+        // Case B: Async response (202) - job started
+        if (data.containsKey('job_id') && data['job_id'] != null) {
+          return GenerateLearningRoadmapResult.started(
+            jobId: data['job_id'] as String,
+            pollAfterSeconds: data['poll_after_seconds'] as int? ?? 3,
+          );
+        }
+
+        throw Exception('Invalid generate response: missing item or job_id');
+      },
+    );
+  }
+
+  /// Get generation status - GET /api/learning-roadmaps/generate/status
+  Future<GenerateLearningRoadmapStatusDto> getGenerateRoadmapStatus(
+    String jobId,
+  ) async {
+    return await _client.get(
+      'learning-roadmaps/generate/status',
+      queryParams: {'job_id': jobId},
+      fromJson: (json) {
+        final data = ApiResponseParser.extractObject(
+          json,
+          preferredKeys: ['data'],
+          context: 'LearningRoadmapApiService.getGenerateRoadmapStatus',
+        );
+        return GenerateLearningRoadmapStatusDto.fromJson(data);
+      },
+    );
+  }
+
+  /// Delete learning roadmap - DELETE /api/learning-roadmaps/:id
+  Future<void> deleteRoadmap(String id) async {
+    await _client.delete(
+      'learning-roadmaps/$id',
+      fromJson: (json) => null,
+    );
+  }
 }

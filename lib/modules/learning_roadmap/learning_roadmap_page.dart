@@ -64,6 +64,13 @@ class _LearningRoadmapPageState
           onSubmit: (preferences) {
             pageModel.onPreferencesSubmitted(preferences);
           },
+          onGenerateWithAI: (preferences) {
+            Navigator.pop(context); // Close the bottom sheet immediately
+            pageModel.generateRoadmapWithAI(preferences);
+          },
+          isGenerating: state.isGeneratingRoadmap,
+          generationMessage: state.generationStatusMessage,
+          generationError: state.generationError,
         ).then((_) {
           // Close sheet on dismiss
           if (state.showPreferenceSheet) {
@@ -104,6 +111,8 @@ class _LearningRoadmapPageState
             bottom: 16,
             child: CreateRoadmapFab(
               onPressed: () => pageModel.showPreferenceSheet(),
+              isGenerating: state.isGeneratingRoadmap,
+              generationMessage: state.generationStatusMessage,
             ),
           ),
         ],
@@ -174,6 +183,9 @@ class _LearningRoadmapPageState
           stepId: step.id,
           completed: completed,
         );
+      },
+      onDeleteRoadmap: () async {
+        return pageModel.deleteRoadmap(roadmap.id);
       },
     );
   }

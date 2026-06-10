@@ -120,7 +120,6 @@ class _ProfilePageState
           // Settings
           ProfileSettingsSection(
             onScheduleTap: _goToScheduleEditor,
-            onLearningGoalsTap: _goToLearningGoals,
             onLearningRoadmapTap: _goToLearningRoadmap,
             onReminderSettingsTap: _goToReminderSettings,
             onQuestRulesTap: _goToQuestRules,
@@ -156,10 +155,6 @@ class _ProfilePageState
 
   void _goToQuestRules() {
     Navigator.pushNamed(context, RoutesConfig.questRules);
-  }
-
-  void _goToLearningGoals() {
-    Navigator.pushNamed(context, RoutesConfig.learningGoals);
   }
 
   void _goToLearningRoadmap() {

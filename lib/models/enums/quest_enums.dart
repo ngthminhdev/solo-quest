@@ -20,7 +20,6 @@ enum QuestSource {
   dailyPlan,
   morningCheckin,
   scheduleRule,
-  learningGoal,
   manual,
   systemSuggestion,
 }

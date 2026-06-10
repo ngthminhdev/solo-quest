@@ -11,7 +11,6 @@ import '../modules/morning_checkin/morning_checkin_page.dart';
 import '../modules/daily_review/daily_review_page.dart';
 import '../modules/weekly_summary/weekly_summary_page.dart';
 import '../modules/schedule_editor/schedule_editor_page.dart';
-import '../modules/learning_goals/learning_goals_page.dart';
 import '../modules/learning_roadmap/learning_roadmap_page.dart';
 import '../modules/reminder_settings/reminder_settings_page.dart';
 import '../modules/quest_rules/quest_rules_page.dart';
@@ -51,8 +50,6 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => WeeklySummaryPage());
       case RoutesConfig.scheduleEditor:
         return MaterialPageRoute(builder: (_) => ScheduleEditorPage());
-      case RoutesConfig.learningGoals:
-        return MaterialPageRoute(builder: (_) => LearningGoalsPage());
       case RoutesConfig.learningRoadmap:
         return MaterialPageRoute(builder: (_) => LearningRoadmapPage());
       case RoutesConfig.reminderSettings:

@@ -11,6 +11,9 @@ import '../../services/learning_service.dart';
 import '../../services/learning_quest_service.dart';
 import '../../services/log_service.dart';
 import '../../services/service_providers.dart';
+import '../../core/api/dto/roadmap_suggestion_dto.dart';
+import '../../config/app_session.dart';
+import '../../widgets/app_toast/app_toast_service.dart';
 import 'widgets/roadmap_suggestion_card.dart';
 import 'widgets/roadmap_preference_sheet.dart';
 
@@ -24,6 +27,10 @@ class LearningRoadmapPageState extends BasePageState {
   final bool isLoadingSuggestions;
   final List<RoadmapSuggestion> suggestions;
   final RoadmapPreferences? userPreferences;
+  final bool isGeneratingRoadmap;
+  final String? generationStatusMessage;
+  final String? generationError;
+  final String? activeGenerationJobId;
 
   LearningRoadmapPageState({
     this.loadState = AppLoadState.idle,
@@ -35,6 +42,10 @@ class LearningRoadmapPageState extends BasePageState {
     this.isLoadingSuggestions = false,
     this.suggestions = const [],
     this.userPreferences,
+    this.isGeneratingRoadmap = false,
+    this.generationStatusMessage,
+    this.generationError,
+    this.activeGenerationJobId,
     super.isLockedPage,
   });
 
@@ -50,6 +61,10 @@ class LearningRoadmapPageState extends BasePageState {
     bool? isLoadingSuggestions,
     List<RoadmapSuggestion>? suggestions,
     RoadmapPreferences? userPreferences,
+    bool? isGeneratingRoadmap,
+    String? generationStatusMessage,
+    String? generationError,
+    String? activeGenerationJobId,
   }) {
     return LearningRoadmapPageState(
       loadState: loadState ?? this.loadState,
@@ -62,6 +77,10 @@ class LearningRoadmapPageState extends BasePageState {
       isLoadingSuggestions: isLoadingSuggestions ?? this.isLoadingSuggestions,
       suggestions: suggestions ?? this.suggestions,
       userPreferences: userPreferences ?? this.userPreferences,
+      isGeneratingRoadmap: isGeneratingRoadmap ?? this.isGeneratingRoadmap,
+      generationStatusMessage: generationStatusMessage,
+      generationError: generationError,
+      activeGenerationJobId: activeGenerationJobId,
     );
   }
 
@@ -98,6 +117,12 @@ class LearningRoadmapPageModel extends BasePageModel<LearningRoadmapPageState> {
   final LearningService learningService;
   final LearningQuestService learningQuestService;
   final LogService logService;
+
+  int _generationSequenceId = 0;
+
+  bool _isGenerationCancelled(int sequenceId) {
+    return sequenceId != _generationSequenceId;
+  }
 
   Future<void> loadRoadmaps() async {
     try {
@@ -213,6 +238,38 @@ class LearningRoadmapPageModel extends BasePageModel<LearningRoadmapPageState> {
       }
 
       state = state.updateState(errorMessage: errorMessage);
+      return false;
+    }
+  }
+
+  Future<bool> deleteRoadmap(String roadmapId) async {
+    try {
+      state = state.updateState(isLockedPage: true);
+      await learningService.deleteRoadmap(roadmapId);
+
+      // Remove from list and update state
+      final updatedRoadmaps = state.roadmaps.where((r) => r.id != roadmapId).toList();
+      state = state.updateState(
+        isLockedPage: false,
+        roadmaps: updatedRoadmaps,
+        errorMessage: null,
+      );
+
+      final context = AppSession.navigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        AppToastService.success(context, 'Xoá lộ trình thành công!');
+      }
+
+      return true;
+    } catch (e) {
+      state = state.updateState(
+        isLockedPage: false,
+        errorMessage: 'Không thể xoá lộ trình. Vui lòng thử lại.',
+      );
+      final context = AppSession.navigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        AppToastService.error(context, 'Không thể xoá lộ trình.');
+      }
       return false;
     }
   }
@@ -397,6 +454,156 @@ class LearningRoadmapPageModel extends BasePageModel<LearningRoadmapPageState> {
 
     // Load template suggestions with preferences
     loadSuggestions(preferences);
+  }
+
+  /// Generate roadmap with AI
+  Future<void> generateRoadmapWithAI(RoadmapPreferences preferences) async {
+    // Validate learning goal
+    if (preferences.learningGoal == null || preferences.learningGoal!.trim().isEmpty) {
+      state = state.updateState(
+        generationError: 'Vui lòng nhập mục tiêu học.',
+      );
+      return;
+    }
+
+    // Prevent double submit
+    if (state.isGeneratingRoadmap) {
+      return;
+    }
+
+    // Increment sequence to cancel any previous polling
+    _generationSequenceId++;
+    final currentSequenceId = _generationSequenceId;
+
+    try {
+      // Clear previous error and start generation
+      state = state.updateState(
+        isGeneratingRoadmap: true,
+        generationStatusMessage: 'Đang tạo lộ trình học...',
+        generationError: null,
+        activeGenerationJobId: null,
+      );
+
+      final result = await learningService.generateRoadmap(
+        learningGoal: preferences.learningGoal!,
+        category: preferences.category,
+        difficulty: _mapPreferredDifficultyToString(preferences.difficulty),
+        maxDuration: preferences.maxDuration,
+      );
+
+      // Check if cancelled
+      if (_isGenerationCancelled(currentSequenceId)) {
+        return;
+      }
+
+      // Handle sync completion
+      if (result.status == GenerateStatus.completed) {
+        if (result.roadmapItem != null) {
+          // Refresh roadmap list to include the new one
+          await refreshRoadmaps();
+
+          if (_isGenerationCancelled(currentSequenceId)) {
+            return;
+          }
+
+          state = state.updateState(
+            isGeneratingRoadmap: false,
+            generationStatusMessage: null,
+            showPreferenceSheet: false,
+            userPreferences: null,
+          );
+
+          final context = AppSession.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            AppToastService.success(context, 'Tạo lộ trình học thành công!');
+          }
+          return;
+        }
+      }
+
+      // Handle async start
+      if (result.status == GenerateStatus.started && result.jobId != null) {
+        state = state.updateState(
+          generationStatusMessage: 'SoloQuest đang tạo lộ trình học...',
+          activeGenerationJobId: result.jobId,
+        );
+
+        // Poll for completion with cancellation guard
+        final generatedRoadmap = await learningService.pollRoadmapGeneration(
+          jobId: result.jobId!,
+          isCancelled: () => _isGenerationCancelled(currentSequenceId),
+        );
+
+        if (_isGenerationCancelled(currentSequenceId)) {
+          return;
+        }
+
+        if (generatedRoadmap != null) {
+          // Success - refresh list
+          await refreshRoadmaps();
+
+          if (_isGenerationCancelled(currentSequenceId)) {
+            return;
+          }
+
+          state = state.updateState(
+            isGeneratingRoadmap: false,
+            generationStatusMessage: null,
+            activeGenerationJobId: null,
+            showPreferenceSheet: false,
+            userPreferences: null,
+          );
+
+          final context = AppSession.navigatorKey.currentContext;
+          if (context != null && context.mounted) {
+            AppToastService.success(context, 'Tạo lộ trình học thành công!');
+          }
+        } else {
+          // Timeout
+          state = state.updateState(
+            isGeneratingRoadmap: false,
+            generationStatusMessage: null,
+            activeGenerationJobId: null,
+            generationError: 'Tạo lộ trình đang lâu hơn dự kiến. Bạn có thể thử lại sau hoặc kéo để làm mới.',
+          );
+        }
+        return;
+      }
+
+      // Handle failed
+      if (result.status == GenerateStatus.failed) {
+        state = state.updateState(
+          isGeneratingRoadmap: false,
+          generationStatusMessage: null,
+          activeGenerationJobId: null,
+          generationError: result.errorMessage ?? 'Không thể tạo lộ trình. Vui lòng thử lại.',
+        );
+        return;
+      }
+    } catch (e) {
+      // Check if cancelled before updating state
+      if (_isGenerationCancelled(currentSequenceId)) {
+        return;
+      }
+
+      // Map error messages
+      String errorMessage = 'Không thể tạo lộ trình. Vui lòng thử lại.';
+
+      if (e.toString().contains('400') || e.toString().contains('validation')) {
+        errorMessage = 'Vui lòng nhập mục tiêu học rõ hơn.';
+      } else if (e.toString().contains('503') && e.toString().contains('AI')) {
+        errorMessage = 'Tính năng tạo lộ trình bằng AI đang tạm tắt.';
+      } else if (e.toString().contains('502') || e.toString().contains('503')) {
+        errorMessage = 'AI đang bận, thử lại sau.';
+      }
+
+      state = state.updateState(
+        isGeneratingRoadmap: false,
+        generationStatusMessage: null,
+        activeGenerationJobId: null,
+        generationError: errorMessage,
+      );
+    }
   }
 }
 

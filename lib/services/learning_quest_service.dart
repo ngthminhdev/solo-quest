@@ -1,5 +1,3 @@
-// UI reactivated with local/mock data; backend integration pending
-
 import '../models/learning_quest_model.dart';
 
 class LearningQuestService {

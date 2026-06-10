@@ -8,7 +8,6 @@ import 'profile_menu_tile.dart';
 
 class ProfileSettingsSection extends StatelessWidget {
   final VoidCallback onScheduleTap;
-  final VoidCallback? onLearningGoalsTap;
   final VoidCallback? onLearningRoadmapTap;
   final VoidCallback onReminderSettingsTap;
   final VoidCallback onQuestRulesTap;
@@ -16,7 +15,6 @@ class ProfileSettingsSection extends StatelessWidget {
   const ProfileSettingsSection({
     super.key,
     required this.onScheduleTap,
-    this.onLearningGoalsTap,
     this.onLearningRoadmapTap,
     required this.onReminderSettingsTap,
     required this.onQuestRulesTap,

@@ -10,25 +10,17 @@ import '../../../widgets/app_section_header/app_section_header.dart';
 
 class ProfileGoalSection extends StatelessWidget {
   final List<String> goals;
-
-  // Frontend fallback: when profile.mainGoals is empty but active learning
-  // goals exist, display learning goal titles instead of empty state.
-  // TODO: Backend should expose a canonical main_goal field so we don't need this fallback.
-  final List<String> learningGoalFallback;
-
   final VoidCallback onSetupGoals;
 
   const ProfileGoalSection({
     super.key,
     required this.goals,
-    this.learningGoalFallback = const [],
     required this.onSetupGoals,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final displayGoals = goals.isNotEmpty ? goals : learningGoalFallback;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
@@ -38,14 +30,10 @@ class ProfileGoalSection extends StatelessWidget {
           AppSectionHeader(title: l10n.profileGoalSectionTitle),
           const SizedBox(height: AppSpacing.s12),
 
-          if (displayGoals.isEmpty)
+          if (goals.isEmpty)
             _buildEmptyState(l10n)
           else
-            _buildGoalsList(
-              l10n,
-              displayGoals,
-              isFallback: goals.isEmpty && learningGoalFallback.isNotEmpty,
-            ),
+            _buildGoalsList(l10n, goals),
         ],
       ),
     );
@@ -86,9 +74,8 @@ class ProfileGoalSection extends StatelessWidget {
 
   Widget _buildGoalsList(
     AppLocalizations l10n,
-    List<String> displayGoals, {
-    required bool isFallback,
-  }) {
+    List<String> displayGoals,
+  ) {
     final primaryGoal = displayGoals.first;
     final secondaryGoals = displayGoals.skip(1).toList();
 
@@ -134,9 +121,7 @@ class ProfileGoalSection extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.s2),
                     Text(
-                      isFallback
-                          ? l10n.profileGoalFromLearning
-                          : l10n.profileGoalFromProfile,
+                      l10n.profileGoalFromProfile,
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColor.textSecondary,
