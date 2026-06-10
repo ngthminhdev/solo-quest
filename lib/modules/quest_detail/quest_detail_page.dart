@@ -14,12 +14,12 @@ import '../../constants/app_color.dart';
 import '../../constants/app_radius.dart';
 import '../../extensions/localization_extension.dart';
 import '../../widgets/app_scaffold/app_scaffold.dart';
-import '../../widgets/app_state/app_loading.dart';
 import '../../widgets/app_state/app_error_state.dart';
 import '../../widgets/app_toast/app_toast_service.dart';
 import '../../widgets/app_dialog/quest_completion_dialog.dart';
 import '../../widgets/app_bottom_sheet/snooze_quest_sheet.dart';
 import '../../widgets/app_bottom_sheet/skip_quest_sheet.dart';
+import '../../widgets/skeleton/skeleton_quest_detail_page.dart';
 import 'quest_detail_page_model.dart';
 import 'widgets/quest_detail_header.dart';
 import 'widgets/quest_detail_status_card.dart';
@@ -30,10 +30,12 @@ import 'widgets/quest_detail_history_section.dart';
 
 class QuestDetailPage extends BasePage<QuestDetailPageModel, QuestDetailPageState> {
   final String questId;
+  final QuestModel? initialQuest;
 
   QuestDetailPage({
     super.key,
     required this.questId,
+    this.initialQuest,
   }) : super(provider: questDetailPageProvider);
 
   @override
@@ -46,8 +48,17 @@ class _QuestDetailPageState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      pageModel.loadQuest(widget.questId);
+      pageModel.loadQuest(widget.questId, initialQuest: widget.initialQuest);
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant QuestDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.questId != widget.questId ||
+        oldWidget.initialQuest?.id != widget.initialQuest?.id) {
+      pageModel.loadQuest(widget.questId, initialQuest: widget.initialQuest);
+    }
   }
 
   @override
@@ -68,16 +79,20 @@ class _QuestDetailPageState
     if (state.loadState == AppLoadState.loading && !state.hasQuest) {
       return AppScaffold(
         title: 'Chi Tiết Nhiệm Vụ',
-        body: const AppLoading(message: 'Đang tải nhiệm vụ...'),
+        scroll: false,
+        body: const SkeletonQuestDetailPage(),
       );
     }
 
-    if (state.loadState == AppLoadState.error || !state.hasQuest) {
+    if (!state.hasQuest) {
       return AppScaffold(
         title: 'Chi Tiết Nhiệm Vụ',
         body: AppErrorState(
           message: state.errorMessage ?? 'Không thể tải nhiệm vụ',
-          onRetry: () => pageModel.loadQuest(widget.questId),
+          onRetry: () => pageModel.loadQuest(
+            widget.questId,
+            initialQuest: widget.initialQuest,
+          ),
         ),
       );
     }

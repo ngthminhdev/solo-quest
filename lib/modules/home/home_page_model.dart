@@ -191,6 +191,8 @@ class HomePageState extends BasePageState {
     HomeGenerationPhase? generationPhase,
     String? generationJobId,
     String? generationMessage,
+    bool clearGenerationJobId = false,
+    bool clearGenerationMessage = false,
   }) {
     return HomePageState(
       loadState: loadState ?? this.loadState,
@@ -208,8 +210,12 @@ class HomePageState extends BasePageState {
       pendingActions: pendingActions ?? this.pendingActions,
       dailyReviewReminder: dailyReviewReminder ?? this.dailyReviewReminder,
       generationPhase: generationPhase ?? this.generationPhase,
-      generationJobId: generationJobId ?? this.generationJobId,
-      generationMessage: generationMessage ?? this.generationMessage,
+      generationJobId: clearGenerationJobId
+          ? null
+          : generationJobId ?? this.generationJobId,
+      generationMessage: clearGenerationMessage
+          ? null
+          : generationMessage ?? this.generationMessage,
     );
   }
 }
@@ -250,6 +256,7 @@ class HomePageModel extends BasePageModel<HomePageState> {
   Timer? _pollTimer;
   int _pollCount = 0;
   bool _isPolling = false;
+  bool _pollInFlight = false;
   bool _disposed = false;
   bool _starting = false; // a generate-today POST is in flight
 
@@ -264,11 +271,16 @@ class HomePageModel extends BasePageModel<HomePageState> {
   @visibleForTesting
   bool get isPolling => _isPolling;
 
-  Future<void> loadHomeData() async {
+  @visibleForTesting
+  int get pollCount => _pollCount;
+
+  Future<void> loadHomeData({bool autoGenerateIfEmpty = true}) async {
     final todayStr = AppTimeFormatter.todayLocalDateQuery();
     final dateChanged = _lastLoadedDate != null && _lastLoadedDate != todayStr;
     if (dateChanged && kDebugMode) {
-      developer.log('[HOME] Date changed from $_lastLoadedDate to $todayStr, force reload');
+      developer.log(
+        '[HOME] Date changed from $_lastLoadedDate to $todayStr, force reload',
+      );
     }
     _lastLoadedDate = todayStr;
 
@@ -293,7 +305,9 @@ class HomePageModel extends BasePageModel<HomePageState> {
         return null as String?;
       }),
       _loadDailyReviewReminder().catchError((e) {
-        if (kDebugMode) developer.log('[HOME] Failed to load daily review reminder: $e');
+        if (kDebugMode) {
+          developer.log('[HOME] Failed to load daily review reminder: $e');
+        }
         return null as ReminderSettingModel?;
       }),
     ]);
@@ -329,7 +343,9 @@ class HomePageModel extends BasePageModel<HomePageState> {
       final overdueIndex = pendingQuests.indexWhere(
         (q) => q.reminderTime != null && q.reminderTime!.isBefore(now),
       );
-      final firstOverdue = overdueIndex >= 0 ? pendingQuests[overdueIndex] : null;
+      final firstOverdue = overdueIndex >= 0
+          ? pendingQuests[overdueIndex]
+          : null;
       final firstUpcoming = pendingQuests.first;
 
       // If there's an overdue quest, pick the earliest one.
@@ -363,9 +379,11 @@ class HomePageModel extends BasePageModel<HomePageState> {
     // Separate skipped quests
     final skipped = allQuests.where((q) => q.isSkipped).toList();
 
-    developer.log('[HOME] Quest breakdown: total=${allQuests.length}, '
-        'active=${featuredQuest != null ? 1 : 0}, upcoming=${upcoming.length}, '
-        'snoozed=${snoozed.length}, completed=${completed.length}, skipped=${skipped.length}');
+    developer.log(
+      '[HOME] Quest breakdown: total=${allQuests.length}, '
+      'active=${featuredQuest != null ? 1 : 0}, upcoming=${upcoming.length}, '
+      'snoozed=${snoozed.length}, completed=${completed.length}, skipped=${skipped.length}',
+    );
 
     final hasQuests = allQuests.isNotEmpty;
 
@@ -388,7 +406,8 @@ class HomePageModel extends BasePageModel<HomePageState> {
     // When today has no quests, find out whether a generation job is running
     // (e.g. started right after onboarding) and resume polling, or kick one
     // off. Skip if we are already generating/polling so we don't double-run.
-    if (!hasQuests &&
+    if (autoGenerateIfEmpty &&
+        !hasQuests &&
         !_isPolling &&
         state.generationPhase != HomeGenerationPhase.generating) {
       await _resumeOrStartGeneration(todayStr);
@@ -401,8 +420,58 @@ class HomePageModel extends BasePageModel<HomePageState> {
   /// poll counter, then reloads. If a job is still generating it restarts
   /// polling from the first attempt.
   Future<void> refresh() async {
+    final shouldCheckGenerationStatus =
+        state.generationPhase != HomeGenerationPhase.idle ||
+        (state.generationJobId?.isNotEmpty ?? false);
+    final date = AppTimeFormatter.todayLocalDateQuery();
+
     _stopPolling();
+
+    if (shouldCheckGenerationStatus) {
+      final handled = await _refreshGenerationStatus(date);
+      if (handled) return;
+    }
+
     await loadHomeData();
+  }
+
+  Future<bool> _refreshGenerationStatus(String date) async {
+    _logQuestGen('pull refresh status check date=$date');
+
+    final status = await _aiApiService.getTodayGenerationStatus(date: date);
+    if (_disposed) return true;
+
+    final s = status?.status;
+    if (s == null) return false;
+
+    _logQuestGen('poll status=$s');
+
+    if (s == DailyQuestGenerationStatus.completed) {
+      _logQuestGen('completed -> reload quests');
+      _setGenerationIdle();
+      await loadHomeData(autoGenerateIfEmpty: false);
+      return true;
+    }
+
+    if (s == DailyQuestGenerationStatus.generating) {
+      _startGenerationPolling(date, jobId: status?.jobId);
+      return true;
+    }
+
+    if (s == DailyQuestGenerationStatus.failed ||
+        s == DailyQuestGenerationStatus.stale) {
+      _setGenerationFailed();
+      return true;
+    }
+
+    if (s == DailyQuestGenerationStatus.notStarted) {
+      _stopPolling();
+      _setGenerationIdle();
+      await generateTodayQuests();
+      return true;
+    }
+
+    return false;
   }
 
   /// Inspects the generation job status for [date] and either resumes polling,
@@ -422,18 +491,21 @@ class HomePageModel extends BasePageModel<HomePageState> {
     final s = status?.status;
 
     if (s == DailyQuestGenerationStatus.generating) {
-      _startGenerationPolling(date);
+      _logQuestGen('poll status=generating');
+      _startGenerationPolling(date, jobId: status?.jobId);
       return;
     }
     if (s == DailyQuestGenerationStatus.failed ||
         s == DailyQuestGenerationStatus.stale) {
+      _logQuestGen('poll status=$s');
       _setGenerationFailed();
       return;
     }
     if (s == DailyQuestGenerationStatus.completed) {
-      // Job finished (possibly with 0 quests for a genuinely empty day).
-      // Leave the normal empty view.
+      _logQuestGen('poll status=completed');
+      _logQuestGen('completed -> reload quests');
       _setGenerationIdle();
+      await loadHomeData(autoGenerateIfEmpty: false);
       return;
     }
 
@@ -457,6 +529,7 @@ class HomePageModel extends BasePageModel<HomePageState> {
         generationPhase: HomeGenerationPhase.generating,
         generationMessage: _generatingMessage,
       );
+      _logQuestGen('start generate today');
 
       final outcome = await _aiApiService.generateTodayQuests(
         preferAI: true,
@@ -473,14 +546,14 @@ class HomePageModel extends BasePageModel<HomePageState> {
       }
 
       if (outcome.isGenerating) {
-        state = state.updateState(generationJobId: outcome.job!.jobId);
-        _startGenerationPolling(date);
+        _logQuestGen('generate response 202 jobId=${outcome.job!.jobId}');
+        _startGenerationPolling(date, jobId: outcome.job!.jobId);
         return;
       }
 
       // 200: quests ready or already existed → reload Home data.
       _setGenerationIdle();
-      await loadHomeData();
+      await loadHomeData(autoGenerateIfEmpty: false);
     } finally {
       _starting = false;
     }
@@ -496,14 +569,17 @@ class HomePageModel extends BasePageModel<HomePageState> {
 
   // ── Polling ──
 
-  void _startGenerationPolling(String date) {
+  void _startGenerationPolling(String date, {String? jobId}) {
     _stopPolling();
     _isPolling = true;
     _pollCount = 0;
+    _pollInFlight = false;
     state = state.updateState(
       generationPhase: HomeGenerationPhase.generating,
+      generationJobId: jobId,
       generationMessage: _generatingMessage,
     );
+    _logQuestGen('start polling date=$date');
     _pollTimer = Timer.periodic(_pollInterval, (_) => _onPollTick(date));
   }
 
@@ -512,65 +588,89 @@ class HomePageModel extends BasePageModel<HomePageState> {
       _stopPolling();
       return;
     }
+    if (!_isPolling || _pollInFlight) return;
 
+    _pollInFlight = true;
     _pollCount++;
-    if (_pollCount > _maxPolls) {
-      // Auto-poll budget exhausted; stop but keep Home usable (pull-to-refresh).
-      _stopPolling();
-      if (!_disposed) {
-        state = state.updateState(
-          generationPhase: HomeGenerationPhase.slow,
-          generationMessage: _slowMessage,
-        );
+    _logQuestGen('poll attempt $_pollCount/$_maxPolls');
+
+    try {
+      final status = await _aiApiService.getTodayGenerationStatus(date: date);
+      if (_disposed) {
+        _stopPolling();
+        return;
       }
-      return;
-    }
+      // Transient status error → keep polling on the next tick until budget.
+      if (status == null) {
+        if (_pollCount >= _maxPolls) _markGenerationSlow();
+        return;
+      }
 
-    final status = await _aiApiService.getTodayGenerationStatus(date: date);
-    if (_disposed) {
-      _stopPolling();
-      return;
-    }
-    // Transient status error → keep polling on the next tick.
-    if (status == null) return;
+      _logQuestGen('poll status=${status.status}');
 
-    switch (status.status) {
-      case DailyQuestGenerationStatus.completed:
-        _stopPolling();
-        _setGenerationIdle();
-        await loadHomeData();
-        break;
-      case DailyQuestGenerationStatus.failed:
-      case DailyQuestGenerationStatus.stale:
-        _setGenerationFailed();
-        break;
-      case DailyQuestGenerationStatus.notStarted:
-        // Job vanished; stop without looping forever.
-        _stopPolling();
-        _setGenerationIdle();
-        break;
-      case DailyQuestGenerationStatus.generating:
-      default:
-        // Keep polling until completion or the poll budget is reached.
-        break;
+      switch (status.status) {
+        case DailyQuestGenerationStatus.completed:
+          _stopPolling();
+          _logQuestGen('completed -> reload quests');
+          _setGenerationIdle();
+          await loadHomeData(autoGenerateIfEmpty: false);
+          break;
+        case DailyQuestGenerationStatus.failed:
+        case DailyQuestGenerationStatus.stale:
+          _setGenerationFailed();
+          break;
+        case DailyQuestGenerationStatus.notStarted:
+          // Job vanished; stop without looping forever.
+          _stopPolling();
+          _setGenerationIdle();
+          break;
+        case DailyQuestGenerationStatus.generating:
+        default:
+          if (_pollCount >= _maxPolls) {
+            _markGenerationSlow();
+          }
+          break;
+      }
+    } finally {
+      _pollInFlight = false;
     }
   }
 
   void _stopPolling() {
+    final hadPolling = _isPolling || _pollTimer != null || _pollCount > 0;
     _pollTimer?.cancel();
     _pollTimer = null;
     _isPolling = false;
+    _pollInFlight = false;
     _pollCount = 0;
+    if (hadPolling) _logQuestGen('cancel polling');
   }
 
   void _setGenerationIdle() {
-    state = state.updateState(generationPhase: HomeGenerationPhase.idle);
+    state = state.updateState(
+      generationPhase: HomeGenerationPhase.idle,
+      clearGenerationJobId: true,
+      clearGenerationMessage: true,
+    );
+  }
+
+  void _markGenerationSlow() {
+    _logQuestGen('poll budget exhausted');
+    _stopPolling();
+    if (!_disposed) {
+      state = state.updateState(
+        generationPhase: HomeGenerationPhase.slow,
+        clearGenerationJobId: true,
+        generationMessage: _slowMessage,
+      );
+    }
   }
 
   void _setGenerationFailed() {
     _stopPolling();
     state = state.updateState(
       generationPhase: HomeGenerationPhase.failed,
+      clearGenerationJobId: true,
       generationMessage: _failedMessage,
     );
   }
@@ -580,6 +680,10 @@ class HomePageModel extends BasePageModel<HomePageState> {
     _disposed = true;
     _stopPolling();
     super.dispose();
+  }
+
+  void _logQuestGen(String message) {
+    if (kDebugMode) developer.log('[QUEST_GEN] $message');
   }
 
   Future<List<QuestModel>> _loadQuests() async {
@@ -614,7 +718,9 @@ class HomePageModel extends BasePageModel<HomePageState> {
         ),
       );
     } catch (e) {
-      if (kDebugMode) developer.log('[HOME] Failed to load daily review reminder: $e');
+      if (kDebugMode) {
+        developer.log('[HOME] Failed to load daily review reminder: $e');
+      }
       return null;
     }
   }

@@ -220,7 +220,7 @@ class _HomePageState
   void _openQuestDetail(QuestModel quest) {
     Navigator.of(
       context,
-    ).pushNamed(RoutesConfig.questDetail, arguments: {'id': quest.id});
+    ).pushNamed(RoutesConfig.questDetail, arguments: {'id': quest.id, 'quest': quest});
   }
 
   Future<void> _handleStartQuest(QuestModel quest) async {

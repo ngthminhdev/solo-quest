@@ -10,7 +10,7 @@ class ReminderService {
   final ReminderSettingsApiService _apiService;
 
   ReminderService({ReminderSettingsApiService? apiService})
-      : _apiService = apiService ?? ReminderSettingsApiService();
+    : _apiService = apiService ?? ReminderSettingsApiService();
 
   // ─── Local fallback data ──────────────────────────────────────────
 
@@ -102,12 +102,16 @@ class ReminderService {
       if (_usingFallback) {
         _usingFallback = false;
         if (kDebugMode) {
-          developer.log('[ReminderSettings] Backend API available again, '
-              'loaded ${models.length} settings from API.');
+          developer.log(
+            '[ReminderSettings] Backend API available again, '
+            'loaded ${models.length} settings from API.',
+          );
         }
       }
       if (kDebugMode) {
-        developer.log('[ReminderSettings] API GET success — ${models.length} items');
+        developer.log(
+          '[ReminderSettings] API GET success — ${models.length} items',
+        );
       }
       return models;
     } catch (e) {
@@ -115,8 +119,10 @@ class ReminderService {
         if (!_usingFallback) {
           _usingFallback = true;
           if (kDebugMode) {
-            developer.log('[ReminderSettings] Backend API unavailable, '
-                'using local fallback. ($e)');
+            developer.log(
+              '[ReminderSettings] Backend API unavailable, '
+              'using local fallback. ($e)',
+            );
           }
         }
         return List<ReminderSettingModel>.from(_fallbackSettings);
@@ -136,14 +142,18 @@ class ReminderService {
         request: request,
       );
       if (kDebugMode) {
-        developer.log('[ReminderSettings] API PATCH success — ${setting.type.name}');
+        developer.log(
+          '[ReminderSettings] API PATCH success — ${setting.type.name}',
+        );
       }
       return dto.toModel();
     } catch (e) {
       if (ReminderSettingsApiService.isEndpointUnavailable(e)) {
         if (kDebugMode) {
-          developer.log('[ReminderSettings] API PATCH unavailable, '
-              'using local fallback for ${setting.type.name}');
+          developer.log(
+            '[ReminderSettings] API PATCH unavailable, '
+            'using local fallback for ${setting.type.name}',
+          );
         }
         return _updateFallback(setting);
       }
@@ -152,31 +162,28 @@ class ReminderService {
   }
 
   Future<ReminderSettingModel> toggleReminder(
-    String settingId, {
+    ReminderType type, {
     required bool enabled,
   }) async {
-    // Find the type from fallback list (works for both API and fallback paths)
-    final type = _resolveType(settingId);
-
     try {
-      final status =
-          enabled ? ReminderStatus.enabled : ReminderStatus.disabled;
-      final dto = await _apiService.toggleReminder(
-        type: type,
-        status: status,
-      );
+      final status = enabled ? ReminderStatus.enabled : ReminderStatus.disabled;
+      final dto = await _apiService.toggleReminder(type: type, status: status);
       if (kDebugMode) {
-        developer.log('[ReminderSettings] API toggle success — '
-            '${type.name} -> ${status.toApiValue()}');
+        developer.log(
+          '[ReminderSettings] API toggle success — '
+          '${type.name} -> ${status.toApiValue()}',
+        );
       }
       return dto.toModel();
     } catch (e) {
       if (ReminderSettingsApiService.isEndpointUnavailable(e)) {
         if (kDebugMode) {
-          developer.log('[ReminderSettings] API toggle unavailable, '
-              'using local fallback for ${type.name}');
+          developer.log(
+            '[ReminderSettings] API toggle unavailable, '
+            'using local fallback for ${type.name}',
+          );
         }
-        return _toggleFallback(settingId, enabled: enabled);
+        return _toggleFallback(type, enabled: enabled);
       }
       rethrow;
     }
@@ -193,22 +200,8 @@ class ReminderService {
 
   // ─── Local fallback helpers ───────────────────────────────────────
 
-  ReminderType _resolveType(String settingId) {
-    // settingId matches type name in fallback data
-    for (final s in _fallbackSettings) {
-      if (s.id == settingId) return s.type;
-    }
-    // Try parsing the id as a type name
-    return ReminderTypeApi.tryFromApiValue(settingId) ??
-        ReminderType.values.firstWhere(
-          (t) => t.name == settingId,
-          orElse: () => ReminderType.custom,
-        );
-  }
-
   ReminderSettingModel _updateFallback(ReminderSettingModel setting) {
-    final index =
-        _fallbackSettings.indexWhere((item) => item.id == setting.id);
+    final index = _fallbackSettings.indexWhere((item) => item.id == setting.id);
     if (index == -1) {
       throw Exception('Reminder setting not found: ${setting.id}');
     }
@@ -217,13 +210,12 @@ class ReminderService {
   }
 
   ReminderSettingModel _toggleFallback(
-    String settingId, {
+    ReminderType type, {
     required bool enabled,
   }) {
-    final index =
-        _fallbackSettings.indexWhere((item) => item.id == settingId);
+    final index = _fallbackSettings.indexWhere((item) => item.type == type);
     if (index == -1) {
-      throw Exception('Reminder setting not found: $settingId');
+      throw Exception('Reminder setting not found: ${type.toApiValue()}');
     }
     final updated = _fallbackSettings[index].copyWith(
       status: enabled ? ReminderStatus.enabled : ReminderStatus.disabled,

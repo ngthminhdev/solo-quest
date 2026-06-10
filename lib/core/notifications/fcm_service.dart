@@ -455,6 +455,20 @@ class FcmService {
         return;
       }
 
+      // Navigate Home by clearing the stack down to a single MainPage instead
+      // of pushing a new one on top. Plain pushNamed stacks a fresh MainPage per
+      // reminder, and each MainPage registers its own countdown/reminder
+      // listeners — so when a countdown expired the popup was shown once per
+      // stacked MainPage, requiring several "close" taps to dismiss them all.
+      // removeUntil((route) => false) guarantees exactly one MainPage remains.
+      void goHome() {
+        _ref?.read(mainPageProvider.notifier).goToTab(0);
+        navigator.pushNamedAndRemoveUntil(
+          RoutesConfig.home,
+          (route) => false,
+        );
+      }
+
       // Quest events
       if ((payload.questId != null && payload.questId!.isNotEmpty) || payload.action == 'open_quest_detail') {
         if (payload.questId != null && payload.questId!.isNotEmpty) {
@@ -466,24 +480,21 @@ class FcmService {
           if (kDebugMode) {
             debugPrint('[FCM] Quest ID is missing, falling back to Home');
           }
-          _ref?.read(mainPageProvider.notifier).goToTab(0);
-          navigator.pushNamed(RoutesConfig.home);
+          goHome();
         }
         return;
       }
 
       // Water reminder
       if (payload.reminderType == 'water' || payload.action == 'water_reminder') {
-        _ref?.read(mainPageProvider.notifier).goToTab(0);
-        navigator.pushNamed(RoutesConfig.home);
+        goHome();
         _showReminderPromptWithSafeguards(payload);
         return;
       }
 
       // Break time reminder
       if (payload.reminderType == 'break_time' || payload.action == 'start_break_timer') {
-        _ref?.read(mainPageProvider.notifier).goToTab(0);
-        navigator.pushNamed(RoutesConfig.home);
+        goHome();
         _showReminderPromptWithSafeguards(payload);
         return;
       }
@@ -493,8 +504,7 @@ class FcmService {
         try {
           navigator.pushNamed(RoutesConfig.dailyReview);
         } catch (e) {
-          _ref?.read(mainPageProvider.notifier).goToTab(0);
-          navigator.pushNamed(RoutesConfig.home);
+          goHome();
           _showReminderPromptWithSafeguards(payload);
         }
         return;
@@ -506,8 +516,7 @@ class FcmService {
       final isSleep = payload.reminderType == 'sleep' || payload.action == 'sleep_reminder';
 
       if (isMovement || isLearning || isSleep) {
-        _ref?.read(mainPageProvider.notifier).goToTab(0);
-        navigator.pushNamed(RoutesConfig.home);
+        goHome();
         _showReminderPromptWithSafeguards(payload);
         return;
       }
@@ -516,8 +525,7 @@ class FcmService {
       if (kDebugMode) {
         debugPrint('[FCM] Unknown event: ${payload.event}, action: ${payload.action}. Falling back to Home.');
       }
-      _ref?.read(mainPageProvider.notifier).goToTab(0);
-      navigator.pushNamed(RoutesConfig.home);
+      goHome();
     } catch (e) {
       if (kDebugMode) {
         debugPrint('[FCM] Error in handleNotificationPayload: $e');

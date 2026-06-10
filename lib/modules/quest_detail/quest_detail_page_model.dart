@@ -55,29 +55,44 @@ class QuestDetailPageModel extends BasePageModel<QuestDetailPageState> {
   final QuestService questService;
   final LogService logService;
   final ProgressService progressService;
+  int _loadRequestVersion = 0;
 
-  Future<void> loadQuest(String questId) async {
+  Future<void> loadQuest(String questId, {QuestModel? initialQuest}) async {
+    final requestVersion = ++_loadRequestVersion;
+    final cachedQuest = initialQuest?.id == questId ? initialQuest : null;
+
     if (questId.isEmpty) {
-      state = state.updateState(
+      state = QuestDetailPageState(
         loadState: AppLoadState.error,
         errorMessage: 'Không tìm thấy nhiệm vụ',
       );
       return;
     }
 
-    state = state.updateState(loadState: AppLoadState.loading);
+    state = QuestDetailPageState(
+      loadState: AppLoadState.loading,
+      quest: cachedQuest,
+    );
 
     try {
       final quest = await questService.getQuestById(questId);
+      if (requestVersion != _loadRequestVersion) return;
+
       if (quest == null) {
-        state = state.updateState(
-          loadState: AppLoadState.error,
-          errorMessage: 'Không tìm thấy nhiệm vụ',
-        );
+        state = cachedQuest == null
+            ? QuestDetailPageState(
+                loadState: AppLoadState.error,
+                errorMessage: 'Không tìm thấy nhiệm vụ',
+              )
+            : state.updateState(
+                loadState: AppLoadState.error,
+                errorMessage: 'Không thể cập nhật nhiệm vụ',
+              );
         return;
       }
 
       final logs = await logService.getQuestLogs(questId);
+      if (requestVersion != _loadRequestVersion) return;
 
       state = state.updateState(
         loadState: AppLoadState.ready,
@@ -85,10 +100,17 @@ class QuestDetailPageModel extends BasePageModel<QuestDetailPageState> {
         logs: logs,
       );
     } catch (e) {
-      state = state.updateState(
-        loadState: AppLoadState.error,
-        errorMessage: 'Không thể tải nhiệm vụ: ${e.toString()}',
-      );
+      if (requestVersion != _loadRequestVersion) return;
+
+      state = cachedQuest == null
+          ? QuestDetailPageState(
+              loadState: AppLoadState.error,
+              errorMessage: 'Không thể tải nhiệm vụ: ${e.toString()}',
+            )
+          : state.updateState(
+              loadState: AppLoadState.error,
+              errorMessage: 'Không thể cập nhật nhiệm vụ: ${e.toString()}',
+            );
     }
   }
 

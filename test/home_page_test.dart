@@ -22,6 +22,7 @@ import 'package:solo_quest/core/api/dto/daily_quest_generation_dto.dart';
 class FakeQuestService extends Fake implements QuestService {
   List<QuestModel> quests = [];
   bool getTodayQuestsCalled = false;
+  int getTodayQuestsCallCount = 0;
   String? startedQuestId;
   String? completedQuestId;
   String? snoozedQuestId;
@@ -32,6 +33,7 @@ class FakeQuestService extends Fake implements QuestService {
   @override
   Future<List<QuestModel>> getTodayQuests() async {
     getTodayQuestsCalled = true;
+    getTodayQuestsCallCount++;
     return quests;
   }
 
@@ -41,13 +43,16 @@ class FakeQuestService extends Fake implements QuestService {
   }
 
   @override
-  Future<List<QuestModel>> getActiveQuests() async => quests.where((q) => q.isActive).toList();
+  Future<List<QuestModel>> getActiveQuests() async =>
+      quests.where((q) => q.isActive).toList();
 
   @override
-  Future<List<QuestModel>> getUpcomingQuests() async => quests.where((q) => q.isPending).toList();
+  Future<List<QuestModel>> getUpcomingQuests() async =>
+      quests.where((q) => q.isPending).toList();
 
   @override
-  Future<List<QuestModel>> getCompletedQuests() async => quests.where((q) => q.isCompleted).toList();
+  Future<List<QuestModel>> getCompletedQuests() async =>
+      quests.where((q) => q.isCompleted).toList();
 
   @override
   Future<QuestModel> startQuest(String questId) async {
@@ -56,7 +61,11 @@ class FakeQuestService extends Fake implements QuestService {
   }
 
   @override
-  Future<QuestModel> completeQuest(String questId, {String? note, String? mood}) async {
+  Future<QuestModel> completeQuest(
+    String questId, {
+    String? note,
+    String? mood,
+  }) async {
     completedQuestId = questId;
     return quests.firstWhere((q) => q.id == questId);
   }
@@ -77,8 +86,11 @@ class FakeQuestService extends Fake implements QuestService {
 }
 
 class FakeProgressService extends Fake implements ProgressService {
+  int getProgressCallCount = 0;
+
   @override
   Future<ProgressModel> getProgress() async {
+    getProgressCallCount++;
     return const ProgressModel(
       level: 2,
       currentLevelExp: 50,
@@ -102,8 +114,7 @@ class FakeLogService extends Fake implements LogService {
     String? type,
     String? questType,
     String? date,
-  }) async =>
-      [];
+  }) async => [];
 
   @override
   Future<List<LogEntryModel>> getLogsByDate(DateTime date) async => [];
@@ -138,8 +149,11 @@ class FakeAuthService extends Fake implements AuthService {
 }
 
 class FakeUserApiService extends Fake implements UserApiService {
+  int getDailyStatusCallCount = 0;
+
   @override
   Future<DailyStatusDto> getDailyStatus() async {
+    getDailyStatusCallCount++;
     return DailyStatusDto(
       hasCheckedIn: true,
       hasReviewed: false,
@@ -168,11 +182,13 @@ class FakeAiApiService extends Fake implements AiApiService {
   bool? lastPreferAI;
   bool? lastForce;
   bool? lastReplacePendingOnly;
+  String? lastGenerateDate;
 
   // status
   DailyQuestGenerationStatusDto? statusResult;
   List<DailyQuestGenerationStatusDto?>? statusQueue;
   int statusCallCount = 0;
+  final List<String?> statusDates = [];
 
   @override
   Future<GenerateTodayOutcome?> generateTodayQuests({
@@ -185,6 +201,7 @@ class FakeAiApiService extends Fake implements AiApiService {
     lastPreferAI = preferAI;
     lastForce = force;
     lastReplacePendingOnly = replacePendingOnly;
+    lastGenerateDate = date;
     return generateOutcome;
   }
 
@@ -193,6 +210,7 @@ class FakeAiApiService extends Fake implements AiApiService {
     String? date,
   }) async {
     statusCallCount++;
+    statusDates.add(date);
     if (statusQueue != null && statusQueue!.isNotEmpty) {
       return statusQueue!.removeAt(0);
     }
@@ -212,7 +230,9 @@ DailyQuestGenerationStatusDto _status(String status, {int questCount = 0}) {
 class FakeApiClient extends Fake implements ApiClient {
   dynamic responseData;
   String? lastPath;
+  String? lastGetPath;
   Map<String, dynamic>? lastBody;
+  Map<String, String?>? lastGetQuery;
 
   @override
   Future<T> post<T>(
@@ -224,6 +244,21 @@ class FakeApiClient extends Fake implements ApiClient {
   }) async {
     lastPath = path;
     lastBody = body;
+    if (fromJson != null) {
+      return fromJson(responseData);
+    }
+    return responseData as T;
+  }
+
+  @override
+  Future<T> get<T>(
+    String path, {
+    Map<String, String?>? queryParams,
+    T Function(dynamic json)? fromJson,
+    int timeout = 30,
+  }) async {
+    lastGetPath = path;
+    lastGetQuery = queryParams;
     if (fromJson != null) {
       return fromJson(responseData);
     }
@@ -274,9 +309,27 @@ void main() {
     test('featured selector picks earliest overdue pending quest', () async {
       final now = DateTime.now();
       fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Late Morning', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.subtract(const Duration(hours: 3))),
-        QuestModel(id: 'q2', title: 'Late Afternoon', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.subtract(const Duration(hours: 1))),
-        QuestModel(id: 'q3', title: 'Evening', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
+        QuestModel(
+          id: 'q1',
+          title: 'Late Morning',
+          type: QuestType.learning,
+          status: QuestStatus.pending,
+          reminderTime: now.subtract(const Duration(hours: 3)),
+        ),
+        QuestModel(
+          id: 'q2',
+          title: 'Late Afternoon',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+          reminderTime: now.subtract(const Duration(hours: 1)),
+        ),
+        QuestModel(
+          id: 'q3',
+          title: 'Evening',
+          type: QuestType.movement,
+          status: QuestStatus.pending,
+          reminderTime: now.add(const Duration(hours: 2)),
+        ),
       ];
 
       await homePageModel.loadHomeData();
@@ -285,25 +338,58 @@ void main() {
       expect(homePageModel.state.activeQuests.first.id, 'q1');
     });
 
-    test('featured selector picks earliest upcoming quest when none are overdue', () async {
-      final now = DateTime.now();
-      fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Evening Quest', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 4))),
-        QuestModel(id: 'q2', title: 'Next Quest', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-        QuestModel(id: 'q3', title: 'Later Quest', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 6))),
-      ];
+    test(
+      'featured selector picks earliest upcoming quest when none are overdue',
+      () async {
+        final now = DateTime.now();
+        fakeQuestService.quests = [
+          QuestModel(
+            id: 'q1',
+            title: 'Evening Quest',
+            type: QuestType.movement,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 4)),
+          ),
+          QuestModel(
+            id: 'q2',
+            title: 'Next Quest',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 1)),
+          ),
+          QuestModel(
+            id: 'q3',
+            title: 'Later Quest',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 6)),
+          ),
+        ];
 
-      await homePageModel.loadHomeData();
+        await homePageModel.loadHomeData();
 
-      expect(homePageModel.state.activeQuests.length, 1);
-      expect(homePageModel.state.activeQuests.first.id, 'q2');
-    });
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(homePageModel.state.activeQuests.first.id, 'q2');
+      },
+    );
 
     test('active quest is featured among pending quests', () async {
       final now = DateTime.now();
       fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Pending First', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-        QuestModel(id: 'q2', title: 'Active Quest', type: QuestType.water, status: QuestStatus.active, reminderTime: now.add(const Duration(hours: 2))),
+        QuestModel(
+          id: 'q1',
+          title: 'Pending First',
+          type: QuestType.learning,
+          status: QuestStatus.pending,
+          reminderTime: now.add(const Duration(hours: 1)),
+        ),
+        QuestModel(
+          id: 'q2',
+          title: 'Active Quest',
+          type: QuestType.water,
+          status: QuestStatus.active,
+          reminderTime: now.add(const Duration(hours: 2)),
+        ),
       ];
 
       await homePageModel.loadHomeData();
@@ -312,68 +398,153 @@ void main() {
       expect(homePageModel.state.activeQuests.first.id, 'q1');
     });
 
-    test('quests without reminderTime come after those with reminderTime', () async {
-      final now = DateTime.now();
-      fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'No Time Quest 1', type: QuestType.learning, status: QuestStatus.pending),
-        const QuestModel(id: 'q2', title: 'No Time Quest 2', type: QuestType.water, status: QuestStatus.pending),
-        QuestModel(id: 'q3', title: 'Timed Quest', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-      ];
+    test(
+      'quests without reminderTime come after those with reminderTime',
+      () async {
+        final now = DateTime.now();
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'No Time Quest 1',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+          ),
+          const QuestModel(
+            id: 'q2',
+            title: 'No Time Quest 2',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+          ),
+          QuestModel(
+            id: 'q3',
+            title: 'Timed Quest',
+            type: QuestType.movement,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 1)),
+          ),
+        ];
 
-      await homePageModel.loadHomeData();
+        await homePageModel.loadHomeData();
 
-      expect(homePageModel.state.activeQuests.length, 1);
-      expect(homePageModel.state.activeQuests.first.id, 'q3');
-    });
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(homePageModel.state.activeQuests.first.id, 'q3');
+      },
+    );
 
     test('upcoming list excludes featured quest', () async {
       final now = DateTime.now();
       fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-        QuestModel(id: 'q2', title: 'Upcoming 1', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
-        QuestModel(id: 'q3', title: 'Upcoming 2', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 3))),
+        QuestModel(
+          id: 'q1',
+          title: 'Featured',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+          reminderTime: now.add(const Duration(hours: 1)),
+        ),
+        QuestModel(
+          id: 'q2',
+          title: 'Upcoming 1',
+          type: QuestType.learning,
+          status: QuestStatus.pending,
+          reminderTime: now.add(const Duration(hours: 2)),
+        ),
+        QuestModel(
+          id: 'q3',
+          title: 'Upcoming 2',
+          type: QuestType.movement,
+          status: QuestStatus.pending,
+          reminderTime: now.add(const Duration(hours: 3)),
+        ),
       ];
 
       await homePageModel.loadHomeData();
 
       expect(homePageModel.state.activeQuests.length, 1);
       expect(homePageModel.state.activeQuests.first.id, 'q1');
-      
-      expect(homePageModel.state.upcomingQuests.any((q) => q.id == 'q1'), isFalse);
+
+      expect(
+        homePageModel.state.upcomingQuests.any((q) => q.id == 'q1'),
+        isFalse,
+      );
       expect(homePageModel.state.upcomingQuests.length, 2);
     });
 
-    test('upcoming count is total remaining quests (excluding completed & featured)', () async {
-      final now = DateTime.now();
-      fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-        QuestModel(id: 'q2', title: 'Upcoming 1', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
-        QuestModel(id: 'q3', title: 'Upcoming 2', type: QuestType.movement, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 3))),
-        const QuestModel(id: 'q4', title: 'Done', type: QuestType.sleep, status: QuestStatus.completed),
-      ];
+    test(
+      'upcoming count is total remaining quests (excluding completed & featured)',
+      () async {
+        final now = DateTime.now();
+        fakeQuestService.quests = [
+          QuestModel(
+            id: 'q1',
+            title: 'Featured',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 1)),
+          ),
+          QuestModel(
+            id: 'q2',
+            title: 'Upcoming 1',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 2)),
+          ),
+          QuestModel(
+            id: 'q3',
+            title: 'Upcoming 2',
+            type: QuestType.movement,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 3)),
+          ),
+          const QuestModel(
+            id: 'q4',
+            title: 'Done',
+            type: QuestType.sleep,
+            status: QuestStatus.completed,
+          ),
+        ];
 
-      await homePageModel.loadHomeData();
+        await homePageModel.loadHomeData();
 
-      expect(homePageModel.state.activeQuests.length, 1);
-      expect(homePageModel.state.upcomingQuests.length, 2);
-      expect(homePageModel.state.completedQuests.length, 1);
-    });
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(homePageModel.state.upcomingQuests.length, 2);
+        expect(homePageModel.state.completedQuests.length, 1);
+      },
+    );
 
-    test('no duplicate quest ids between featured and upcoming sections', () async {
-      final now = DateTime.now();
-      fakeQuestService.quests = [
-        QuestModel(id: 'q1', title: 'Featured', type: QuestType.water, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 1))),
-        QuestModel(id: 'q2', title: 'Upcoming', type: QuestType.learning, status: QuestStatus.pending, reminderTime: now.add(const Duration(hours: 2))),
-      ];
+    test(
+      'no duplicate quest ids between featured and upcoming sections',
+      () async {
+        final now = DateTime.now();
+        fakeQuestService.quests = [
+          QuestModel(
+            id: 'q1',
+            title: 'Featured',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 1)),
+          ),
+          QuestModel(
+            id: 'q2',
+            title: 'Upcoming',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+            reminderTime: now.add(const Duration(hours: 2)),
+          ),
+        ];
 
-      await homePageModel.loadHomeData();
+        await homePageModel.loadHomeData();
 
-      final activeIds = homePageModel.state.activeQuests.map((q) => q.id).toSet();
-      final upcomingIds = homePageModel.state.upcomingQuests.map((q) => q.id).toSet();
+        final activeIds = homePageModel.state.activeQuests
+            .map((q) => q.id)
+            .toSet();
+        final upcomingIds = homePageModel.state.upcomingQuests
+            .map((q) => q.id)
+            .toSet();
 
-      final intersection = activeIds.intersection(upcomingIds);
-      expect(intersection.isEmpty, isTrue);
-    });
+        final intersection = activeIds.intersection(upcomingIds);
+        expect(intersection.isEmpty, isTrue);
+      },
+    );
   });
 
   group('Pull-to-refresh & Button Actions', () {
@@ -385,7 +556,12 @@ void main() {
 
     test('startQuest calls startQuest on service and reloads', () async {
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.pending),
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+        ),
       ];
       await homePageModel.startQuest('q1');
       expect(fakeQuestService.startedQuestId, 'q1');
@@ -393,7 +569,12 @@ void main() {
 
     test('completeQuest calls completeQuest on service and reloads', () async {
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.active,
+        ),
       ];
       await homePageModel.completeQuest('q1');
       expect(fakeQuestService.completedQuestId, 'q1');
@@ -401,7 +582,12 @@ void main() {
 
     test('snoozeQuest calls snoozeQuest on service and reloads', () async {
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.active,
+        ),
       ];
       await homePageModel.snoozeQuest('q1', minutes: 15);
       expect(fakeQuestService.snoozedQuestId, 'q1');
@@ -410,7 +596,12 @@ void main() {
 
     test('skipQuest calls skipQuest on service and reloads', () async {
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.active),
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.active,
+        ),
       ];
       await homePageModel.skipQuest('q1', reason: 'Too busy');
       expect(fakeQuestService.skippedQuestId, 'q1');
@@ -421,16 +612,21 @@ void main() {
   group('Duplicate Tap Prevention & Action Loading Map', () {
     test('startQuest updates pendingActions state map correctly', () async {
       fakeQuestService.quests = [
-        const QuestModel(id: 'q1', title: 'Q1', type: QuestType.water, status: QuestStatus.pending),
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+        ),
       ];
-      
+
       final future = homePageModel.startQuest('q1');
       expect(homePageModel.state.pendingActions.containsKey('q1'), isTrue);
       expect(homePageModel.state.pendingActions['q1'], QuestActionType.start);
       expect(homePageModel.state.isLockedPage, isTrue);
-      
+
       await future;
-      
+
       expect(homePageModel.state.pendingActions.containsKey('q1'), isFalse);
       expect(homePageModel.state.isLockedPage, isFalse);
     });
@@ -456,7 +652,7 @@ void main() {
           'source': 'dailyPlan',
           'exp': 20,
           'estimated_minutes': 15,
-        }
+        },
       };
 
       final result = await questApiService.startQuest('q-100');
@@ -476,7 +672,7 @@ void main() {
           'source': 'dailyPlan',
           'exp': 20,
           'estimated_minutes': 15,
-        }
+        },
       };
 
       final result = await questApiService.startQuest('q-200');
@@ -484,16 +680,17 @@ void main() {
       expect(result.title, 'Start Data Test');
     });
 
-    test('startQuest throws FormatException when response only has message', () async {
-      fakeApiClient.responseData = {
-        'message': 'success'
-      };
+    test(
+      'startQuest throws FormatException when response only has message',
+      () async {
+        fakeApiClient.responseData = {'message': 'success'};
 
-      expect(
-        () => questApiService.startQuest('q-300'),
-        throwsA(isA<FormatException>()),
-      );
-    });
+        expect(
+          () => questApiService.startQuest('q-300'),
+          throwsA(isA<FormatException>()),
+        );
+      },
+    );
 
     test('completeQuest parses {"result": {...}} successfully', () async {
       fakeApiClient.responseData = {
@@ -511,8 +708,8 @@ void main() {
           'exp_earned': 25,
           'leveled_up': true,
           'new_level': 3,
-          'message': 'completed successfully'
-        }
+          'message': 'completed successfully',
+        },
       };
 
       final result = await questApiService.completeQuest('q-400');
@@ -523,36 +720,40 @@ void main() {
       expect(result.newLevel, 3);
     });
 
-    test('completeQuest throws FormatException when response only has message', () async {
-      fakeApiClient.responseData = {
-        'message': 'success'
-      };
+    test(
+      'completeQuest throws FormatException when response only has message',
+      () async {
+        fakeApiClient.responseData = {'message': 'success'};
 
-      expect(
-        () => questApiService.completeQuest('q-500'),
-        throwsA(isA<FormatException>()),
-      );
-    });
+        expect(
+          () => questApiService.completeQuest('q-500'),
+          throwsA(isA<FormatException>()),
+        );
+      },
+    );
 
-    test('startQuest parses new standardized envelope {"item": {"id": ..., "title": ...}} within response', () async {
-      fakeApiClient.responseData = {
-        'item': {
-          'id': 'q-std-1',
-          'title': 'Standardized Start',
-          'type': 'learning',
-          'status': 'active',
-          'difficulty': 'hard',
-          'source': 'dailyPlan',
-          'exp': 20,
-          'estimated_minutes': 15,
-        }
-      };
+    test(
+      'startQuest parses new standardized envelope {"item": {"id": ..., "title": ...}} within response',
+      () async {
+        fakeApiClient.responseData = {
+          'item': {
+            'id': 'q-std-1',
+            'title': 'Standardized Start',
+            'type': 'learning',
+            'status': 'active',
+            'difficulty': 'hard',
+            'source': 'dailyPlan',
+            'exp': 20,
+            'estimated_minutes': 15,
+          },
+        };
 
-      final result = await questApiService.startQuest('q-std-1');
-      expect(result.id, 'q-std-1');
-      expect(result.title, 'Standardized Start');
-      expect(result.status, QuestStatus.active);
-    });
+        final result = await questApiService.startQuest('q-std-1');
+        expect(result.id, 'q-std-1');
+        expect(result.title, 'Standardized Start');
+        expect(result.status, QuestStatus.active);
+      },
+    );
   });
 
   group('Async Quest Generation', () {
@@ -564,28 +765,34 @@ void main() {
       quests: [],
     );
 
-    test('200 outcome reloads quests without entering generating state', () async {
-      fakeQuestService.quests = [
-        const QuestModel(
-          id: 'q1',
-          title: 'Q1',
-          type: QuestType.water,
-          status: QuestStatus.pending,
-        ),
-      ];
-      fakeAiApiService.generateOutcome =
-          const GenerateTodayOutcome(result: result200);
+    test(
+      '200 outcome reloads quests without entering generating state',
+      () async {
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+          ),
+        ];
+        fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+          result: result200,
+        );
 
-      await homePageModel.generateTodayQuests();
+        await homePageModel.generateTodayQuests();
 
-      expect(homePageModel.state.isGeneratingQuests, isFalse);
-      expect(homePageModel.isPolling, isFalse);
-      expect(homePageModel.state.activeQuests.length, 1);
-      expect(fakeAiApiService.generateCallCount, 1);
-    });
+        expect(homePageModel.state.isGeneratingQuests, isFalse);
+        expect(homePageModel.isPolling, isFalse);
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(fakeAiApiService.generateCallCount, 1);
+      },
+    );
 
     test('202 outcome enters generating state and starts polling', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
         job: DailyQuestGenerationStartDto(
           date: '2026-06-09',
@@ -595,8 +802,9 @@ void main() {
         ),
       );
       // Keep it generating so the test can observe the polling state.
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
 
       await homePageModel.generateTodayQuests();
 
@@ -604,6 +812,7 @@ void main() {
       expect(homePageModel.state.generationJobId, 'job-202');
       expect(homePageModel.isPolling, isTrue);
       expect(homePageModel.state.isGenerationFailed, isFalse);
+      expect(fakeAiApiService.statusCallCount, 0);
 
       homePageModel.dispose();
     });
@@ -617,9 +826,12 @@ void main() {
           estimatedSeconds: 15,
         ),
       );
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
 
       await homePageModel.retryGeneration();
 
@@ -630,47 +842,69 @@ void main() {
       homePageModel.dispose();
     });
 
-    test('polling completed stops polling, reloads, clears generating', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
-      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
-        job: DailyQuestGenerationStartDto(
-          date: '2026-06-09',
-          status: 'generating',
-          jobId: 'job-c',
-          estimatedSeconds: 15,
-        ),
-      );
-      // First the job is generating, then completes; on reload quests appear.
-      fakeAiApiService.statusQueue = [
-        _status(DailyQuestGenerationStatus.completed, questCount: 1),
-      ];
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.completed, questCount: 1);
+    test(
+      'polling completed stops polling, reloads, clears generating',
+      () async {
+        homePageModel = buildModel(
+          pollInterval: const Duration(milliseconds: 20),
+        );
+        fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+          job: DailyQuestGenerationStartDto(
+            date: '2026-06-09',
+            status: 'generating',
+            jobId: 'job-c',
+            estimatedSeconds: 15,
+          ),
+        );
+        // First the job is generating, then completes; on reload quests appear.
+        fakeAiApiService.statusQueue = [
+          _status(DailyQuestGenerationStatus.completed, questCount: 1),
+        ];
+        fakeAiApiService.statusResult = _status(
+          DailyQuestGenerationStatus.completed,
+          questCount: 1,
+        );
 
-      await homePageModel.generateTodayQuests();
-      expect(homePageModel.isPolling, isTrue);
+        await homePageModel.generateTodayQuests();
+        expect(homePageModel.isPolling, isTrue);
 
-      // Quests are available on the next reload.
-      fakeQuestService.quests = [
-        const QuestModel(
-          id: 'qc',
-          title: 'Generated',
-          type: QuestType.learning,
-          status: QuestStatus.pending,
-        ),
-      ];
+        // Quests are available on the next reload.
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'qc',
+            title: 'Generated',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+          ),
+        ];
 
-      await Future.delayed(const Duration(milliseconds: 80));
+        await Future.delayed(const Duration(milliseconds: 80));
 
-      expect(homePageModel.isPolling, isFalse);
-      expect(homePageModel.state.isGeneratingQuests, isFalse);
-      expect(homePageModel.state.activeQuests.length, 1);
+        expect(homePageModel.isPolling, isFalse);
+        expect(homePageModel.state.isGeneratingQuests, isFalse);
+        expect(homePageModel.state.generationPhase, HomeGenerationPhase.idle);
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(
+          fakeQuestService.getTodayQuestsCallCount,
+          greaterThanOrEqualTo(1),
+        );
+        expect(
+          fakeUserApiService.getDailyStatusCallCount,
+          greaterThanOrEqualTo(1),
+        );
+        expect(
+          fakeProgressService.getProgressCallCount,
+          greaterThanOrEqualTo(1),
+        );
 
-      homePageModel.dispose();
-    });
+        homePageModel.dispose();
+      },
+    );
 
     test('polling failed stops polling and shows retry/failed state', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
         job: DailyQuestGenerationStartDto(
           date: '2026-06-09',
@@ -679,8 +913,9 @@ void main() {
           estimatedSeconds: 15,
         ),
       );
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.failed);
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.failed,
+      );
 
       await homePageModel.generateTodayQuests();
       await Future.delayed(const Duration(milliseconds: 60));
@@ -693,7 +928,9 @@ void main() {
     });
 
     test('polling stale stops polling and shows retry/failed state', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
         job: DailyQuestGenerationStartDto(
           date: '2026-06-09',
@@ -702,8 +939,7 @@ void main() {
           estimatedSeconds: 15,
         ),
       );
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.stale);
+      fakeAiApiService.statusResult = _status(DailyQuestGenerationStatus.stale);
 
       await homePageModel.generateTodayQuests();
       await Future.delayed(const Duration(milliseconds: 60));
@@ -714,35 +950,46 @@ void main() {
       homePageModel.dispose();
     });
 
-    test('poll budget exhausted stops polling and shows slow message', () async {
-      homePageModel = buildModel(
-        pollInterval: const Duration(milliseconds: 15),
-        maxPolls: 2,
-      );
-      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
-        job: DailyQuestGenerationStartDto(
-          date: '2026-06-09',
-          status: 'generating',
-          jobId: 'job-slow',
-          estimatedSeconds: 15,
-        ),
-      );
-      // Always still generating → poll budget runs out.
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
+    test(
+      'poll budget exhausted stops polling and shows slow message',
+      () async {
+        homePageModel = buildModel(
+          pollInterval: const Duration(milliseconds: 15),
+          maxPolls: 2,
+        );
+        fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+          job: DailyQuestGenerationStartDto(
+            date: '2026-06-09',
+            status: 'generating',
+            jobId: 'job-slow',
+            estimatedSeconds: 15,
+          ),
+        );
+        // Always still generating → poll budget runs out.
+        fakeAiApiService.statusResult = _status(
+          DailyQuestGenerationStatus.generating,
+        );
 
-      await homePageModel.generateTodayQuests();
-      await Future.delayed(const Duration(milliseconds: 120));
+        await homePageModel.generateTodayQuests();
+        await Future.delayed(const Duration(milliseconds: 120));
 
-      expect(homePageModel.isPolling, isFalse);
-      expect(homePageModel.state.isGenerationSlow, isTrue);
-      expect(homePageModel.state.isGeneratingQuests, isFalse);
+        expect(homePageModel.isPolling, isFalse);
+        expect(fakeAiApiService.statusCallCount, 2);
+        expect(homePageModel.state.isGenerationSlow, isTrue);
+        expect(homePageModel.state.isGeneratingQuests, isFalse);
+        expect(
+          homePageModel.state.generationMessage,
+          'Quest vẫn đang được tạo. Bạn có thể kéo để làm mới sau.',
+        );
 
-      homePageModel.dispose();
-    });
+        homePageModel.dispose();
+      },
+    );
 
     test('dispose cancels the polling timer', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
         job: DailyQuestGenerationStartDto(
           date: '2026-06-09',
@@ -751,18 +998,25 @@ void main() {
           estimatedSeconds: 15,
         ),
       );
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
 
       await homePageModel.generateTodayQuests();
       expect(homePageModel.isPolling, isTrue);
 
       homePageModel.dispose();
       expect(homePageModel.isPolling, isFalse);
+
+      final callsAfterDispose = fakeAiApiService.statusCallCount;
+      await Future.delayed(const Duration(milliseconds: 70));
+      expect(fakeAiApiService.statusCallCount, callsAfterDispose);
     });
 
     test('concurrent generate calls do not start two timers', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
         job: DailyQuestGenerationStartDto(
           date: '2026-06-09',
@@ -771,8 +1025,9 @@ void main() {
           estimatedSeconds: 15,
         ),
       );
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
 
       await homePageModel.generateTodayQuests();
       await homePageModel.generateTodayQuests(); // guarded — should no-op
@@ -783,11 +1038,153 @@ void main() {
       homePageModel.dispose();
     });
 
+    test(
+      'pull-to-refresh resets polling and restarts from attempt 1 when still generating',
+      () async {
+        homePageModel = buildModel(
+          pollInterval: const Duration(milliseconds: 20),
+          maxPolls: 10,
+        );
+        fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+          job: DailyQuestGenerationStartDto(
+            date: '2026-06-09',
+            status: 'generating',
+            jobId: 'job-refresh',
+            estimatedSeconds: 15,
+          ),
+        );
+        fakeAiApiService.statusResult = _status(
+          DailyQuestGenerationStatus.generating,
+        );
+
+        await homePageModel.generateTodayQuests();
+        await Future.delayed(const Duration(milliseconds: 55));
+        expect(homePageModel.pollCount, greaterThanOrEqualTo(1));
+
+        await homePageModel.refresh();
+
+        expect(homePageModel.isPolling, isTrue);
+        expect(homePageModel.pollCount, 0);
+        expect(fakeAiApiService.statusCallCount, greaterThanOrEqualTo(1));
+
+        await Future.delayed(const Duration(milliseconds: 25));
+
+        expect(homePageModel.pollCount, 1);
+        homePageModel.dispose();
+      },
+    );
+
+    test(
+      'pull-to-refresh completed status reloads quests without starting a new job',
+      () async {
+        homePageModel = buildModel(
+          pollInterval: const Duration(milliseconds: 20),
+        );
+        fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+          job: DailyQuestGenerationStartDto(
+            date: '2026-06-09',
+            status: 'generating',
+            jobId: 'job-refresh-completed',
+            estimatedSeconds: 15,
+          ),
+        );
+        fakeAiApiService.statusResult = _status(
+          DailyQuestGenerationStatus.generating,
+        );
+
+        await homePageModel.generateTodayQuests();
+        expect(homePageModel.isPolling, isTrue);
+
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'qr',
+            title: 'Reloaded',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+          ),
+        ];
+        fakeAiApiService.statusResult = _status(
+          DailyQuestGenerationStatus.completed,
+          questCount: 1,
+        );
+        final generateCallsBeforeRefresh = fakeAiApiService.generateCallCount;
+
+        await homePageModel.refresh();
+
+        expect(homePageModel.isPolling, isFalse);
+        expect(homePageModel.state.generationPhase, HomeGenerationPhase.idle);
+        expect(homePageModel.state.activeQuests.length, 1);
+        expect(fakeAiApiService.generateCallCount, generateCallsBeforeRefresh);
+
+        homePageModel.dispose();
+      },
+    );
+
+    test('status null keeps polling until budget without crashing', () async {
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 15),
+        maxPolls: 2,
+      );
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-null',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult = null;
+
+      await homePageModel.generateTodayQuests();
+      await Future.delayed(const Duration(milliseconds: 80));
+
+      expect(fakeAiApiService.statusCallCount, 2);
+      expect(homePageModel.isPolling, isFalse);
+      expect(homePageModel.state.isGenerationSlow, isTrue);
+
+      homePageModel.dispose();
+    });
+
+    test('status calls use yyyy-MM-dd date from generation flow', () async {
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
+      fakeAiApiService.generateOutcome = const GenerateTodayOutcome(
+        job: DailyQuestGenerationStartDto(
+          date: '2026-06-09',
+          status: 'generating',
+          jobId: 'job-date',
+          estimatedSeconds: 15,
+        ),
+      );
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
+
+      await homePageModel.generateTodayQuests();
+      await Future.delayed(const Duration(milliseconds: 25));
+
+      expect(
+        fakeAiApiService.lastGenerateDate,
+        matches(RegExp(r'^\d{4}-\d{2}-\d{2}$')),
+      );
+      expect(fakeAiApiService.statusDates, isNotEmpty);
+      expect(
+        fakeAiApiService.statusDates.last,
+        matches(RegExp(r'^\d{4}-\d{2}-\d{2}$')),
+      );
+
+      homePageModel.dispose();
+    });
+
     test('empty day with a running job resumes polling on load', () async {
-      homePageModel = buildModel(pollInterval: const Duration(milliseconds: 20));
+      homePageModel = buildModel(
+        pollInterval: const Duration(milliseconds: 20),
+      );
       fakeQuestService.quests = []; // empty day
-      fakeAiApiService.statusResult =
-          _status(DailyQuestGenerationStatus.generating);
+      fakeAiApiService.statusResult = _status(
+        DailyQuestGenerationStatus.generating,
+      );
 
       await homePageModel.loadHomeData();
 

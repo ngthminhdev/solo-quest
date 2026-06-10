@@ -108,28 +108,35 @@ class ReminderSettingsPageModel
   }
 
   Future<bool> toggleReminder({
-    required String settingId,
+    required ReminderType type,
     required bool enabled,
   }) async {
     try {
       state = state.updateState(isLockedPage: true);
 
       final updated = await reminderService.toggleReminder(
-        settingId,
+        type,
         enabled: enabled,
+      );
+
+      state = state.updateState(
+        loadState: AppLoadState.ready,
+        settings: _replaceSetting(updated),
+        errorMessage: null,
       );
 
       await logService.addLog(
         LogEntryModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           type: LogEntryType.ruleUpdated,
-          title: enabled ? 'reminderSettingsLogToggleOn' : 'reminderSettingsLogToggleOff',
+          title: enabled
+              ? 'reminderSettingsLogToggleOn'
+              : 'reminderSettingsLogToggleOff',
           description: updated.title,
           createdAt: DateTime.now(),
         ),
       );
 
-      await loadSettings();
       state = state.updateState(isLockedPage: false);
       return true;
     } catch (e) {
@@ -182,12 +189,20 @@ class ReminderSettingsPageModel
   ) {
     final sorted = List<ReminderSettingModel>.from(settings);
     sorted.sort((a, b) {
-      if (a.isEnabled != b.isEnabled) {
-        return a.isEnabled ? -1 : 1;
-      }
       return a.type.index.compareTo(b.type.index);
     });
     return sorted;
+  }
+
+  List<ReminderSettingModel> _replaceSetting(ReminderSettingModel updated) {
+    final settings = List<ReminderSettingModel>.from(state.settings);
+    final index = settings.indexWhere((item) => item.type == updated.type);
+    if (index == -1) {
+      settings.add(updated);
+    } else {
+      settings[index] = updated;
+    }
+    return _sortSettings(settings);
   }
 }
 

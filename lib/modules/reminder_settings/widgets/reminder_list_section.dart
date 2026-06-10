@@ -54,6 +54,7 @@ class ReminderListSection extends StatelessWidget {
           else
             ...settings.map(
               (setting) => ReminderSettingCard(
+                key: ValueKey('${setting.type.toApiValue()}:${setting.id}'),
                 setting: setting,
                 isLocked: isLocked,
                 onEdit: () => onEdit(setting),

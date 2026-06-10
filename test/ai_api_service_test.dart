@@ -9,6 +9,7 @@ class FakeApiClient extends Fake implements ApiClient {
   dynamic getData;
   dynamic postData;
   String? lastPostPath;
+  String? lastGetPath;
   Map<String, dynamic>? lastPostBody;
   Map<String, String?>? lastGetQuery;
 
@@ -33,6 +34,7 @@ class FakeApiClient extends Fake implements ApiClient {
     T Function(dynamic json)? fromJson,
     int timeout = 30,
   }) async {
+    lastGetPath = path;
     lastGetQuery = queryParams;
     if (fromJson != null) return fromJson(getData);
     return getData as T;
@@ -64,6 +66,40 @@ void main() {
       expect(outcome.job!.jobId, 'job-123');
       expect(outcome.job!.estimatedSeconds, 15);
       expect(outcome.result, isNull);
+    });
+
+    test('202 wrapped backend payload parses async job data', () async {
+      client.postData = {
+        'code': 202,
+        'message': 'Quest generation started',
+        'data': {
+          'date': '2026-06-09',
+          'status': 'generating',
+          'job_id': 'job-wrapped',
+          'estimated_seconds': 15,
+        },
+      };
+
+      final outcome = await service.generateTodayQuests();
+
+      expect(outcome, isNotNull);
+      expect(outcome!.isGenerating, isTrue);
+      expect(outcome.job!.jobId, 'job-wrapped');
+      expect(client.lastPostPath, 'quests/generate-today');
+    });
+
+    test('202 is treated as success by ApiClient 2xx contract', () async {
+      client.postData = {
+        'date': '2026-06-09',
+        'status': 'generating',
+        'job_id': 'job-success',
+        'estimated_seconds': 15,
+      };
+
+      final outcome = await service.generateTodayQuests();
+
+      expect(outcome, isNotNull);
+      expect(outcome!.isGenerating, isTrue);
     });
 
     test('200 quests payload → outcome.result', () async {
@@ -134,7 +170,12 @@ void main() {
       expect(status!.isCompleted, isTrue);
       expect(status.questCount, 5);
       expect(status.source, 'ai');
+      expect(client.lastGetPath, 'quests/generate-today/status');
       expect(client.lastGetQuery?['date'], '2026-06-09');
+      expect(
+        client.lastGetQuery?['date'],
+        matches(RegExp(r'^\d{4}-\d{2}-\d{2}$')),
+      );
     });
 
     test('parses failed status with error_message and fallback_used', () async {

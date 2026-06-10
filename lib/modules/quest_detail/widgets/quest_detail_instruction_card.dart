@@ -4,54 +4,46 @@ import '../../../constants/app_color.dart';
 import '../../../constants/app_radius.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../models/quest_model.dart';
-import '../../../models/enums/quest_enums.dart';
 
 class QuestDetailInstructionCard extends StatelessWidget {
   final QuestModel quest;
 
-  const QuestDetailInstructionCard({
-    super.key,
-    required this.quest,
-  });
+  const QuestDetailInstructionCard({super.key, required this.quest});
 
-  String get _instruction {
-    if (quest.instruction != null && quest.instruction!.isNotEmpty) {
-      return quest.instruction!;
+  String? get _instruction {
+    final instruction = quest.instruction?.trim();
+    if (instruction != null && instruction.isNotEmpty) {
+      return instruction;
     }
+    return null;
+  }
 
-    // Fallback based on quest type
-    switch (quest.type) {
-      case QuestType.water:
-        return 'Uống một ly nước 250ml, chậm rãi.';
-      case QuestType.breakTime:
-        return 'Rời mắt khỏi màn hình, nhìn xa và thả lỏng vai.';
-      case QuestType.movement:
-        return 'Đi bộ nhẹ hoặc giãn cơ trong vài phút.';
-      case QuestType.learning:
-        return 'Tập trung học một nội dung nhỏ, tránh đa nhiệm.';
-      case QuestType.sleep:
-        return 'Chuẩn bị đi ngủ sớm, tắt thiết bị điện tử.';
-      case QuestType.fitness:
-        return 'Thực hiện bài tập thể chất nhẹ nhàng.';
-      case QuestType.mindfulness:
-        return 'Tập trung vào hơi thở, thả lỏng tâm trí.';
-      case QuestType.review:
-        return 'Ghi lại điều đã làm tốt và điều cần cải thiện.';
-      case QuestType.custom:
-        return 'Thực hiện nhiệm vụ theo hướng dẫn.';
+  String get _missionText {
+    final description = quest.description.trim();
+    if (description.isNotEmpty) {
+      return description;
     }
+    return _instruction ?? 'Thực hiện nhiệm vụ theo hướng dẫn.';
   }
 
   List<String> get _checklistItems {
-    final lines = _instruction.split('\n');
+    final instruction = _instruction;
+    if (instruction == null) {
+      return const [];
+    }
+
+    final lines = instruction.split('\n');
     if (lines.length > 1) {
       return lines.where((l) => l.trim().isNotEmpty).toList();
     }
-    return [_instruction];
+    return [instruction];
   }
 
   @override
   Widget build(BuildContext context) {
+    final instruction = _instruction;
+    final checklistItems = _checklistItems;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s20),
       child: Column(
@@ -83,7 +75,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
               children: [
                 // Mission action
                 Text(
-                  quest.description.isNotEmpty ? quest.description : _instruction,
+                  _missionText,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -93,13 +85,13 @@ class QuestDetailInstructionCard extends StatelessWidget {
                 ),
 
                 // Checklist if instruction has multiple lines
-                if (_checklistItems.length > 1) ...[
+                if (checklistItems.length > 1) ...[
                   const SizedBox(height: AppSpacing.s12),
-                  ...(_checklistItems.map((item) => _buildChecklistItem(item))),
+                  ...(checklistItems.map((item) => _buildChecklistItem(item))),
                 ],
 
-                // Reason
-                if (quest.reason != null && quest.reason!.isNotEmpty) ...[
+                // Instruction
+                if (instruction != null) ...[
                   const SizedBox(height: AppSpacing.s12),
                   Container(
                     width: double.infinity,
@@ -110,7 +102,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      quest.reason!,
+                      instruction,
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColor.fgSecondary,
@@ -144,10 +136,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.fg,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppColor.fg),
             ),
           ),
         ],

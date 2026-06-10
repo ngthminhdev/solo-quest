@@ -6,6 +6,7 @@ import 'package:solo_quest/models/enums/quest_enums.dart';
 import 'package:solo_quest/modules/quest_detail/widgets/quest_detail_header.dart';
 import 'package:solo_quest/modules/quest_detail/widgets/quest_detail_status_card.dart';
 import 'package:solo_quest/modules/quest_detail/widgets/quest_detail_action_bar.dart';
+import 'package:solo_quest/modules/quest_detail/widgets/quest_detail_instruction_card.dart';
 
 void main() {
   group('Quest Detail Widget Tests', () {
@@ -248,5 +249,25 @@ void main() {
       expect(find.text('Hoãn'), findsOneWidget);
       expect(find.text('Bỏ Qua'), findsOneWidget);
     });
+
+    testWidgets(
+      'QuestDetailInstructionCard does not invent type-specific fallback copy',
+      (tester) async {
+        const quest = QuestModel(
+          id: 'water_missing_copy',
+          title: 'Water Quest',
+          type: QuestType.water,
+        );
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: QuestDetailInstructionCard(quest: quest)),
+          ),
+        );
+
+        expect(find.text('Thực hiện nhiệm vụ theo hướng dẫn.'), findsOneWidget);
+        expect(find.textContaining('250ml'), findsNothing);
+      },
+    );
   });
 }

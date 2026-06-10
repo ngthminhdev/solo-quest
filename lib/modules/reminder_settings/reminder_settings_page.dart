@@ -68,7 +68,8 @@ class _ReminderSettingsPageState
             ReminderSettingsHeader(onBack: () => Navigator.of(context).pop()),
             Expanded(
               child: AppErrorState(
-                message: state.errorMessage ?? context.l10n.reminderSettingsError,
+                message:
+                    state.errorMessage ?? context.l10n.reminderSettingsError,
                 onRetry: pageModel.loadSettings,
               ),
             ),
@@ -117,7 +118,16 @@ class _ReminderSettingsPageState
 
     if (result == null || !mounted) return;
 
-    final updated = setting.copyWith(
+    // Build directly instead of copyWith: the form's nullable fields
+    // (maxPerDay, interval, time range) must be able to clear a previous
+    // value. copyWith collapses null back to the old value (`x ?? this.x`),
+    // so clearing the daily cap would never take effect.
+    final updated = ReminderSettingModel(
+      id: setting.id,
+      type: setting.type,
+      title: setting.title,
+      description: setting.description,
+      status: setting.status,
       frequency: result.frequency,
       startTime: result.startTime,
       endTime: result.endTime,
@@ -147,7 +157,7 @@ class _ReminderSettingsPageState
     bool enabled,
   ) async {
     final success = await pageModel.toggleReminder(
-      settingId: setting.id,
+      type: setting.type,
       enabled: enabled,
     );
     if (!mounted) return;

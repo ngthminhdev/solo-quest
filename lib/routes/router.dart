@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/quest_model.dart';
 import '../modules/splash/splash_page.dart';
 import '../modules/login/login_page.dart';
 import '../modules/welcome/welcome_page.dart';
@@ -31,8 +32,12 @@ class AppRouter {
       case RoutesConfig.questDetail:
         final args = settings.arguments as Map<String, dynamic>?;
         final questId = args?['id'] as String? ?? '';
+        final initialQuest = args?['quest'] is QuestModel
+            ? args!['quest'] as QuestModel
+            : null;
         return MaterialPageRoute(
-          builder: (_) => QuestDetailPage(questId: questId),
+          builder: (_) =>
+              QuestDetailPage(questId: questId, initialQuest: initialQuest),
         );
       case RoutesConfig.welcome:
         return MaterialPageRoute(builder: (_) => WelcomePage());

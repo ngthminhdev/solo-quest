@@ -62,7 +62,13 @@ class LocalNotificationService {
       } else if (payload.startsWith(NotificationIds.prefixCountdown)) {
         final id = payload.substring(NotificationIds.prefixCountdown.length);
         if (id.startsWith('break_time') || id.contains(':')) {
-          navigator.pushNamed(RoutesConfig.home);
+          // Clear the stack down to a single MainPage instead of pushing a new
+          // one, to avoid stacking duplicate MainPage instances (and their
+          // countdown/reminder listeners).
+          navigator.pushNamedAndRemoveUntil(
+            RoutesConfig.home,
+            (route) => false,
+          );
         } else {
           navigator.pushNamed(RoutesConfig.questDetail, arguments: {'id': id});
         }
