@@ -46,7 +46,7 @@ class XPHistoryCard extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColor.warn,
                   shape: BoxShape.circle,
                 ),
@@ -54,7 +54,7 @@ class XPHistoryCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s6),
               Text(
                 l10n.progressXPHistoryTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -67,7 +67,7 @@ class XPHistoryCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s12),
           Text(
             l10n.progressXPHistoryRecent,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -89,7 +89,7 @@ class XPHistoryCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
         vertical: AppSpacing.s10,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: AppColor.borderSubtle, width: 1),
         ),
@@ -119,7 +119,7 @@ class XPHistoryCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,
@@ -130,7 +130,7 @@ class XPHistoryCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   AppTimeFormatter.formatLocalDateTime(transaction.createdAt) ?? '',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColor.fgMuted,
                   ),

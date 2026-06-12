@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:remixicon/remixicon.dart';
 
 import '../../constants/app_color.dart';
@@ -19,6 +20,9 @@ class QuestCompletionDialog extends StatefulWidget {
     required int exp,
     VoidCallback? onDone,
   }) {
+    // Satisfying success haptic feedback
+    HapticFeedback.mediumImpact();
+
     return showDialog(
       context: context,
       builder: (_) => QuestCompletionDialog(exp: exp, onDone: onDone),
@@ -66,10 +70,10 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                   color: AppColor.successDim,
                   border: Border.all(color: AppColor.success, width: 2),
                 ),
-                child: const Icon(RemixIcons.check_line, color: AppColor.success, size: 26),
+                child: Icon(RemixIcons.check_line, color: AppColor.success, size: 26),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Nhiệm vụ hoàn thành',
                 style: TextStyle(
                   fontSize: 18,
@@ -80,7 +84,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
               const SizedBox(height: 4),
               Text(
                 '+${widget.exp} EXP',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColor.expGold,
@@ -92,23 +96,23 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
               TextField(
                 controller: _noteController,
                 maxLines: 2,
-                style: const TextStyle(fontSize: 13, color: AppColor.fg),
+                style: TextStyle(fontSize: 13, color: AppColor.fg),
                 decoration: InputDecoration(
                   hintText: 'Bạn cảm thấy thế nào sau nhiệm vụ này?',
-                  hintStyle: const TextStyle(color: AppColor.fgMuted),
+                  hintStyle: TextStyle(color: AppColor.fgMuted),
                   filled: true,
                   fillColor: AppColor.surface,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.md),
-                    borderSide: const BorderSide(color: AppColor.border),
+                    borderSide: BorderSide(color: AppColor.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.md),
-                    borderSide: const BorderSide(color: AppColor.border),
+                    borderSide: BorderSide(color: AppColor.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.md),
-                    borderSide: const BorderSide(color: AppColor.cyan),
+                    borderSide: BorderSide(color: AppColor.cyan),
                   ),
                   contentPadding: const EdgeInsets.all(12),
                 ),
@@ -116,7 +120,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
               const SizedBox(height: 14),
 
               // Feeling options
-              const Text(
+              Text(
                 'Cảm nhận của bạn?',
                 style: TextStyle(fontSize: 13, color: AppColor.fgSecondary),
               ),
@@ -145,7 +149,7 @@ class _QuestCompletionDialogState extends State<QuestCompletionDialog> {
                     color: AppColor.cyan,
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Xong',
                       style: TextStyle(

@@ -22,7 +22,7 @@ class AppBottomSheet {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(ctx).size.height * AppConstant.bottomSheetMaxHeightRatio,
         ),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColor.bgRaised,
           borderRadius: AppRadius.sheet,
         ),
@@ -47,7 +47,7 @@ class AppBottomSheet {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,
@@ -57,7 +57,7 @@ class AppBottomSheet {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgSecondary,
                       ),

@@ -23,7 +23,7 @@ class ExpBadge extends StatelessWidget {
       ),
       child: Text(
         showPrefix ? '+$exp EXP' : '$exp EXP',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           color: AppColor.expGold,

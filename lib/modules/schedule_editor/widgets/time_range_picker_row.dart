@@ -39,7 +39,7 @@ class TimeRangePickerRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.s12),
-        const Icon(
+        Icon(
           RemixIcons.arrow_right_s_line,
           size: 16,
           color: AppColor.fgMuted,
@@ -90,7 +90,7 @@ class _TimePickerField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+              style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
             const SizedBox(height: AppSpacing.s4),
             Text(

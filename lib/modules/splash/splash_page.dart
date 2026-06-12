@@ -117,7 +117,7 @@ class _SplashPageState
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColor.bgDeep,
               ),
@@ -129,10 +129,10 @@ class _SplashPageState
             ),
             const SizedBox(height: 24),
             ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
+              shaderCallback: (bounds) => LinearGradient(
                 colors: [AppColor.cyan, AppColor.violet],
               ).createShader(bounds),
-              child: const Text(
+              child: Text(
                 'SoloQuest',
                 style: TextStyle(
                   fontSize: 24,
@@ -142,7 +142,7 @@ class _SplashPageState
               ),
             ),
             const SizedBox(height: 16),
-            const SizedBox(
+            SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(

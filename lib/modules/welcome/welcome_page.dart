@@ -66,7 +66,7 @@ class _WelcomePageState
                 ),
                 child: Text(
                   l10n.welcomeSystemMessage,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.cyan,
                     height: 1.6,

@@ -82,7 +82,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
                     children: [
                       Text(
                         suggestion.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: AppColor.fg,
@@ -93,7 +93,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
                       const SizedBox(height: AppSpacing.s4),
                       Text(
                         suggestion.category,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColor.fgMuted,
                           fontWeight: FontWeight.w500,
@@ -113,7 +113,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
             // Description
             Text(
               suggestion.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgSecondary,
                 height: 1.5,
@@ -131,7 +131,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
                 // Stats
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       RemixIcons.list_check_2,
                       size: 16,
                       color: AppColor.fgMuted,
@@ -139,13 +139,13 @@ class RoadmapSuggestionCard extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s4),
                     Text(
                       '${suggestion.totalSteps} bước',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgMuted,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.s12),
-                    const Icon(
+                    Icon(
                       RemixIcons.time_line,
                       size: 16,
                       color: AppColor.fgMuted,
@@ -153,7 +153,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s4),
                     Text(
                       '~${suggestion.estimatedMinutes} phút',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgMuted,
                       ),
@@ -172,7 +172,7 @@ class RoadmapSuggestionCard extends StatelessWidget {
                       color: AppColor.cyan,
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(

@@ -71,7 +71,7 @@ class SnoozeQuestSheet {
                     color: AppColor.warn,
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Xác nhận hoãn',
                       style: TextStyle(
@@ -90,7 +90,7 @@ class SnoozeQuestSheet {
                   width: double.infinity,
                   height: 44,
                   color: AppColor.transparent,
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Huỷ',
                       style: TextStyle(

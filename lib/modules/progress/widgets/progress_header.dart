@@ -23,7 +23,7 @@ class ProgressHeader extends StatelessWidget {
         children: [
           Text(
             l10n.progressHeaderTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.02,
@@ -33,7 +33,7 @@ class ProgressHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.s4),
           Text(
             l10n.progressHeaderSubtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,
               height: 1.4,

@@ -44,7 +44,7 @@ class RoadmapCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     roadmap.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,
@@ -61,7 +61,7 @@ class RoadmapCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.s6),
               Text(
                 roadmap.description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: AppColor.fgSecondary,
                   height: 1.4,
@@ -73,7 +73,7 @@ class RoadmapCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.s12),
             Row(
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.checkbox_circle_line,
                   size: 14,
                   color: AppColor.fgMuted,
@@ -81,13 +81,13 @@ class RoadmapCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   l10n.lrCardSteps(roadmap.completedSteps, roadmap.totalSteps),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgMuted,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
-                const Icon(
+                Icon(
                   RemixIcons.time_line,
                   size: 14,
                   color: AppColor.fgMuted,
@@ -95,7 +95,7 @@ class RoadmapCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   l10n.lrCardMinutes(roadmap.totalEstimatedMinutes),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgMuted,
                   ),

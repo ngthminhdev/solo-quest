@@ -37,7 +37,7 @@ class QuestDailyLimitCard extends StatelessWidget {
               color: AppColor.warnDim,
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.calendar_check_line,
               size: 20,
               color: AppColor.warn,
@@ -50,7 +50,7 @@ class QuestDailyLimitCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.questRulesDailyLimitTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppColor.fg,
@@ -59,7 +59,7 @@ class QuestDailyLimitCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s4),
                 Text(
                   l10n.questRulesDailyLimitSubtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     height: 1.35,
                     color: AppColor.fgSecondary,
@@ -113,7 +113,7 @@ class _LimitStepper extends StatelessWidget {
             child: Text(
               '$value',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
                 color: AppColor.fg,

@@ -35,7 +35,7 @@ class AppToast extends StatelessWidget {
             Flexible(
               child: Text(
                 message,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColor.fg,

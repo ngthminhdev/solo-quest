@@ -17,13 +17,13 @@ class WeeklySummaryEmptyView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               RemixIcons.bar_chart_2_line,
               size: 48,
               color: AppColor.fgMuted,
             ),
             const SizedBox(height: AppSpacing.s16),
-            const Text(
+            Text(
               'Chưa có dữ liệu tuần',
               style: TextStyle(
                 fontSize: 16,
@@ -32,7 +32,7 @@ class WeeklySummaryEmptyView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.s8),
-            const Text(
+            Text(
               'Hoàn thành quest để xem báo cáo tuần.',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -53,7 +53,7 @@ class WeeklySummaryEmptyView extends StatelessWidget {
                     color: AppColor.cyan,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Thử lại',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,

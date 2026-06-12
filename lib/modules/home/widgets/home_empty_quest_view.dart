@@ -17,13 +17,13 @@ class HomeEmptyQuestView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               RemixIcons.task_line,
               size: 64,
               color: AppColor.fgMuted,
             ),
             const SizedBox(height: AppSpacing.s16),
-            const Text(
+            Text(
               'Chưa có quest hôm nay',
               style: TextStyle(
                 fontSize: 18,
@@ -33,7 +33,7 @@ class HomeEmptyQuestView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.s8),
-            const Text(
+            Text(
               'Hãy check-in buổi sáng để hệ thống tạo nhiệm vụ phù hợp.',
               style: TextStyle(
                 fontSize: 14,
@@ -52,7 +52,7 @@ class HomeEmptyQuestView extends StatelessWidget {
                   color: AppColor.cyan,
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Text(
+                child: Text(
                   'Check-in ngay',
                   style: TextStyle(
                     fontSize: 14,

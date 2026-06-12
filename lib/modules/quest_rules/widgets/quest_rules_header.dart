@@ -35,7 +35,7 @@ class QuestRulesHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(color: AppColor.border),
               ),
-              child: const Icon(
+              child: Icon(
                 RemixIcons.arrow_left_s_line,
                 color: AppColor.fg,
                 size: 22,
@@ -49,7 +49,7 @@ class QuestRulesHeader extends StatelessWidget {
               children: [
                 Text(
                   l10n.questRulesPageTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     height: 1.12,
                     fontWeight: FontWeight.w800,
@@ -59,7 +59,7 @@ class QuestRulesHeader extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s6),
                 Text(
                   l10n.questRulesPageSubtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.35,
                     color: AppColor.fgSecondary,
@@ -77,7 +77,7 @@ class QuestRulesHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(color: AppColor.borderGlowCyan),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.magic_line,
               color: AppColor.cyan,
               size: 20,

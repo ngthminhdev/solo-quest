@@ -88,6 +88,7 @@ class _QuestRulesPageState
 
     return AppScaffold(
       scroll: false,
+      isLocked: state.isLockedPage,
       body: RefreshIndicator(
         onRefresh: pageModel.refreshSettings,
         child: SingleChildScrollView(
@@ -139,7 +140,7 @@ class _QuestRulesPageState
                 child: AppButton(
                   label: context.l10n.questRulesResetDefault,
                   variant: AppButtonVariant.secondary,
-                  icon: const Icon(
+                  icon: Icon(
                     RemixIcons.refresh_line,
                     size: 16,
                     color: AppColor.fg,
@@ -321,7 +322,7 @@ class _GlobalSettingsCard extends StatelessWidget {
                   color: AppColor.violet.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Icon(
+                child: Icon(
                   RemixIcons.equalizer_line,
                   size: 18,
                   color: AppColor.violet,
@@ -330,7 +331,7 @@ class _GlobalSettingsCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s10),
               Text(
                 l10n.questRulesGeneralSettings,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppColor.fg,
@@ -402,7 +403,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w800,
         color: AppColor.fgSecondary,

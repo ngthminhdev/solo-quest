@@ -58,7 +58,7 @@ class OnboardingRewardsStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep7SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -154,7 +154,7 @@ class OnboardingRewardsStep extends StatelessWidget {
                     ),
                     Text(
                       reward.desc,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgSecondary,
                       ),
@@ -174,7 +174,7 @@ class OnboardingRewardsStep extends StatelessWidget {
                   ),
                 ),
                 child: isSelected
-                    ? const Icon(
+                    ? Icon(
                         RemixIcons.check_line,
                         size: 14,
                         color: AppColor.bgDeep,

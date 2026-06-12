@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:remixicon/remixicon.dart';
 
 import '../../base/app_load_state.dart';
 import '../../base/base_page.dart';
 import '../../base/base_page_consumer_state.dart';
 import '../../constants/app_color.dart';
 import '../../constants/app_spacing.dart';
+import '../../constants/app_text_style.dart';
 import '../../extensions/localization_extension.dart';
 import '../../routes/routes_config.dart';
 import '../../widgets/skeleton/skeleton_profile_page.dart';
@@ -117,6 +119,11 @@ class _ProfilePageState
 
           const SizedBox(height: AppSpacing.s20),
 
+          // Theme Selector
+          _buildThemeSelector(),
+
+          const SizedBox(height: AppSpacing.s20),
+
           // Settings
           ProfileSettingsSection(
             onScheduleTap: _goToScheduleEditor,
@@ -135,6 +142,91 @@ class _ProfilePageState
         ],
       ),
     );
+  }
+
+  Widget _buildThemeSelector() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final currentTheme = ref.watch(themeProvider);
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+          padding: const EdgeInsets.all(AppSpacing.s16),
+          decoration: BoxDecoration(
+            color: AppColor.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColor.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Theme',
+                style: AppTextStyle.body.copyWith(color: AppColor.fg),
+              ),
+              const SizedBox(height: AppSpacing.s12),
+              DropdownButtonFormField<AppThemeMode>(
+                value: currentTheme.mode,
+                dropdownColor: AppColor.bgRaised,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColor.bg,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.s14,
+                    vertical: AppSpacing.s12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColor.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColor.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColor.primary),
+                  ),
+                ),
+                style: AppTextStyle.body.copyWith(color: AppColor.fg),
+                icon: Icon(
+                  RemixIcons.arrow_down_s_line,
+                  color: AppColor.fgSecondary,
+                  size: 20,
+                ),
+                isExpanded: true,
+                onChanged: (mode) {
+                  if (mode != null) {
+                    final theme = _themeForMode(mode);
+                    ref.read(themeProvider.notifier).setTheme(mode);
+                    AppColor.setTheme(theme);
+                  }
+                },
+                items: const [
+                  DropdownMenuItem(value: AppThemeMode.dark, child: Text('Dark')),
+                  DropdownMenuItem(value: AppThemeMode.light, child: Text('Light')),
+                  DropdownMenuItem(value: AppThemeMode.midnight, child: Text('Midnight')),
+                  DropdownMenuItem(value: AppThemeMode.sunset, child: Text('Sunset')),
+                  DropdownMenuItem(value: AppThemeMode.ocean, child: Text('Ocean')),
+                  DropdownMenuItem(value: AppThemeMode.forest, child: Text('Forest')),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  AppTheme _themeForMode(AppThemeMode mode) {
+    return switch (mode) {
+      AppThemeMode.dark => AppTheme.dark,
+      AppThemeMode.light => AppTheme.light,
+      AppThemeMode.midnight => AppTheme.midnight,
+      AppThemeMode.sunset => AppTheme.sunset,
+      AppThemeMode.ocean => AppTheme.ocean,
+      AppThemeMode.forest => AppTheme.forest,
+    };
   }
 
   void _goToMorningCheckin() {

@@ -28,7 +28,7 @@ class LogEmptyView extends StatelessWidget {
                 color: AppColor.surface,
                 border: Border.all(color: AppColor.border),
               ),
-              child: const Icon(
+              child: Icon(
                 RemixIcons.file_text_line,
                 size: 28,
                 color: AppColor.fgMuted,
@@ -37,7 +37,7 @@ class LogEmptyView extends StatelessWidget {
             const SizedBox(height: AppSpacing.s20),
             Text(
               context.l10n.logsEmptyTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fgSecondary,
@@ -47,7 +47,7 @@ class LogEmptyView extends StatelessWidget {
             const SizedBox(height: AppSpacing.s8),
             Text(
               context.l10n.logsEmptyMessage,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgMuted,
                 height: 1.5,
@@ -71,7 +71,7 @@ class LogEmptyView extends StatelessWidget {
                 ),
                 child: Text(
                   context.l10n.logsHomeButton,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColor.cyan,

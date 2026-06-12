@@ -113,10 +113,7 @@ class CountdownTimerService extends StateNotifier<CountdownSession?> with Widget
   }
 
   void _vibrate() {
-    HapticFeedback.mediumImpact();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      HapticFeedback.heavyImpact();
-    });
+    HapticFeedback.vibrate();
   }
 
   Future<void> startSession(QuestModel quest) async {

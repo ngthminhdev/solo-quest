@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'config/app_config.dart';
 import 'config/app_session.dart';
 import 'config/app_theme_registry.dart';
+import 'constants/app_color.dart';
 import 'generated/l10n/app_localizations.dart';
 import 'routes/router.dart';
 import 'routes/routes_config.dart';
@@ -24,15 +25,22 @@ void main() async {
   final container = ProviderContainer();
   await container.read(localNotificationServiceProvider).initialize();
 
+  // Initialize default theme
+  AppColor.setTheme(AppTheme.dark);
+
   runApp(ProviderScope(parent: container, child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch theme to trigger rebuild when changed
+    final theme = ref.watch(themeProvider);
+    
     return MaterialApp(
+      key: ValueKey(theme.mode),
       title: 'Solo Quest',
       navigatorKey: AppSession.navigatorKey,
       onGenerateRoute: AppRouter.generateRoute,

@@ -70,7 +70,7 @@ class _HomePageState
       ref.listen(mainPageProvider.select((s) => s.settledIndex), (prev, next) {
         if (next == _tabIndex && prev != _tabIndex) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            pageModel.loadHomeData();
+            pageModel.scheduleTabVisibleRefresh();
           });
         }
       });
@@ -88,23 +88,6 @@ class _HomePageState
   @override
   Widget renderPage(BuildContext context) {
     final state = read;
-
-    if (state.loadState == AppLoadState.loading && !state.hasAnyQuest) {
-      return AppScaffold(
-        showBottomNav: false,
-        body: const SkeletonHomePage(),
-      );
-    }
-
-    if (state.loadState == AppLoadState.error && !state.hasAnyQuest) {
-      return AppScaffold(
-        showBottomNav: false,
-        body: AppErrorState(
-          message: state.errorMessage ?? 'Không thể tải dữ liệu hôm nay',
-          onRetry: pageModel.loadHomeData,
-        ),
-      );
-    }
 
     // No quests yet, but an async generation job is running / failed / slow.
     // Show a dedicated state instead of an empty/error screen.
@@ -137,6 +120,20 @@ class _HomePageState
       );
     }
 
+    if (state.loadState == AppLoadState.loading && !state.hasAnyQuest) {
+      return AppScaffold(showBottomNav: false, body: const SkeletonHomePage());
+    }
+
+    if (state.loadState == AppLoadState.error && !state.hasAnyQuest) {
+      return AppScaffold(
+        showBottomNav: false,
+        body: AppErrorState(
+          message: state.errorMessage ?? 'Không thể tải dữ liệu hôm nay',
+          onRetry: pageModel.loadHomeData,
+        ),
+      );
+    }
+
     if (!state.hasAnyQuest && state.loadState == AppLoadState.ready) {
       return AppScaffold(
         showBottomNav: false,
@@ -147,6 +144,7 @@ class _HomePageState
     return AppScaffold(
       showBottomNav: false,
       scroll: false,
+      isLocked: state.isLockedPage,
       body: RefreshIndicator(
         backgroundColor: AppColor.surface,
         color: AppColor.cyan,
@@ -218,14 +216,15 @@ class _HomePageState
   }
 
   void _openQuestDetail(QuestModel quest) {
-    Navigator.of(
-      context,
-    ).pushNamed(RoutesConfig.questDetail, arguments: {'id': quest.id, 'quest': quest});
+    Navigator.of(context).pushNamed(
+      RoutesConfig.questDetail,
+      arguments: {'id': quest.id, 'quest': quest},
+    );
   }
 
   Future<void> _handleStartQuest(QuestModel quest) async {
     developer.log('[QUEST ACTION] start tapped: id=${quest.id}');
-    
+
     // Check countdown eligibility
     if (isCountdownEligible(quest)) {
       final timerService = ref.read(countdownTimerServiceProvider.notifier);
@@ -244,7 +243,7 @@ class _HomePageState
             ),
             title: Text(
               l10n.timerConfirmReplace,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fg,
                 fontWeight: FontWeight.w600,
@@ -255,14 +254,14 @@ class _HomePageState
                 onPressed: () => Navigator.of(ctx).pop(false),
                 child: Text(
                   l10n.commonCancel,
-                  style: const TextStyle(color: AppColor.fgSecondary),
+                  style: TextStyle(color: AppColor.fgSecondary),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
                 child: Text(
                   l10n.commonConfirm,
-                  style: const TextStyle(color: AppColor.cyan),
+                  style: TextStyle(color: AppColor.cyan),
                 ),
               ),
             ],
@@ -339,12 +338,17 @@ class _HomePageState
     final minutes = await SnoozeQuestSheet.show(context);
     if (minutes == null) return;
 
-    developer.log('[QUEST ACTION] snooze tapped: id=${quest.id}, minutes=$minutes');
+    developer.log(
+      '[QUEST ACTION] snooze tapped: id=${quest.id}, minutes=$minutes',
+    );
     try {
       await pageModel.snoozeQuest(quest.id, minutes: minutes);
       developer.log('[QUEST ACTION] snooze success: id=${quest.id}');
       if (mounted) {
-        AppToastService.success(context, 'Đã hoãn. Solo sẽ nhắc lại sau $minutes phút.');
+        AppToastService.success(
+          context,
+          'Đã hoãn. Solo sẽ nhắc lại sau $minutes phút.',
+        );
       }
     } catch (e) {
       developer.log('[QUEST ACTION] snooze failed: $e');
@@ -385,7 +389,7 @@ class _HomePageState
       backgroundColor: AppColor.transparent,
       builder: (_) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColor.bgRaised,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -393,7 +397,7 @@ class _HomePageState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Vì sao có nhiệm vụ này?',
               style: TextStyle(
                 fontSize: 16,
@@ -405,7 +409,7 @@ class _HomePageState
             Text(
               quest.reason ??
                   'Nhiệm vụ này được đề xuất dựa trên lịch sinh hoạt và mục tiêu hôm nay của bạn.',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fgSecondary,
                 height: 1.6,

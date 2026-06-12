@@ -11,6 +11,7 @@ import '../../widgets/page_header/page_header.dart';
 import 'main_page_model.dart';
 import '../../core/timer/countdown_session.dart';
 import '../../core/timer/countdown_timer_service.dart';
+import '../../core/notifications/local_notification_service.dart';
 import '../../widgets/app_dialog/timer_completion_dialog.dart';
 import '../../widgets/app_dialog/reminder_dialog.dart';
 import '../../core/notifications/fcm_notification_payload.dart';
@@ -95,6 +96,8 @@ class _MainPageState
 
   void _showTimerCompletionDialog(CountdownSession session) {
     final l10n = context.l10n;
+    LocalNotificationService.playAttentionCue();
+
     if (session.questId == null) {
       showDialog(
         context: context,
@@ -145,14 +148,14 @@ class _MainPageState
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16, vertical: AppSpacing.s10),
       decoration: BoxDecoration(
         color: AppColor.bgRaised,
-        border: const Border(
+        border: Border(
           top: BorderSide(color: AppColor.borderGlowCyan),
           bottom: BorderSide(color: AppColor.border),
         ),
       ),
       child: Row(
         children: [
-          const Icon(RemixIcons.time_line, color: AppColor.cyan, size: 18),
+          Icon(RemixIcons.time_line, color: AppColor.cyan, size: 18),
           const SizedBox(width: AppSpacing.s8),
           Expanded(
             child: Column(
@@ -163,7 +166,7 @@ class _MainPageState
                   countdownSession.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,
@@ -172,7 +175,7 @@ class _MainPageState
                 const SizedBox(height: 2),
                 Text(
                   '${l10n.timerRemaining}: $timeStr',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColor.cyan,
                     fontWeight: FontWeight.w500,
@@ -193,7 +196,7 @@ class _MainPageState
             },
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColor.cyan,
-              side: const BorderSide(color: AppColor.borderGlowCyan),
+              side: BorderSide(color: AppColor.borderGlowCyan),
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s12, vertical: 0),
               minimumSize: const Size(0, 32),
               shape: RoundedRectangleBorder(
@@ -328,7 +331,7 @@ class _MainPageState
   }
 
   void _showReminderPrompt(BuildContext context, FcmNotificationPayload payload) {
+    LocalNotificationService.playAttentionCue();
     ReminderDialog.showReminderPrompt(context, payload, ref);
   }
 }
-

@@ -122,7 +122,7 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               sub!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 9,
                 color: AppColor.fgMuted,
               ),
@@ -131,7 +131,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,

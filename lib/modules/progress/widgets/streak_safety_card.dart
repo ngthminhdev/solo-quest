@@ -37,7 +37,7 @@ class StreakSafetyCard extends StatelessWidget {
             children: [
               Text(
                 l10n.progressStreakDaysLabel(progress.streakDays),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fg,
@@ -48,7 +48,7 @@ class StreakSafetyCard extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '${progress.streakDays}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -57,7 +57,7 @@ class StreakSafetyCard extends StatelessWidget {
                     ),
                     TextSpan(
                       text: l10n.progressStreakDaysSuffix,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: AppColor.fgSecondary,
@@ -111,7 +111,7 @@ class StreakSafetyCard extends StatelessWidget {
             ),
             child: Text.rich(
               TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColor.fgSecondary,
                   height: 1.5,
@@ -119,7 +119,7 @@ class StreakSafetyCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: l10n.progressStreakShield,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColor.success,
                       fontWeight: FontWeight.w600,
                     ),
@@ -174,7 +174,7 @@ class _StreakStat extends StatelessWidget {
           const SizedBox(height: AppSpacing.s4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               color: AppColor.fgMuted,
             ),

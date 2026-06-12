@@ -33,7 +33,7 @@ class ReminderSettingsHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(color: AppColor.border),
               ),
-              child: const Icon(
+              child: Icon(
                 RemixIcons.arrow_left_s_line,
                 color: AppColor.fg,
                 size: 22,
@@ -47,7 +47,7 @@ class ReminderSettingsHeader extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       RemixIcons.notification_3_line,
                       color: AppColor.cyan,
                       size: 18,
@@ -56,7 +56,7 @@ class ReminderSettingsHeader extends StatelessWidget {
                     Expanded(
                       child: Text(
                         context.l10n.reminderSettingsPageTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -68,7 +68,7 @@ class ReminderSettingsHeader extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s4),
                 Text(
                   context.l10n.reminderSettingsPageSubtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                     height: 1.4,

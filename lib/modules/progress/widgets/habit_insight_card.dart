@@ -52,7 +52,7 @@ class HabitInsightCard extends StatelessWidget {
                   children: [
                     Text(
                       insight.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fg,
@@ -94,7 +94,7 @@ class HabitInsightCard extends StatelessWidget {
 
                 Text(
                   insight.insight,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColor.fgMuted,
                   ),
@@ -104,7 +104,7 @@ class HabitInsightCard extends StatelessWidget {
           ),
 
           const SizedBox(width: AppSpacing.s8),
-          const Icon(
+          Icon(
             RemixIcons.arrow_right_s_line,
             size: 16,
             color: AppColor.fgMuted,

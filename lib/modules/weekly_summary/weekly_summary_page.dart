@@ -150,7 +150,7 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
           alignment: Alignment.center,
           child: Text(
             '${l10n.weeklySummaryCtaApply} (${state.enabledSuggestionCount})',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColor.bgDeep,
@@ -180,7 +180,7 @@ class _WeeklySummaryPageState extends BasePageConsumerState<WeeklySummaryPage,
           alignment: Alignment.center,
           child: Text(
             l10n.weeklySummaryCtaManual,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColor.fg,

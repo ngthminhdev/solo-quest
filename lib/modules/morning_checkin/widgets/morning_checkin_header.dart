@@ -17,7 +17,7 @@ class MorningCheckinHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(RemixIcons.sun_line, size: 24, color: AppColor.warn),
+              Icon(RemixIcons.sun_line, size: 24, color: AppColor.warn),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

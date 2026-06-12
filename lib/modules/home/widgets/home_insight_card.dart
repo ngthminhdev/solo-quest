@@ -32,7 +32,7 @@ class HomeInsightCard extends StatelessWidget {
               color: AppColor.cyanDim,
               border: Border.all(color: AppColor.borderGlowCyan),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.lightbulb_line,
               size: 18,
               color: AppColor.cyan,
@@ -45,7 +45,7 @@ class HomeInsightCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Gợi ý hôm nay',
                       style: TextStyle(
                         fontSize: 13,
@@ -63,7 +63,7 @@ class HomeInsightCard extends StatelessWidget {
                         color: AppColor.cyanDim,
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
-                      child: const Text(
+                      child: Text(
                         'AI',
                         style: TextStyle(
                           fontFamily: 'JetBrains Mono',
@@ -79,7 +79,7 @@ class HomeInsightCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   insight!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                     height: 1.5,

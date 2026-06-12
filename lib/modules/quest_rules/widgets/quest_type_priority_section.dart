@@ -31,7 +31,7 @@ class QuestTypePrioritySection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(RemixIcons.sort_desc, size: 18, color: AppColor.violet),
+              Icon(RemixIcons.sort_desc, size: 18, color: AppColor.violet),
               const SizedBox(width: AppSpacing.s8),
               Text(
                 context.l10n.questRulesPriorityTitle,
@@ -65,7 +65,7 @@ class QuestTypePrioritySection extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s6),
                     Text(
                       context.l10n.questRulesPriorityValue(rule.priority),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: AppColor.fgSecondary,

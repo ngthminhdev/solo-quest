@@ -60,7 +60,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '◆ $title',
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'JetBrains Mono',
         fontSize: 11,
         fontWeight: FontWeight.w700,
@@ -100,7 +100,7 @@ class _RankingCard extends StatelessWidget {
         children: [
           Text(
             '$position',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'JetBrains Mono',
               fontSize: 14,
               fontWeight: FontWeight.w800,
@@ -114,7 +114,7 @@ class _RankingCard extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fg,
@@ -122,7 +122,7 @@ class _RankingCard extends StatelessWidget {
                 ),
                 Text(
                   note,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                   ),

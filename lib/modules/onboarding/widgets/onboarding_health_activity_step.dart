@@ -58,7 +58,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep3SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -152,7 +152,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
                         ),
                         Text(
                           opt.desc,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColor.fgSecondary,
                           ),
@@ -172,7 +172,7 @@ class OnboardingHealthActivityStep extends StatelessWidget {
                       ),
                     ),
                     child: isSelected
-                      ? const Icon(
+                      ? Icon(
                           RemixIcons.check_line,
                           size: 14,
                           color: AppColor.bgDeep,

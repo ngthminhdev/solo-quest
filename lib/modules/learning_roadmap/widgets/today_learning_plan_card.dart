@@ -50,7 +50,7 @@ class TodayLearningPlanCard extends StatelessWidget {
           // Header
           Row(
             children: [
-              const Icon(
+              Icon(
                 RemixIcons.calendar_line,
                 size: 16,
                 color: AppColor.violet,
@@ -58,7 +58,7 @@ class TodayLearningPlanCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s8),
               Text(
                 l10n.lrTodayPlanTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'JetBrainsMono',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -82,7 +82,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                     color: AppColor.successDim,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     RemixIcons.check_line,
                     size: 18,
                     color: AppColor.success,
@@ -95,7 +95,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                     children: [
                       Text(
                         l10n.lrTodayPlanDone,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColor.success,
@@ -104,7 +104,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                       const SizedBox(height: AppSpacing.s2),
                       Text(
                         l10n.lrTodayPlanStats(completedTodayCount, studyMinutesToday),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColor.fgSecondary,
                         ),
@@ -155,7 +155,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     RemixIcons.play_circle_fill,
                     size: 18,
                     color: AppColor.cyan,
@@ -168,7 +168,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                     children: [
                       Text(
                         currentLesson!.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColor.fg,
@@ -177,7 +177,7 @@ class TodayLearningPlanCard extends StatelessWidget {
                       const SizedBox(height: AppSpacing.s2),
                       Text(
                         l10n.lrTodayPlanNextLesson(currentLesson!.estimatedMinutes),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColor.fgSecondary,
                         ),
@@ -259,7 +259,7 @@ class _StatChip extends StatelessWidget {
           const SizedBox(width: AppSpacing.s4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               color: AppColor.fgSecondary,
             ),

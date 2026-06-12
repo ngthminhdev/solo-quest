@@ -35,7 +35,7 @@ class GoogleSignInButton extends StatelessWidget {
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
@@ -46,7 +46,7 @@ class GoogleSignInButton extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s12),
                     Text(
                       context.l10n.loginGoogleLoading,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fgSecondary,
@@ -65,7 +65,7 @@ class GoogleSignInButton extends StatelessWidget {
                     const SizedBox(width: AppSpacing.s12),
                     Text(
                       context.l10n.loginGoogleButton,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColor.darkSlate,

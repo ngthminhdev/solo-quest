@@ -30,7 +30,7 @@ class CompletedQuestSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Chưa có quest nào hoàn thành hôm nay.',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgMuted,
               ),

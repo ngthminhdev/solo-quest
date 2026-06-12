@@ -40,7 +40,7 @@ class HomeGenerationView extends StatelessWidget {
             const SizedBox(height: AppSpacing.s20),
             Text(
               _title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fg,
@@ -50,7 +50,7 @@ class HomeGenerationView extends StatelessWidget {
             const SizedBox(height: AppSpacing.s8),
             Text(
               message ?? _defaultSubtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fgSecondary,
                 height: 1.5,
@@ -59,7 +59,7 @@ class HomeGenerationView extends StatelessWidget {
             ),
             if (_isGenerating) ...[
               const SizedBox(height: AppSpacing.s8),
-              const Text(
+              Text(
                 'Quá trình này có thể mất một chút thời gian.',
                 style: TextStyle(fontSize: 13, color: AppColor.fgMuted),
                 textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class HomeGenerationView extends StatelessWidget {
 
   Widget _buildIndicator() {
     if (_isGenerating) {
-      return const SizedBox(
+      return SizedBox(
         width: 48,
         height: 48,
         child: CircularProgressIndicator(

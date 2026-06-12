@@ -13,7 +13,7 @@ class LoginFooterNote extends StatelessWidget {
       children: [
         Text(
           context.l10n.loginNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -23,7 +23,7 @@ class LoginFooterNote extends StatelessWidget {
         const SizedBox(height: AppSpacing.s12),
         Text(
           context.l10n.loginTerms,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -43,7 +43,7 @@ class LoginFooterNote extends StatelessWidget {
           ),
           child: Text(
             context.l10n.loginPrototypeNote,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               color: AppColor.violet,
               fontWeight: FontWeight.w600,

@@ -67,7 +67,7 @@ class QuestDetailReasonCard extends StatelessWidget {
                 // Reason text
                 Text(
                   reason ?? 'Nhiệm vụ này được đề xuất dựa trên lịch sinh hoạt và mục tiêu hôm nay của bạn.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppColor.fgSecondary,
                     height: 1.5,

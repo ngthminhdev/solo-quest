@@ -47,7 +47,7 @@ class LearningQuestCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(color: AppColor.primaryBorder),
                 ),
-                child: const Icon(
+                child: Icon(
                   RemixIcons.book_open_line,
                   size: 20,
                   color: AppColor.primary,
@@ -62,7 +62,7 @@ class LearningQuestCard extends StatelessWidget {
                       quest.isCompleted
                           ? l10n.lqCompletedToday
                           : quest.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColor.textPrimary,
@@ -71,7 +71,7 @@ class LearningQuestCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s2),
                     Text(
                       quest.subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.textSecondary,
                       ),
@@ -105,7 +105,7 @@ class LearningQuestCard extends StatelessWidget {
             label: Text(l10n.lqChooseMoreTopics),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColor.primary,
-              side: const BorderSide(color: AppColor.borderGlowCyan),
+              side: BorderSide(color: AppColor.borderGlowCyan),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.s12,
                 vertical: AppSpacing.s10,
@@ -142,7 +142,7 @@ class _ProgressPill extends StatelessWidget {
       ),
       child: Text(
         l10n.lqTopicsCount(completedCount, totalCount),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,
           color: AppColor.textSecondary,

@@ -63,7 +63,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep2SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -146,7 +146,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(
+                        ? Icon(
                             RemixIcons.check_line,
                             size: 14,
                             color: AppColor.bgDeep,
@@ -291,7 +291,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.time_line,
                   size: 18,
                   color: AppColor.fgMuted,
@@ -301,7 +301,7 @@ class OnboardingWorkStudyStep extends StatelessWidget {
                   TimeHelper.formatOrFallback(
                     value.isNotEmpty ? value : '08:00',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
                     fontWeight: FontWeight.w600,

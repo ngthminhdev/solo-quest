@@ -69,6 +69,7 @@ class _MorningCheckinPageState extends BasePageConsumerState<
 
     return AppScaffold(
       scroll: false,
+      isLocked: state.isLockedPage,
       bottom: CheckinSubmitBar(
         canSubmit: state.canSubmit,
         isLoading: state.isLockedPage,

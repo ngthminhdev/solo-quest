@@ -40,7 +40,7 @@ class QuestRuleListSection extends StatelessWidget {
         children: [
           Text(
             l10n.questRulesListTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColor.fg,

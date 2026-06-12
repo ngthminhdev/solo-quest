@@ -31,7 +31,7 @@ class ExpExplainCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 RemixIcons.information_line,
                 size: 16,
                 color: AppColor.expGold,
@@ -39,7 +39,7 @@ class ExpExplainCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s6),
               Text(
                 l10n.progressExpExplainTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fg,
@@ -50,7 +50,7 @@ class ExpExplainCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s8),
           Text(
             l10n.progressExpExplainText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,
               height: 1.5,

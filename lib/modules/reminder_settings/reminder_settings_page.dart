@@ -80,6 +80,7 @@ class _ReminderSettingsPageState
 
     return AppScaffold(
       scroll: false,
+      isLocked: state.isLockedPage,
       body: RefreshIndicator(
         onRefresh: pageModel.refreshSettings,
         child: SingleChildScrollView(

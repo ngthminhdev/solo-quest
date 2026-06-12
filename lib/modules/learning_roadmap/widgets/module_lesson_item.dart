@@ -32,7 +32,7 @@ class ModuleLessonItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.s10),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: AppColor.border, width: 1)),
         ),
         child: Row(
@@ -96,7 +96,7 @@ class ModuleLessonItem extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s4),
                     Text(
                       step.description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColor.textSecondary,
                         height: 1.35,

@@ -65,6 +65,7 @@ class _DailyReviewPageState extends BasePageConsumerState<DailyReviewPage,
 
     return AppScaffold(
       scroll: false,
+      isLocked: state.isLockedPage,
       bottom: DailyReviewSubmitBar(
         canSubmit: state.canSubmit,
         isLoading: state.isLockedPage,

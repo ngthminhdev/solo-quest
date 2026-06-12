@@ -23,13 +23,13 @@ class WeeklyProtectionCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
+            Icon(
               RemixIcons.shield_check_line,
               size: 18,
               color: AppColor.cyan,
             ),
             const SizedBox(width: AppSpacing.s10),
-            const Expanded(
+            Expanded(
               child: Text(
                 WeeklySummaryConstants.protectionText,
                 style: TextStyle(

@@ -48,7 +48,7 @@ class AppSectionHeader extends StatelessWidget {
             const Spacer(),
             Text(
               count!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 color: AppColor.fgMuted,
               ),
@@ -60,7 +60,7 @@ class AppSectionHeader extends StatelessWidget {
               onTap: onAction,
               child: Text(
                 actionText!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColor.cyan,

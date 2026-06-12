@@ -26,7 +26,7 @@ class CheckinStepIndicator extends StatelessWidget {
             children: [
               Text(
                 context.l10n.morningCheckinStepTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.08,

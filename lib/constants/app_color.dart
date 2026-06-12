@@ -1,6 +1,186 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/enums/quest_enums.dart';
+
+enum AppThemeMode { dark, light, midnight, sunset, ocean, forest }
+
+class AppTheme {
+  final AppThemeMode mode;
+  final Color bgDeep;
+  final Color bg;
+  final Color bgRaised;
+  final Color surface;
+  final Color surfaceHover;
+  final Color surfaceActive;
+  final Color fg;
+  final Color fgSecondary;
+  final Color fgMuted;
+  final Color border;
+  final Color borderSubtle;
+
+  const AppTheme({
+    required this.mode,
+    required this.bgDeep,
+    required this.bg,
+    required this.bgRaised,
+    required this.surface,
+    required this.surfaceHover,
+    required this.surfaceActive,
+    required this.fg,
+    required this.fgSecondary,
+    required this.fgMuted,
+    required this.border,
+    required this.borderSubtle,
+  });
+
+  static const dark = AppTheme(
+    mode: AppThemeMode.dark,
+    bgDeep: Color(0xFF060A14),
+    bg: Color(0xFF0A0E1A),
+    bgRaised: Color(0xFF0F1629),
+    surface: Color(0xFF141B2D),
+    surfaceHover: Color(0xFF1A2340),
+    surfaceActive: Color(0xFF1F2A4A),
+    fg: Color(0xFFE8ECF4),
+    fgSecondary: Color(0xFF8B95A8),
+    fgMuted: Color(0xFF4A5568),
+    border: Color(0x0FFFFFFF),
+    borderSubtle: Color(0x08FFFFFF),
+  );
+
+  static const light = AppTheme(
+    mode: AppThemeMode.light,
+    bgDeep: Color(0xFFFFFFFF),
+    bg: Color(0xFFF8F9FA),
+    bgRaised: Color(0xFFFFFFFF),
+    surface: Color(0xFFFFFFFF),
+    surfaceHover: Color(0xFFF1F3F5),
+    surfaceActive: Color(0xFFE9ECEF),
+    fg: Color(0xFF1A1D29),
+    fgSecondary: Color(0xFF495057),
+    fgMuted: Color(0xFF868E96),
+    border: Color(0x1F000000),
+    borderSubtle: Color(0x0A000000),
+  );
+
+  static const midnight = AppTheme(
+    mode: AppThemeMode.midnight,
+    bgDeep: Color(0xFF05070D),
+    bg: Color(0xFF0A0D15),
+    bgRaised: Color(0xFF111521),
+    surface: Color(0xFF181D2B),
+    surfaceHover: Color(0xFF202637),
+    surfaceActive: Color(0xFF283044),
+    fg: Color(0xFFE0E0E8),
+    fgSecondary: Color(0xFF9090A0),
+    fgMuted: Color(0xFF505060),
+    border: Color(0x12FFFFFF),
+    borderSubtle: Color(0x08FFFFFF),
+  );
+
+  static const sunset = AppTheme(
+    mode: AppThemeMode.sunset,
+    bgDeep: Color(0xFF1A0F0A),
+    bg: Color(0xFF2A1810),
+    bgRaised: Color(0xFF3A2218),
+    surface: Color(0xFF4A2D20),
+    surfaceHover: Color(0xFF5A3828),
+    surfaceActive: Color(0xFF6A4330),
+    fg: Color(0xFFFFE8D6),
+    fgSecondary: Color(0xFFD4A88A),
+    fgMuted: Color(0xFF8A6850),
+    border: Color(0x1AFFB380),
+    borderSubtle: Color(0x0AFFB380),
+  );
+
+  static const ocean = AppTheme(
+    mode: AppThemeMode.ocean,
+    bgDeep: Color(0xFF0A1420),
+    bg: Color(0xFF0F1D2E),
+    bgRaised: Color(0xFF15283C),
+    surface: Color(0xFF1B334A),
+    surfaceHover: Color(0xFF213E58),
+    surfaceActive: Color(0xFF274966),
+    fg: Color(0xFFE0F0FF),
+    fgSecondary: Color(0xFF8AB4D4),
+    fgMuted: Color(0xFF4A6A84),
+    border: Color(0x1A4A9FD4),
+    borderSubtle: Color(0x0A4A9FD4),
+  );
+
+  static const forest = AppTheme(
+    mode: AppThemeMode.forest,
+    bgDeep: Color(0xFF0A1410),
+    bg: Color(0xFF0F1E18),
+    bgRaised: Color(0xFF152822),
+    surface: Color(0xFF1B332C),
+    surfaceHover: Color(0xFF213E36),
+    surfaceActive: Color(0xFF274940),
+    fg: Color(0xFFE0FFE8),
+    fgSecondary: Color(0xFF8AD4A0),
+    fgMuted: Color(0xFF4A8460),
+    border: Color(0x1A4AD484),
+    borderSubtle: Color(0x0A4AD484),
+  );
+}
+
+class ThemeNotifier extends StateNotifier<AppTheme> {
+  static const _prefsKey = 'app_theme_mode';
+  static bool _initialized = false;
+
+  ThemeNotifier() : super(AppTheme.dark) {
+    _loadTheme();
+  }
+
+  AppTheme _themeForMode(AppThemeMode mode) {
+    return switch (mode) {
+      AppThemeMode.dark => AppTheme.dark,
+      AppThemeMode.light => AppTheme.light,
+      AppThemeMode.midnight => AppTheme.midnight,
+      AppThemeMode.sunset => AppTheme.sunset,
+      AppThemeMode.ocean => AppTheme.ocean,
+      AppThemeMode.forest => AppTheme.forest,
+    };
+  }
+
+  Future<void> _loadTheme() async {
+    if (_initialized) return;
+    _initialized = true;
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedMode = prefs.getString(_prefsKey);
+      if (savedMode != null) {
+        final mode = AppThemeMode.values.firstWhere(
+          (m) => m.name == savedMode,
+          orElse: () => AppThemeMode.dark,
+        );
+        state = _themeForMode(mode);
+        AppColor.setTheme(state);
+      }
+    } catch (_) {
+      // Fallback to default dark theme
+    }
+  }
+
+  Future<void> setTheme(AppThemeMode mode) async {
+    state = _themeForMode(mode);
+    AppColor.setTheme(state);
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefsKey, mode.name);
+    } catch (_) {
+      // Silently fail - theme still works without persistence
+    }
+  }
+}
+
+final themeProvider = StateNotifierProvider<ThemeNotifier, AppTheme>((ref) {
+  return ThemeNotifier();
+});
 
 extension HexColor on Color {
   static Color fromHex(String hexString) {
@@ -24,13 +204,19 @@ extension HexColor on Color {
 }
 
 class AppColor {
+  static AppTheme? _currentTheme;
+
+  static void setTheme(AppTheme theme) {
+    _currentTheme = theme;
+  }
+
   // ── Background layers (deep → raised) ──
-  static const Color bgDeep = Color(0xFF060A14);
-  static const Color bg = Color(0xFF0A0E1A);
-  static const Color bgRaised = Color(0xFF0F1629);
-  static const Color surface = Color(0xFF141B2D);
-  static const Color surfaceHover = Color(0xFF1A2340);
-  static const Color surfaceActive = Color(0xFF1F2A4A);
+  static Color get bgDeep => _currentTheme?.bgDeep ?? AppTheme.dark.bgDeep;
+  static Color get bg => _currentTheme?.bg ?? AppTheme.dark.bg;
+  static Color get bgRaised => _currentTheme?.bgRaised ?? AppTheme.dark.bgRaised;
+  static Color get surface => _currentTheme?.surface ?? AppTheme.dark.surface;
+  static Color get surfaceHover => _currentTheme?.surfaceHover ?? AppTheme.dark.surfaceHover;
+  static Color get surfaceActive => _currentTheme?.surfaceActive ?? AppTheme.dark.surfaceActive;
 
   // ── Base neutrals ──
   static const Color white = Color(0xFFFFFFFF);
@@ -38,27 +224,27 @@ class AppColor {
   static const Color transparent = Color(0x00000000);
 
   // ── Text ──
-  static const Color fg = Color(0xFFE8ECF4);
-  static const Color fgSecondary = Color(0xFF8B95A8);
-  static const Color fgMuted = Color(0xFF4A5568);
+  static Color get fg => _currentTheme?.fg ?? AppTheme.dark.fg;
+  static Color get fgSecondary => _currentTheme?.fgSecondary ?? AppTheme.dark.fgSecondary;
+  static Color get fgMuted => _currentTheme?.fgMuted ?? AppTheme.dark.fgMuted;
 
   // ── Semantic base aliases ──
-  static const Color background = bgDeep;
-  static const Color surfaceElevated = bgRaised;
-  static const Color card = surface;
-  static const Color cardMuted = surfaceHover;
-  static const Color divider = borderSubtle;
-  static const Color textPrimary = fg;
-  static const Color textSecondary = fgSecondary;
-  static const Color textMuted = fgMuted;
-  static const Color textDisabled = fgMuted;
-  static const Color textOnAccent = bgDeep;
+  static Color get background => bgDeep;
+  static Color get surfaceElevated => bgRaised;
+  static Color get card => surface;
+  static Color get cardMuted => surfaceHover;
+  static Color get divider => borderSubtle;
+  static Color get textPrimary => fg;
+  static Color get textSecondary => fgSecondary;
+  static Color get textMuted => fgMuted;
+  static Color get textDisabled => fgMuted;
+  static Color get textOnAccent => bgDeep;
 
   // ── Primary accents ──
-  static const Color cyan = Color(0xFF00F0FF);
-  static const Color cyanDim = Color(0x2600F0FF);
-  static const Color cyanGlow = Color(0x4D00F0FF);
-  static const Color cyanBright = Color(0xFF00C4FF);
+  static const Color cyan = Color(0xFF67DDEB);
+  static const Color cyanDim = Color(0x2667DDEB);
+  static const Color cyanGlow = Color(0x3D67DDEB);
+  static const Color cyanBright = Color(0xFF84ECF5);
 
   static const Color violet = Color(0xFFA855F7);
   static const Color violetDim = Color(0x26A855F7);
@@ -94,13 +280,13 @@ class AppColor {
   static const Color infoBackground = infoDim;
 
   // ── EXP / Gamification ──
-  static const Color expGold = Color(0xFFFFD700);
-  static const Color expGoldDim = Color(0x26FFD700);
+  static const Color expGold = Color(0xFFF3C969);
+  static const Color expGoldDim = Color(0x26F3C969);
 
   // ── Borders ──
-  static const Color border = Color(0x0FFFFFFF);
-  static const Color borderSubtle = Color(0x08FFFFFF);
-  static const Color borderGlowCyan = Color(0x3300F0FF);
+  static Color get border => _currentTheme?.border ?? AppTheme.dark.border;
+  static Color get borderSubtle => _currentTheme?.borderSubtle ?? AppTheme.dark.borderSubtle;
+  static const Color borderGlowCyan = Color(0x3367DDEB);
   static const Color borderGlowViolet = Color(0x33A855F7);
 
   // ── Chip colors (Quest Types) ──
@@ -130,7 +316,7 @@ class AppColor {
   // ── Status semantic colors ──
   static const Color completed = success;
   static const Color active = cyan;
-  static const Color locked = fgMuted;
+  static Color get locked => fgMuted;
   static const Color paused = warn;
   static const Color snoozed = warn;
 
@@ -146,33 +332,33 @@ class AppColor {
   static const Color highlight = cyanDim;
 
   // ── Common alpha tokens ──
-  static final Color primaryBorder = cyan.withValues(alpha: 0.3);
-  static final Color primaryStrongBorder = cyan.withValues(alpha: 0.7);
-  static final Color primarySubtleOverlay = cyan.withValues(alpha: 0.08);
-  static final Color primaryHoverOverlay = cyan.withValues(alpha: 0.2);
-  static final Color primaryShadow = cyan.withValues(alpha: 0.3);
-  static final Color primarySoftShadow = cyan.withValues(alpha: 0.2);
-  static final Color secondarySubtleOverlay = violet.withValues(alpha: 0.12);
-  static final Color secondaryBorder = violet.withValues(alpha: 0.3);
-  static final Color secondarySoftBorder = violet.withValues(alpha: 0.35);
-  static final Color secondaryStrongBorder = violet.withValues(alpha: 0.4);
-  static final Color secondaryShadow = violet.withValues(alpha: 0.15);
-  static final Color successDisabledBackground = successDim.withValues(alpha: 0.3);
-  static final Color successBorder = success.withValues(alpha: 0.3);
-  static final Color successStrongBorder = success.withValues(alpha: 0.4);
-  static final Color successStrongOverlay = success.withValues(alpha: 0.7);
-  static final Color successOverlay = success.withValues(alpha: 0.08);
-  static final Color warningDisabledBackground = warnDim.withValues(alpha: 0.3);
-  static final Color warningBorder = warn.withValues(alpha: 0.3);
-  static final Color warningSoftBorder = warn.withValues(alpha: 0.2);
-  static final Color warningOverlay = warn.withValues(alpha: 0.15);
-  static final Color warningStrongOverlay = warn.withValues(alpha: 0.22);
-  static final Color errorDisabledBackground = danger.withValues(alpha: 0.3);
-  static final Color errorStrongBorder = danger.withValues(alpha: 0.3);
-  static final Color errorBorder = danger.withValues(alpha: 0.24);
-  static final Color accentBorder = expGold.withValues(alpha: 0.4);
-  static final Color mutedOverlay = fgMuted.withValues(alpha: 0.3);
-  static final Color mutedStrongOverlay = fgMuted.withValues(alpha: 0.6);
+  static Color get primaryBorder => cyan.withValues(alpha: 0.3);
+  static Color get primaryStrongBorder => cyan.withValues(alpha: 0.7);
+  static Color get primarySubtleOverlay => cyan.withValues(alpha: 0.08);
+  static Color get primaryHoverOverlay => cyan.withValues(alpha: 0.2);
+  static Color get primaryShadow => cyan.withValues(alpha: 0.3);
+  static Color get primarySoftShadow => cyan.withValues(alpha: 0.2);
+  static Color get secondarySubtleOverlay => violet.withValues(alpha: 0.12);
+  static Color get secondaryBorder => violet.withValues(alpha: 0.3);
+  static Color get secondarySoftBorder => violet.withValues(alpha: 0.35);
+  static Color get secondaryStrongBorder => violet.withValues(alpha: 0.4);
+  static Color get secondaryShadow => violet.withValues(alpha: 0.15);
+  static Color get successDisabledBackground => successDim.withValues(alpha: 0.3);
+  static Color get successBorder => success.withValues(alpha: 0.3);
+  static Color get successStrongBorder => success.withValues(alpha: 0.4);
+  static Color get successStrongOverlay => success.withValues(alpha: 0.7);
+  static Color get successOverlay => success.withValues(alpha: 0.08);
+  static Color get warningDisabledBackground => warnDim.withValues(alpha: 0.3);
+  static Color get warningBorder => warn.withValues(alpha: 0.3);
+  static Color get warningSoftBorder => warn.withValues(alpha: 0.2);
+  static Color get warningOverlay => warn.withValues(alpha: 0.15);
+  static Color get warningStrongOverlay => warn.withValues(alpha: 0.22);
+  static Color get errorDisabledBackground => danger.withValues(alpha: 0.3);
+  static Color get errorStrongBorder => danger.withValues(alpha: 0.3);
+  static Color get errorBorder => danger.withValues(alpha: 0.24);
+  static Color get accentBorder => expGold.withValues(alpha: 0.4);
+  static Color get mutedOverlay => fgMuted.withValues(alpha: 0.3);
+  static Color get mutedStrongOverlay => fgMuted.withValues(alpha: 0.6);
 
   // ── Category palette ──
   static const List<Color> categoryPalette = [
@@ -189,11 +375,15 @@ class AppColor {
   ];
 
   // ── Gradient presets ──
-  static const LinearGradient backgroundGradient = LinearGradient(
+  static LinearGradient get backgroundGradient => LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [bg, bgDeep],
-    stops: [0.0, 0.7],
+    colors: [
+      Color.lerp(bg, cyan, 0.035)!,
+      bg,
+      Color.lerp(bgDeep, violet, 0.025)!,
+    ],
+    stops: const [0.0, 0.42, 1.0],
   );
 
   static Color get scaffoldBackground => bgDeep;
@@ -228,7 +418,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient dailyReviewCtaGradient = LinearGradient(
+  static LinearGradient get dailyReviewCtaGradient => LinearGradient(
     colors: [
       violet.withValues(alpha: 0.08),
       cyan.withValues(alpha: 0.05),
@@ -241,7 +431,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient insightCardGradient = LinearGradient(
+  static LinearGradient get insightCardGradient => LinearGradient(
     colors: [
       cyan.withValues(alpha: 0.05),
       violet.withValues(alpha: 0.04),
@@ -250,7 +440,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient successCardGradient = LinearGradient(
+  static LinearGradient get successCardGradient => LinearGradient(
     colors: [
       success.withValues(alpha: 0.06),
       cyan.withValues(alpha: 0.04),
@@ -259,7 +449,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient heroCardGradient = LinearGradient(
+  static LinearGradient get heroCardGradient => LinearGradient(
     colors: [
       cyan.withValues(alpha: 0.06),
       violet.withValues(alpha: 0.04),
@@ -268,7 +458,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient roadmapOverviewGradient = LinearGradient(
+  static LinearGradient get roadmapOverviewGradient => LinearGradient(
     colors: [
       violet.withValues(alpha: 0.08),
       cyan.withValues(alpha: 0.06),
@@ -277,7 +467,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient activeQuestGradient = LinearGradient(
+  static LinearGradient get activeQuestGradient => LinearGradient(
     colors: [
       success.withValues(alpha: 0.08),
       surface,
@@ -286,7 +476,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient questCyanGradient = LinearGradient(
+  static LinearGradient get questCyanGradient => LinearGradient(
     colors: [
       cyan.withValues(alpha: 0.05),
       surface,
@@ -295,7 +485,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient activeQuestReadableGradient = LinearGradient(
+  static LinearGradient get activeQuestReadableGradient => LinearGradient(
     colors: [
       cyan.withValues(alpha: 0.16),
       bgRaised,
@@ -306,7 +496,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient todayLearningPlanGradient = LinearGradient(
+  static LinearGradient get todayLearningPlanGradient => LinearGradient(
     colors: [
       violet.withValues(alpha: 0.10),
       cyan.withValues(alpha: 0.08),
@@ -321,7 +511,7 @@ class AppColor {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient weeklyScoreGradient = _weeklyScoreGradient();
+  static LinearGradient get weeklyScoreGradient => _weeklyScoreGradient();
 
   static LinearGradient _weeklyScoreGradient() {
     return LinearGradient(

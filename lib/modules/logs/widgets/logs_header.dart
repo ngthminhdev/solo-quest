@@ -49,7 +49,7 @@ class LogsHeader extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.calendar_line,
                   size: 14,
                   color: AppColor.cyan,
@@ -57,7 +57,7 @@ class LogsHeader extends StatelessWidget {
                 const SizedBox(width: AppSpacing.s6),
                 Text(
                   dateLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'JetBrains Mono',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

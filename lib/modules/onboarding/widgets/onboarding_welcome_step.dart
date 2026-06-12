@@ -24,7 +24,7 @@ class OnboardingWelcomeStep extends StatelessWidget {
     ];
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: RadialGradient(
           center: Alignment(0, 0.2),
           radius: 0.8,
@@ -141,7 +141,7 @@ class OnboardingWelcomeStep extends StatelessWidget {
             child: Center(
               child: Text(
                 '$num',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: AppColor.cyan,

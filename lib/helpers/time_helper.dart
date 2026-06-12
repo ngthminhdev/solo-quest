@@ -54,13 +54,13 @@ class TimeHelper {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColor.cyan,
               onPrimary: AppColor.bgDeep,
               surface: AppColor.surface,
               onSurface: AppColor.fg,
             ),
-            dialogTheme: const DialogThemeData(
+            dialogTheme: DialogThemeData(
               backgroundColor: AppColor.bgRaised,
             ),
           ),

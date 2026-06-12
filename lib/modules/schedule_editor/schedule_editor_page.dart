@@ -138,14 +138,14 @@ class _ScheduleEditorPageState extends BasePageConsumerState<
       elevation: 0,
       title: Text(
         context.l10n.scheduleEditorPageTitle,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: AppColor.fg,
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColor.fg),
+        icon: Icon(Icons.arrow_back, color: AppColor.fg),
         onPressed: () => Navigator.of(context).pop(),
       ),
     );

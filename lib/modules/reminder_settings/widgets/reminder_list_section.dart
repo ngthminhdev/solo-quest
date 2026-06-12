@@ -36,7 +36,7 @@ class ReminderListSection extends StatelessWidget {
         children: [
           Text(
             context.l10n.reminderSettingsListTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: AppColor.fgMuted,

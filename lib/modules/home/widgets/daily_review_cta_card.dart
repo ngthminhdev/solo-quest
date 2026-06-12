@@ -42,7 +42,7 @@ class DailyReviewCtaCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.pill),
                 border: Border.all(color: AppColor.borderGlowViolet),
               ),
-              child: const Icon(
+              child: Icon(
                 RemixIcons.file_text_line,
                 color: AppColor.violet,
                 size: 20,
@@ -53,7 +53,7 @@ class DailyReviewCtaCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Cuối ngày rồi? Đánh giá hôm nay',
                     style: TextStyle(
                       fontSize: 14,
@@ -62,7 +62,7 @@ class DailyReviewCtaCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Text(
+                  Text(
                     'Giúp hệ thống hiểu bạn hơn và tạo quest tốt hơn cho ngày mai.',
                     style: TextStyle(
                       fontSize: 12,
@@ -73,7 +73,7 @@ class DailyReviewCtaCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               RemixIcons.arrow_right_s_line,
               color: AppColor.fgMuted,
               size: 18,

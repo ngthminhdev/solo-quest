@@ -61,7 +61,7 @@ class LogsTimelineSection extends StatelessWidget {
                 const Spacer(),
                 Text(
                   context.l10n.logsTimelineCount(logs.length),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'JetBrains Mono',
                     fontSize: 10,
                     color: AppColor.fgMuted,

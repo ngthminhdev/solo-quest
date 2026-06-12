@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:remixicon/remixicon.dart';
 import '../../constants/app_color.dart';
 import '../../constants/app_radius.dart';
@@ -25,6 +26,9 @@ class TimerCompletionDialog extends StatefulWidget {
     required Future<void> Function() onComplete,
     VoidCallback? onCancel,
   }) {
+    // Vibrate device to alert the user
+    HapticFeedback.vibrate();
+
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -91,7 +95,7 @@ class _TimerCompletionDialogState extends State<TimerCompletionDialog> {
                 color: AppColor.warnDim,
                 border: Border.all(color: AppColor.warn, width: 2),
               ),
-              child: const Icon(
+              child: Icon(
                 RemixIcons.time_line,
                 color: AppColor.warn,
                 size: 28,
@@ -102,7 +106,7 @@ class _TimerCompletionDialogState extends State<TimerCompletionDialog> {
             // Title
             Text(
               l10n.timerTimeUp,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: AppColor.fg,
@@ -114,7 +118,7 @@ class _TimerCompletionDialogState extends State<TimerCompletionDialog> {
             Text(
               '${widget.questTitle} ${l10n.timerQuestEnded.toLowerCase()}',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fgSecondary,
                 height: 1.4,
@@ -136,7 +140,7 @@ class _TimerCompletionDialogState extends State<TimerCompletionDialog> {
                 elevation: 0,
               ),
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(

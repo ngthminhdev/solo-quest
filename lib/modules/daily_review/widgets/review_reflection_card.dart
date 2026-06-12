@@ -44,20 +44,20 @@ class ReviewReflectionCard extends StatelessWidget {
               maxLines: 3,
               minLines: 2,
               maxLength: 200,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fg,
                 height: 1.5,
               ),
               decoration: InputDecoration(
                 hintText: context.l10n.dailyReviewReflectionHint,
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   color: AppColor.fgMuted,
                   fontSize: 13,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.all(AppSpacing.s12),
-                counterStyle: const TextStyle(
+                counterStyle: TextStyle(
                   fontSize: 10,
                   color: AppColor.fgMuted,
                 ),

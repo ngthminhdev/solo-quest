@@ -96,7 +96,7 @@ class ExpBreakdownCard extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColor.expGold,
                   shape: BoxShape.circle,
                 ),
@@ -104,7 +104,7 @@ class ExpBreakdownCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s6),
               Text(
                 l10n.progressExpBreakdownSection,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -151,7 +151,7 @@ class _ExpRow extends StatelessWidget {
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,
@@ -159,7 +159,7 @@ class _ExpRow extends StatelessWidget {
                 ),
                 Text(
                   item.note,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColor.fgMuted,
                   ),
@@ -169,7 +169,7 @@ class _ExpRow extends StatelessWidget {
           ),
           Text(
             '+${item.exp}',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Roboto',
               fontSize: 14,
               fontWeight: FontWeight.w700,

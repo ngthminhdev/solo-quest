@@ -68,7 +68,7 @@ class _LogDetailContent extends StatelessWidget {
             label: context.l10n.logsDetailDescLabel,
             child: Text(
               log.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fg,
                 height: 1.5,
@@ -129,7 +129,7 @@ class _LogDetailContent extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   log.mood!.label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColor.violet,
@@ -150,7 +150,7 @@ class _LogDetailContent extends StatelessWidget {
               log.metadata.entries
                   .map((e) => '${e.key}: ${e.value}')
                   .join('\n'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'JetBrains Mono',
                 color: AppColor.fgSecondary,
@@ -192,7 +192,7 @@ class _LogDetailContent extends StatelessWidget {
                   SizedBox(width: AppSpacing.s8),
                   Text(
                     context.l10n.logsViewQuest,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColor.cyan,
@@ -221,7 +221,7 @@ class _LogDetailContent extends StatelessWidget {
           width: 72,
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: AppColor.fgMuted,

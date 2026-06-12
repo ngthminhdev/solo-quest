@@ -76,7 +76,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
                 // Mission action
                 Text(
                   _missionText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,
@@ -103,7 +103,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
                     ),
                     child: Text(
                       instruction,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColor.fgSecondary,
                         height: 1.5,
@@ -136,7 +136,7 @@ class QuestDetailInstructionCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, color: AppColor.fg),
+              style: TextStyle(fontSize: 14, color: AppColor.fg),
             ),
           ),
         ],

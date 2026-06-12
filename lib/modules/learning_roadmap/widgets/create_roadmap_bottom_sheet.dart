@@ -52,7 +52,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
       constraints: BoxConstraints(
         maxHeight: maxHeight,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bg,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppRadius.xl),
@@ -84,14 +84,14 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
                     gradient: AppColor.secondaryToPrimaryGradient,
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     RemixIcons.sparkling_2_fill,
                     size: 22,
                     color: AppColor.bgDeep,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -124,7 +124,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
             ),
           ),
 
-          const Divider(height: 1, color: AppColor.border),
+          Divider(height: 1, color: AppColor.border),
 
           // Content
           Flexible(
@@ -139,7 +139,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
           if (!widget.isLoadingSuggestions && widget.suggestions.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(AppSpacing.s16),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColor.bg,
                 border: Border(
                   top: BorderSide(color: AppColor.border),
@@ -184,7 +184,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.all(AppSpacing.s40),
         child: Column(
@@ -220,7 +220,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
               color: AppColor.fgMuted,
             ),
             const SizedBox(height: AppSpacing.s16),
-            const Text(
+            Text(
               'Không tìm thấy lộ trình',
               style: TextStyle(
                 fontSize: 16,
@@ -229,7 +229,7 @@ class _CreateRoadmapBottomSheetState extends State<CreateRoadmapBottomSheet> {
               ),
             ),
             const SizedBox(height: AppSpacing.s8),
-            const Text(
+            Text(
               'Chưa có lộ trình phù hợp với bộ lọc.\nVui lòng thử lại với điều kiện khác.',
               textAlign: TextAlign.center,
               style: TextStyle(

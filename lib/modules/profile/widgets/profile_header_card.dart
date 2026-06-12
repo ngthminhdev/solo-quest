@@ -26,7 +26,7 @@ class ProfileHeaderCard extends StatelessWidget {
     return Center(
       child: Text(
         profile.name.isNotEmpty ? profile.name[0].toUpperCase() : 'U',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.w700,
           color: AppColor.cyan,
@@ -63,7 +63,7 @@ class ProfileHeaderCard extends StatelessWidget {
                               _buildFallbackAvatar(),
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return const Center(
+                            return Center(
                               child: SizedBox(
                                 width: 20,
                                 height: 20,
@@ -90,7 +90,7 @@ class ProfileHeaderCard extends StatelessWidget {
                   children: [
                     Text(
                       profile.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: AppColor.fg,
@@ -114,7 +114,7 @@ class ProfileHeaderCard extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   RemixIcons.google_line,
                                   size: 11,
                                   color: AppColor.fgSecondary,
@@ -122,7 +122,7 @@ class ProfileHeaderCard extends StatelessWidget {
                                 const SizedBox(width: 3),
                                 Text(
                                   provider![0].toUpperCase() + provider!.substring(1),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                     color: AppColor.fgSecondary,
@@ -153,7 +153,7 @@ class ProfileHeaderCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         RemixIcons.fire_line,
                         size: 16,
                         color: AppColor.warn,
@@ -161,7 +161,7 @@ class ProfileHeaderCard extends StatelessWidget {
                       const SizedBox(width: AppSpacing.s4),
                       Text(
                         '$streakDays',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColor.warn,

@@ -116,7 +116,7 @@ class _TypeRow extends StatelessWidget {
                 child: Text(
                   '$count',
                   textAlign: TextAlign.end,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Roboto',
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -151,7 +151,7 @@ class _SectionLabel extends StatelessWidget {
         const SizedBox(width: AppSpacing.s6),
         Text(
           title.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Roboto',
             fontSize: 11,
             fontWeight: FontWeight.w800,

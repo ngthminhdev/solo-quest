@@ -66,7 +66,7 @@ class QuestDetailHistorySection extends StatelessWidget {
             width: 50,
             child: Text(
               _formatDate(log.createdAt),
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 12,
                 color: AppColor.fgMuted,

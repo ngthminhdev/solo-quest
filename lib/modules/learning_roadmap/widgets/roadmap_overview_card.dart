@@ -34,7 +34,7 @@ class RoadmapOverviewCard extends StatelessWidget {
           // Title
           Text(
             roadmap.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -78,11 +78,11 @@ class RoadmapOverviewCard extends StatelessWidget {
                 children: [
                   Text(
                     l10n.lrOverviewTotalProgress,
-                    style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+                    style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
                   ),
                   Text(
                     l10n.lrOverviewProgressCount(completedTopics, totalTopics),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'JetBrainsMono',
                       fontSize: 11,
                       color: AppColor.violet,
@@ -116,7 +116,7 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'JetBrainsMono',
             fontSize: 18,
             fontWeight: FontWeight.w800,
@@ -127,7 +127,7 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: AppSpacing.s2),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             color: AppColor.fgMuted,
             letterSpacing: 0.4,

@@ -26,7 +26,7 @@ class LoginErrorBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             RemixIcons.error_warning_line,
             size: 16,
             color: AppColor.danger,
@@ -35,7 +35,7 @@ class LoginErrorBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.danger,
                 height: 1.4,

@@ -307,7 +307,7 @@ class _TimeRangeRow extends StatelessWidget {
             onChanged: onStartChanged,
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.s10),
           child: Icon(
             RemixIcons.arrow_right_s_line,
@@ -359,7 +359,7 @@ class _TimePickerField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+              style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
             const SizedBox(height: AppSpacing.s4),
             Text(
@@ -397,7 +397,7 @@ class _FormLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w800,
         color: AppColor.fgSecondary,
@@ -444,7 +444,7 @@ class _PrioritySelector extends StatelessWidget {
               child: Center(
                 child: Text(
                   '${selectedPriority.value}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColor.cyan,
@@ -455,14 +455,14 @@ class _PrioritySelector extends StatelessWidget {
             const SizedBox(width: AppSpacing.s12),
             Text(
               selectedPriority.getLocalizedLabel(l10n),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fg,
               ),
             ),
             const Spacer(),
-            const Icon(
+            Icon(
               RemixIcons.arrow_down_s_line,
               size: 18,
               color: AppColor.fgMuted,
@@ -492,7 +492,7 @@ class _PrioritySelector extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                   child: Text(
                     l10n.questRulesPrioritySelectTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColor.fg,
@@ -544,7 +544,7 @@ class _PrioritySelector extends StatelessWidget {
                           ),
                           const Spacer(),
                           if (selected)
-                            const Icon(
+                            Icon(
                               RemixIcons.check_line,
                               size: 18,
                               color: AppColor.cyan,

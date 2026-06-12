@@ -38,7 +38,7 @@ class ProfileAccountCard extends StatelessWidget {
               ),
               child: Center(
                 child: isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
@@ -46,7 +46,7 @@ class ProfileAccountCard extends StatelessWidget {
                           color: AppColor.danger,
                         ),
                       )
-                    : const Row(
+                    : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(

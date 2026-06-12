@@ -152,7 +152,7 @@ class _ProgressPageState
   //             Container(
   //               width: 8,
   //               height: 8,
-  //               decoration: const BoxDecoration(
+  //               decoration: BoxDecoration(
   //                 color: AppColor.violet,
   //                 shape: BoxShape.circle,
   //               ),
@@ -194,7 +194,7 @@ class _ProgressPageState
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColor.fgMuted,
                   shape: BoxShape.circle,
                 ),
@@ -202,7 +202,7 @@ class _ProgressPageState
               const SizedBox(width: AppSpacing.s6),
               Text(
                 context.l10n.progressLinksTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,

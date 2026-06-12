@@ -548,6 +548,7 @@ class FcmService {
           return;
         }
 
+        LocalNotificationService.playAttentionCue();
         ReminderDialog.showReminderPrompt(context, payload, _ref);
       } catch (e) {
         _ref?.read(pendingReminderProvider.notifier).state = payload;

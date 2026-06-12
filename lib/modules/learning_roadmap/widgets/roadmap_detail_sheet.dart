@@ -69,7 +69,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -98,7 +98,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                     Expanded(
                       child: Text(
                         _roadmap.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -107,7 +107,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                     ),
                     IconButton(
                       onPressed: () => _confirmDelete(context),
-                      icon: const Icon(
+                      icon: Icon(
                         RemixIcons.delete_bin_6_line,
                         size: 20,
                         color: AppColor.danger,
@@ -116,7 +116,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
+                      icon: Icon(
                         RemixIcons.close_line,
                         size: 20,
                         color: AppColor.fgMuted,
@@ -126,12 +126,17 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                 ),
                 if (_roadmap.description.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text(
-                    _roadmap.description,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColor.fgSecondary,
-                      height: 1.4,
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 100),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _roadmap.description,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColor.fgSecondary,
+                          height: 1.4,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -141,14 +146,14 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                   children: [
                     Text(
                       '${l10n.lrDetailProgressLabel}: ${_roadmap.completedSteps}/${_roadmap.totalSteps} ${l10n.lrDetailSteps}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgMuted,
                       ),
                     ),
                     Text(
                       '$progressPercent%',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColor.violet,
@@ -163,7 +168,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
                   progressColor: AppColor.violet,
                 ),
                 const SizedBox(height: AppSpacing.s12),
-                const Divider(color: AppColor.border, height: 1),
+                Divider(color: AppColor.border, height: 1),
               ],
             ),
           ),
@@ -229,7 +234,7 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text(
+        title: Text(
           'Xoá lộ trình học',
           style: TextStyle(
             color: AppColor.fg,
@@ -238,12 +243,12 @@ class _RoadmapDetailContentState extends State<_RoadmapDetailContent> {
         ),
         content: Text(
           'Bạn có chắc chắn muốn xoá lộ trình "${_roadmap.title}" không? Hành động này không thể hoàn tác.',
-          style: const TextStyle(color: AppColor.fgSecondary),
+          style: TextStyle(color: AppColor.fgSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
+            child: Text(
               'Hủy',
               style: TextStyle(color: AppColor.fgMuted),
             ),

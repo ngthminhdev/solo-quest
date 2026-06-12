@@ -114,7 +114,7 @@ class _OnboardingPageState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(
+              SizedBox(
                 width: 48,
                 height: 48,
                 child: CircularProgressIndicator(
@@ -125,7 +125,7 @@ class _OnboardingPageState
               const SizedBox(height: 24),
               Text(
                 l10n.onboardingGeneratingQuestsTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColor.fg,
@@ -135,7 +135,7 @@ class _OnboardingPageState
               const SizedBox(height: 12),
               Text(
                 l10n.onboardingGeneratingQuestsSubtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: AppColor.fgSecondary,
                   height: 1.5,

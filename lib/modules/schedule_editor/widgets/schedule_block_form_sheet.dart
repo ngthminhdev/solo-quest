@@ -131,7 +131,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
               l10n,
               ScheduleEditorConstants.labelType,
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,
@@ -178,7 +178,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
               l10n,
               ScheduleEditorConstants.labelTime,
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,
@@ -200,7 +200,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
               l10n,
               ScheduleEditorConstants.labelDays,
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,
@@ -285,7 +285,7 @@ class _ScheduleBlockFormState extends State<_ScheduleBlockForm> {
                             l10n,
                             ScheduleEditorConstants.badgeFlexible,
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColor.fg,

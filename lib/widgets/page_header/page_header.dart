@@ -24,7 +24,7 @@ class PageHeader extends StatelessWidget {
         horizontal: AppSpacing.s16,
         vertical: AppSpacing.s12,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         border: Border(bottom: BorderSide(color: AppColor.border, width: 1)),
       ),
@@ -42,7 +42,7 @@ class PageHeader extends StatelessWidget {
                 title,
                 style:
                     titleStyle ??
-                    const TextStyle(
+                    TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,

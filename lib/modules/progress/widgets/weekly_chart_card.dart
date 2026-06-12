@@ -50,7 +50,7 @@ class WeeklyChartCard extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColor.cyan,
                   shape: BoxShape.circle,
                 ),
@@ -58,7 +58,7 @@ class WeeklyChartCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.s6),
               Text(
                 l10n.progressWeeklyChartSection,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -71,7 +71,7 @@ class WeeklyChartCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s12),
           Text(
             l10n.progressWeeklyChartTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -98,7 +98,7 @@ class WeeklyChartCard extends StatelessWidget {
                       children: [
                         Text(
                           '${day.completed}/${day.planned}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Roboto',
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
@@ -123,7 +123,7 @@ class WeeklyChartCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           day.dayLabel,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Roboto',
                             fontSize: 10,
                             color: AppColor.fgMuted,
@@ -142,7 +142,7 @@ class WeeklyChartCard extends StatelessWidget {
           // Legend
           Container(
             padding: const EdgeInsets.only(top: AppSpacing.s8),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(color: AppColor.borderSubtle, width: 1),
               ),
@@ -152,14 +152,14 @@ class WeeklyChartCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.progressWeeklyChartAverage((avgRate * 100).toInt()),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     color: AppColor.fgMuted,
                   ),
                 ),
                 Text(
                   l10n.progressWeeklyChartTotal(weeklyTotal, weeklyPlanned),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fgSecondary,

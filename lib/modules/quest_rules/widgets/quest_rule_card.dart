@@ -63,7 +63,7 @@ class QuestRuleCard extends StatelessWidget {
                         rule.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: AppColor.fg,
@@ -74,7 +74,7 @@ class QuestRuleCard extends StatelessWidget {
                         rule.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColor.fgSecondary,
                           height: 1.35,
@@ -162,7 +162,7 @@ class QuestRuleCard extends StatelessWidget {
                     rule.difficulty.getLocalizedDescription(l10n),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
                       height: 1.35,
@@ -185,7 +185,7 @@ class QuestRuleCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           RemixIcons.edit_2_line,
                           size: 14,
                           color: AppColor.cyan,
@@ -193,7 +193,7 @@ class QuestRuleCard extends StatelessWidget {
                         const SizedBox(width: AppSpacing.s4),
                         Text(
                           l10n.questRulesRuleCardEditButton,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: AppColor.cyan,
@@ -304,7 +304,7 @@ class _AdaptChip extends StatelessWidget {
           const SizedBox(width: AppSpacing.s4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: AppColor.fgSecondary,
@@ -349,7 +349,7 @@ class _QuestRuleSwitch extends StatelessWidget {
           child: Container(
             width: 20,
             height: 20,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.fg,
             ),

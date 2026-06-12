@@ -48,7 +48,7 @@ class QuestDetailHeader extends StatelessWidget {
             // Title
             Text(
               quest.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fg,
@@ -60,7 +60,7 @@ class QuestDetailHeader extends StatelessWidget {
             // Subtitle (time)
             Text(
               _getTimeOfDay(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgSecondary,
               ),

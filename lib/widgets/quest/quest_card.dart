@@ -123,7 +123,7 @@ class QuestCard extends StatelessWidget {
             if (quest.displayTime != null) ...[
               Text(
                 quest.displayTime!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   color: AppColor.cyan,
@@ -133,7 +133,7 @@ class QuestCard extends StatelessWidget {
             ],
             Text(
               quest.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fg,
@@ -142,7 +142,7 @@ class QuestCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               quest.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.textSecondary,
                 height: 1.4,
@@ -156,11 +156,11 @@ class QuestCard extends StatelessWidget {
                 QuestTypeChip(type: quest.type),
                 const SizedBox(width: 12),
                 if (quest.estimatedMinutes > 0) ...[
-                  const Icon(RemixIcons.time_line, size: 16, color: AppColor.textSecondary),
+                  Icon(RemixIcons.time_line, size: 16, color: AppColor.textSecondary),
                   const SizedBox(width: 5),
                   Text(
                     '${quest.estimatedMinutes} phút',
-                    style: const TextStyle(fontSize: 13, color: AppColor.textSecondary),
+                    style: TextStyle(fontSize: 13, color: AppColor.textSecondary),
                   ),
                 ],
                 const Spacer(),
@@ -234,7 +234,7 @@ class QuestCard extends StatelessWidget {
               if (!isCompleted) ...[
                 Text(
                   quest.displayTime!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fg,
@@ -243,7 +243,7 @@ class QuestCard extends StatelessWidget {
               ] else ...[
                 Text(
                   quest.displayTime!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fgSecondary,
@@ -281,12 +281,12 @@ class QuestCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             if (isCompleted) ...[
-              const Icon(RemixIcons.checkbox_circle_line, size: 16, color: AppColor.success),
+              Icon(RemixIcons.checkbox_circle_line, size: 16, color: AppColor.success),
               if (quest.displayTime != null) ...[
                 const SizedBox(width: 4),
                 Text(
                   quest.displayTime!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: AppColor.success,
@@ -296,9 +296,9 @@ class QuestCard extends StatelessWidget {
               const SizedBox(width: 6),
               ExpBadge(exp: quest.exp),
             ] else if (isSnoozed) ...[
-              const Icon(RemixIcons.time_line, size: 16, color: AppColor.warn),
+              Icon(RemixIcons.time_line, size: 16, color: AppColor.warn),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 'Đã hoãn',
                 style: TextStyle(
                   fontSize: 11,
@@ -323,7 +323,7 @@ class QuestCard extends StatelessWidget {
                     ),
                     child: Center(
                       child: isActionPending
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -331,7 +331,7 @@ class QuestCard extends StatelessWidget {
                                 valueColor: AlwaysStoppedAnimation<Color>(AppColor.cyan),
                               ),
                             )
-                          : const Icon(RemixIcons.check_line, size: 16, color: AppColor.cyan),
+                          : Icon(RemixIcons.check_line, size: 16, color: AppColor.cyan),
                     ),
                   ),
                 ),

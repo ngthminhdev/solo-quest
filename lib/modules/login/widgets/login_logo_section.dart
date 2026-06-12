@@ -38,10 +38,10 @@ class LoginLogoSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.s20),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
+          shaderCallback: (bounds) => LinearGradient(
             colors: [AppColor.cyan, AppColor.violet],
           ).createShader(bounds),
-          child: const Text(
+          child: Text(
             'SoloQuest',
             style: TextStyle(
               fontSize: 28,
@@ -53,7 +53,7 @@ class LoginLogoSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.s8),
         Text(
           context.l10n.loginTagline,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             color: AppColor.fgSecondary,
             height: 1.5,

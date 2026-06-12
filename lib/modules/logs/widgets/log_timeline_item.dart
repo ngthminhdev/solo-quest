@@ -81,7 +81,7 @@ class LogTimelineItem extends StatelessWidget {
                       children: [
                         Text(
                           DateHelper.formatTime(log.createdAt),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'JetBrains Mono',
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -111,7 +111,7 @@ class LogTimelineItem extends StatelessWidget {
                     // Title
                     Text(
                       log.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fg,
@@ -124,7 +124,7 @@ class LogTimelineItem extends StatelessWidget {
                       const SizedBox(height: AppSpacing.s4),
                       Text(
                         log.description,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColor.fgSecondary,
                         ),
@@ -234,7 +234,7 @@ class LogTimelineItem extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             mood.label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
               color: AppColor.violet,

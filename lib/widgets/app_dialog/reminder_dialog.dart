@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:remixicon/remixicon.dart';
 import '../../constants/app_color.dart';
 import '../../constants/app_radius.dart';
@@ -170,6 +171,9 @@ class ReminderDialog extends StatelessWidget {
     required Color iconColor,
     required Color iconBgColor,
   }) {
+    // Vibrate the device to alert the user
+    HapticFeedback.vibrate();
+
     return showDialog(
       context: context,
       barrierDismissible: true,
@@ -228,7 +232,7 @@ class ReminderDialog extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColor.fg,
@@ -240,7 +244,7 @@ class ReminderDialog extends StatelessWidget {
             Text(
               body,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fgSecondary,
                 height: 1.4,

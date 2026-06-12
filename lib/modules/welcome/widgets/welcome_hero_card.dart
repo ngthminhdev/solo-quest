@@ -27,10 +27,10 @@ class WelcomeHeroCard extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xl),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
+          shaderCallback: (bounds) => LinearGradient(
             colors: [AppColor.cyan, AppColor.violet],
           ).createShader(bounds),
-          child: const Text(
+          child: Text(
             'SoloQuest',
             style: TextStyle(
               fontSize: 28,

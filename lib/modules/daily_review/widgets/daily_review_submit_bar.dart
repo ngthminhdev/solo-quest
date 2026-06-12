@@ -33,7 +33,7 @@ class DailyReviewSubmitBar extends StatelessWidget {
         AppSpacing.s16,
         MediaQuery.of(context).padding.bottom + AppSpacing.s12,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         border: Border(top: BorderSide(color: AppColor.border)),
       ),
@@ -53,7 +53,7 @@ class DailyReviewSubmitBar extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -103,7 +103,7 @@ class DailyReviewSubmitBar extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   context.l10n.dailyReviewLinkToWeekly,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,

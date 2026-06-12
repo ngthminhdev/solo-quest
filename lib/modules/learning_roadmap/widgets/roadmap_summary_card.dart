@@ -38,7 +38,7 @@ class RoadmapSummaryCard extends StatelessWidget {
         children: [
           Text(
             l10n.lrSummaryTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -70,11 +70,11 @@ class RoadmapSummaryCard extends StatelessWidget {
             children: [
               Text(
                 l10n.lrSummaryAvgProgress,
-                style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+                style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
               ),
               Text(
                 '${(averageProgress * 100).round()}%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   color: AppColor.violet,
                   fontWeight: FontWeight.w700,
@@ -91,7 +91,7 @@ class RoadmapSummaryCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s8),
           Text(
             l10n.lrLocalProgressHint,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               color: AppColor.fgMuted,
               height: 1.35,
@@ -131,7 +131,7 @@ class _StatItem extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               color: AppColor.fgMuted,
               letterSpacing: 0.04,

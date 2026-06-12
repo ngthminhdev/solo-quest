@@ -63,7 +63,7 @@ class LogsFilterBar extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         RemixIcons.calendar_line,
                         size: 16,
                         color: AppColor.fgSecondary,
@@ -71,7 +71,7 @@ class LogsFilterBar extends StatelessWidget {
                       const SizedBox(width: AppSpacing.s4),
                       Text(
                         context.l10n.logsSelectDate,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: AppColor.fgSecondary,
@@ -96,7 +96,7 @@ class LogsFilterBar extends StatelessWidget {
                     ),
                     child: Text(
                       context.l10n.logsClearFilter,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColor.cyan,
@@ -172,7 +172,7 @@ class LogsFilterBar extends StatelessWidget {
       builder: (_) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.55,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColor.bgRaised,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
@@ -185,7 +185,7 @@ class LogsFilterBar extends StatelessWidget {
                   children: [
                     Text(
                       context.l10n.logsSelectDate,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColor.fg,
@@ -193,7 +193,7 @@ class LogsFilterBar extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(
+                      child: Icon(
                         RemixIcons.close_line,
                         size: 22,
                         color: AppColor.fgMuted,
@@ -210,7 +210,7 @@ class LogsFilterBar extends StatelessWidget {
                   maxDate: DateTime.now(),
                   selectionMode: DateRangePickerSelectionMode.single,
                   backgroundColor: AppColor.bgRaised,
-                  headerStyle: const DateRangePickerHeaderStyle(
+                  headerStyle: DateRangePickerHeaderStyle(
                     backgroundColor: AppColor.bgRaised,
                     textStyle: TextStyle(
                       fontSize: 15,
@@ -218,7 +218,7 @@ class LogsFilterBar extends StatelessWidget {
                       color: AppColor.fg,
                     ),
                   ),
-                  monthViewSettings: const DateRangePickerMonthViewSettings(
+                  monthViewSettings: DateRangePickerMonthViewSettings(
                     viewHeaderStyle: DateRangePickerViewHeaderStyle(
                       textStyle: TextStyle(
                         fontSize: 12,
@@ -226,7 +226,7 @@ class LogsFilterBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  monthCellStyle: const DateRangePickerMonthCellStyle(
+                  monthCellStyle: DateRangePickerMonthCellStyle(
                     textStyle: TextStyle(
                       fontSize: 13,
                       color: AppColor.fg,
@@ -243,7 +243,7 @@ class LogsFilterBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  selectionTextStyle: const TextStyle(
+                  selectionTextStyle: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColor.bgDeep,
@@ -274,7 +274,7 @@ class LogsFilterBar extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         context.l10n.commonConfirm,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColor.bgDeep,

@@ -87,18 +87,18 @@ class _CompletedDayCard extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColor.successDim,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.checkbox_circle_line,
               color: AppColor.success,
               size: 32,
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Tất cả nhiệm vụ đã hoàn thành!',
             style: TextStyle(
               fontSize: 16,
@@ -108,7 +108,7 @@ class _CompletedDayCard extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Hôm nay thật tuyệt vời! Bạn đã hoàn thành xuất sắc tất cả các quest được giao.',
             style: TextStyle(
               fontSize: 13,

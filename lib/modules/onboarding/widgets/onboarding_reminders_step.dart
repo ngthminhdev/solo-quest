@@ -62,7 +62,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep6SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -92,7 +92,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           l10n.onboardingStep6BreakQuestDesc,
-          style: const TextStyle(fontSize: 12, color: AppColor.fgSecondary),
+          style: TextStyle(fontSize: 12, color: AppColor.fgSecondary),
         ),
         const SizedBox(height: AppSpacing.sm),
         Wrap(
@@ -204,7 +204,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           l10n.onboardingStep6WaterQuestDesc,
-          style: const TextStyle(fontSize: 12, color: AppColor.fgSecondary),
+          style: TextStyle(fontSize: 12, color: AppColor.fgSecondary),
         ),
         const SizedBox(height: AppSpacing.sm),
         Row(
@@ -248,7 +248,7 @@ class OnboardingRemindersStep extends StatelessWidget {
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
               l10n.onboardingStep6WaterQuestNote,
-              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+              style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
           ),
       ],
@@ -292,7 +292,7 @@ class OnboardingRemindersStep extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.time_line,
                   size: 18,
                   color: AppColor.fgMuted,
@@ -304,7 +304,7 @@ class OnboardingRemindersStep extends StatelessWidget {
                         ? data.quietAfterTime
                         : '22:00',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
                     fontWeight: FontWeight.w600,
@@ -317,7 +317,7 @@ class OnboardingRemindersStep extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           l10n.onboardingStep6QuietAfterNote,
-          style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+          style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
         ),
       ],
     );

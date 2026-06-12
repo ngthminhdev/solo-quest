@@ -117,7 +117,7 @@ class LessonSessionSheet extends StatelessWidget {
                           ),
                           child: Text(
                             l10n.lsWeek(weekNumber),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'JetBrainsMono',
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -129,7 +129,7 @@ class LessonSessionSheet extends StatelessWidget {
                         const SizedBox(width: AppSpacing.s8),
                         Text(
                           moduleTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColor.fgSecondary,
                           ),
@@ -143,7 +143,7 @@ class LessonSessionSheet extends StatelessWidget {
                 // Lesson title
                 Text(
                   lesson.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fg,
@@ -192,7 +192,7 @@ class LessonSessionSheet extends StatelessWidget {
                     ),
                     child: Text(
                       lesson.description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColor.fgSecondary,
                         height: 1.6,
@@ -235,12 +235,12 @@ class LessonSessionSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(RemixIcons.lock_line, size: 14, color: AppColor.warn),
+          Icon(RemixIcons.lock_line, size: 14, color: AppColor.warn),
           const SizedBox(width: AppSpacing.s8),
           Expanded(
             child: Text(
               l10n.lsLockedInfo,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColor.warn,
                 height: 1.4,
@@ -261,12 +261,12 @@ class LessonSessionSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(RemixIcons.check_line, size: 14, color: AppColor.success),
+          Icon(RemixIcons.check_line, size: 14, color: AppColor.success),
           const SizedBox(width: AppSpacing.s8),
           Expanded(
             child: Text(
               l10n.lsCompletedInfo,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColor.fgSecondary,
               ),
@@ -286,12 +286,12 @@ class LessonSessionSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(RemixIcons.star_line, size: 14, color: AppColor.violet),
+          Icon(RemixIcons.star_line, size: 14, color: AppColor.violet),
           const SizedBox(width: AppSpacing.s8),
           Expanded(
             child: Text(
               l10n.lsExtraInfo,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 color: AppColor.fgSecondary,
                 height: 1.4,
@@ -306,12 +306,12 @@ class LessonSessionSheet extends StatelessWidget {
   Widget _buildActiveInfo(AppLocalizations l10n) {
     return Row(
       children: [
-        const Icon(RemixIcons.play_circle_fill, size: 14, color: AppColor.cyan),
+        Icon(RemixIcons.play_circle_fill, size: 14, color: AppColor.cyan),
         const SizedBox(width: AppSpacing.s8),
         Flexible(
           child: Text(
             l10n.lsReadyInfo,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColor.fgSecondary,
             ),
@@ -335,7 +335,7 @@ class LessonSessionSheet extends StatelessWidget {
           child: Text(
             l10n.lsClose,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,
@@ -358,7 +358,7 @@ class LessonSessionSheet extends StatelessWidget {
           child: Text(
             l10n.lsClose,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColor.fgSecondary,
@@ -427,7 +427,7 @@ class LessonSessionSheet extends StatelessWidget {
                 onPressed: () => onAction?.call(LessonSessionAction.skipForNow),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColor.fgSecondary,
-                  side: const BorderSide(color: AppColor.border),
+                  side: BorderSide(color: AppColor.border),
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.s10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

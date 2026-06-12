@@ -89,7 +89,7 @@ class LessonCompletionSheet extends StatelessWidget {
                 width: 2,
               ),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.checkbox_circle_line,
               size: 30,
               color: AppColor.success,
@@ -101,7 +101,7 @@ class LessonCompletionSheet extends StatelessWidget {
           // Title
           Text(
             l10n.lsCompleteTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -112,7 +112,7 @@ class LessonCompletionSheet extends StatelessWidget {
 
           Text(
             '"$lessonTitle"',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,
             ),
@@ -138,11 +138,11 @@ class LessonCompletionSheet extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(RemixIcons.time_line, size: 12, color: AppColor.fgMuted),
+                Icon(RemixIcons.time_line, size: 12, color: AppColor.fgMuted),
                 const SizedBox(width: AppSpacing.s4),
                 Text(
                   l10n.lsCompleteStats(todayCompletedCount, todayStudyMinutes),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                   ),
@@ -199,7 +199,7 @@ class LessonCompletionSheet extends StatelessWidget {
                     label: Text(l10n.lsCompleteStop),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColor.fgSecondary,
-                      side: const BorderSide(color: AppColor.border),
+                      side: BorderSide(color: AppColor.border),
                       padding: const EdgeInsets.symmetric(vertical: AppSpacing.s10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

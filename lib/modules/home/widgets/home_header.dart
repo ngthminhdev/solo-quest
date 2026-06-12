@@ -48,7 +48,7 @@ class HomeHeader extends StatelessWidget {
             children: [
               Text(
                 dateStr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'JetBrains Mono',
                   fontSize: 11,
                   color: AppColor.fgMuted,
@@ -59,11 +59,11 @@ class HomeHeader extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(RemixIcons.fire_fill, size: 14, color: AppColor.warn),
+                    Icon(RemixIcons.fire_fill, size: 14, color: AppColor.warn),
                     const SizedBox(width: 4),
                     Text(
                       '${progress!.streakDays} ngày',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'JetBrains Mono',
                         fontSize: 11,
                         fontWeight: FontWeight.w700,

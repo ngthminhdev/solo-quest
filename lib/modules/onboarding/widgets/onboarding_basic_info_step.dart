@@ -119,7 +119,7 @@ class OnboardingBasicInfoStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep1SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -212,10 +212,10 @@ class _InputFieldState extends State<_InputField> {
               controller: _controller,
               onChanged: widget.onChanged,
               keyboardType: widget.keyboardType,
-              style: const TextStyle(fontSize: 15, color: AppColor.fg),
+              style: TextStyle(fontSize: 15, color: AppColor.fg),
               decoration: InputDecoration(
                 hintText: widget.hint,
-                hintStyle: const TextStyle(color: AppColor.fgMuted),
+                hintStyle: TextStyle(color: AppColor.fgMuted),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
@@ -229,7 +229,7 @@ class _InputFieldState extends State<_InputField> {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Text(
                 widget.suffix!,
-                style: const TextStyle(fontSize: 13, color: AppColor.fgMuted),
+                style: TextStyle(fontSize: 13, color: AppColor.fgMuted),
               ),
             ),
         ],
@@ -263,8 +263,8 @@ class _DropdownField extends StatelessWidget {
           value: value,
           isExpanded: true,
           dropdownColor: AppColor.surface,
-          style: const TextStyle(fontSize: 15, color: AppColor.fg),
-          icon: const Icon(
+          style: TextStyle(fontSize: 15, color: AppColor.fg),
+          icon: Icon(
             RemixIcons.arrow_down_s_line,
             size: 18,
             color: AppColor.fgMuted,
@@ -272,7 +272,7 @@ class _DropdownField extends StatelessWidget {
           hint: options.isNotEmpty
               ? Text(
                   options.first.label,
-                  style: const TextStyle(fontSize: 15, color: AppColor.fgMuted),
+                  style: TextStyle(fontSize: 15, color: AppColor.fgMuted),
                 )
               : null,
           items: options.map((OnboardingStepOption option) {

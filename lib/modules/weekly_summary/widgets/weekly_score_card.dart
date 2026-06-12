@@ -36,7 +36,7 @@ class WeeklyScoreCard extends StatelessWidget {
             // Big percentage
             Text(
               '$rate%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'JetBrains Mono',
                 fontSize: 48,
                 fontWeight: FontWeight.w800,
@@ -47,7 +47,7 @@ class WeeklyScoreCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.s4),
             Text(
               '${summary.completedQuestCount} / $total nhiệm vụ',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColor.fgSecondary,
               ),
@@ -105,7 +105,7 @@ class _MiniStat extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               color: AppColor.fgMuted,
             ),

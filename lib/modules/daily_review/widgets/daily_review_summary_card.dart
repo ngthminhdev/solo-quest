@@ -27,7 +27,7 @@ class DailyReviewSummaryCard extends StatelessWidget {
         horizontal: AppSpacing.s16,
         vertical: AppSpacing.s12,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColor.border)),
       ),
       child: Row(
@@ -106,7 +106,7 @@ class _StatCell extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 color: AppColor.fgMuted,
                 letterSpacing: 0.04,

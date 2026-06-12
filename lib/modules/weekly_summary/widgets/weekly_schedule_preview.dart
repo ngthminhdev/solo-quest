@@ -25,7 +25,7 @@ class WeeklySchedulePreview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               WeeklySummaryConstants.scheduleTitle,
               style: TextStyle(
                 fontSize: 13,
@@ -72,7 +72,7 @@ class _ScheduleGroup extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: AppColor.fgMuted,
@@ -88,7 +88,7 @@ class _ScheduleGroup extends StatelessWidget {
                     width: 44,
                     child: Text(
                       item.time,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'JetBrains Mono',
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
@@ -100,7 +100,7 @@ class _ScheduleGroup extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item.label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColor.fgSecondary,
                       ),

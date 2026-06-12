@@ -157,7 +157,7 @@ class QuestDetailActionBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: AppColor.success.withValues(alpha: 0.2)),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               '✓ Đã hoàn thành',
               style: TextStyle(
@@ -183,7 +183,7 @@ class QuestDetailActionBar extends StatelessWidget {
             color: AppColor.surface,
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               '— Đã bỏ qua',
               style: TextStyle(

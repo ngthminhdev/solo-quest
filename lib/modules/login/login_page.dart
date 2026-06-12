@@ -76,7 +76,7 @@ class _LoginPageState
                       // Heading
                       Text(
                         context.l10n.loginTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -89,7 +89,7 @@ class _LoginPageState
                       // Description
                       Text(
                         context.l10n.loginSubtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppColor.fgSecondary,
                           height: 1.6,
@@ -176,7 +176,7 @@ class _DevLoginButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColor.border),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Continue with Dev Login',
             style: TextStyle(

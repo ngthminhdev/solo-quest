@@ -32,7 +32,7 @@ class ReminderTimeRangeRow extends StatelessWidget {
             onChanged: onStartChanged,
           ),
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.s10),
           child: Icon(
             RemixIcons.arrow_right_s_line,
@@ -84,7 +84,7 @@ class _TimePickerField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppColor.fgMuted),
+              style: TextStyle(fontSize: 11, color: AppColor.fgMuted),
             ),
             const SizedBox(height: AppSpacing.s4),
             Text(

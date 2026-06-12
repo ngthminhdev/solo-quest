@@ -42,7 +42,7 @@ class WelcomeActionBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.rocket_2_line,
                   size: 18,
                   color: AppColor.bgDeep,

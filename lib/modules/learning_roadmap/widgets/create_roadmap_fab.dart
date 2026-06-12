@@ -40,7 +40,7 @@ class CreateRoadmapFab extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 16,
               height: 16,
               child: CircularProgressIndicator(
@@ -51,7 +51,7 @@ class CreateRoadmapFab extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               generationMessage ?? 'Đang tạo lộ trình...',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColor.cyan,

@@ -77,7 +77,7 @@ class _SummaryMetric extends StatelessWidget {
         const SizedBox(height: AppSpacing.s6),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
             color: AppColor.fg,
@@ -87,7 +87,7 @@ class _SummaryMetric extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 10, color: AppColor.fgMuted),
+          style: TextStyle(fontSize: 10, color: AppColor.fgMuted),
         ),
       ],
     );

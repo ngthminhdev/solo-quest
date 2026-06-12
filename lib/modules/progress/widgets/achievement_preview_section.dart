@@ -46,7 +46,7 @@ class AchievementPreviewSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
           child: Row(
             children: [
-              const Icon(RemixIcons.award_line, size: 16, color: AppColor.expGold),
+              Icon(RemixIcons.award_line, size: 16, color: AppColor.expGold),
               const SizedBox(width: AppSpacing.s6),
               Text(
                 context.l10n.progressAchievementSectionTitle,

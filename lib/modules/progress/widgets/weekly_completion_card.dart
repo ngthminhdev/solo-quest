@@ -34,7 +34,7 @@ class WeeklyCompletionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 RemixIcons.bar_chart_box_line,
                 size: 20,
                 color: AppColor.cyan,
@@ -43,7 +43,7 @@ class WeeklyCompletionCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   context.l10n.progressWeeklyCompletionTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fg,
@@ -52,7 +52,7 @@ class WeeklyCompletionCard extends StatelessWidget {
               ),
               Text(
                 '$percent%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
@@ -66,7 +66,7 @@ class WeeklyCompletionCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.s8),
           Text(
             weeklyMessage(rate),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColor.fgSecondary,
               height: 1.35,

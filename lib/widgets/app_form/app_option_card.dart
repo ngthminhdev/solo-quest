@@ -66,7 +66,7 @@ class AppOptionCard extends StatelessWidget {
               ),
             ),
             if (selected)
-              const Icon(RemixIcons.checkbox_circle_line, size: 20, color: AppColor.cyan),
+              Icon(RemixIcons.checkbox_circle_line, size: 20, color: AppColor.cyan),
           ],
         ),
       ),

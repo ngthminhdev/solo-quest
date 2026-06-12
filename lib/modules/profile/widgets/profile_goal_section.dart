@@ -52,7 +52,7 @@ class ProfileGoalSection extends StatelessWidget {
         children: [
           Text(
             l10n.profileGoalEmpty,
-            style: const TextStyle(fontSize: 14, color: AppColor.fgMuted),
+            style: TextStyle(fontSize: 14, color: AppColor.fgMuted),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.s12),
@@ -60,7 +60,7 @@ class ProfileGoalSection extends StatelessWidget {
             onPressed: onSetupGoals,
             child: Text(
               l10n.profileGoalSetupButton,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColor.cyan,
@@ -100,7 +100,7 @@ class ProfileGoalSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(color: AppColor.primaryBorder),
                 ),
-                child: const Icon(
+                child: Icon(
                   RemixIcons.focus_3_line,
                   size: 18,
                   color: AppColor.primary,
@@ -113,7 +113,7 @@ class ProfileGoalSection extends StatelessWidget {
                   children: [
                     Text(
                       l10n.profileGoalPursuing,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColor.textPrimary,
@@ -122,7 +122,7 @@ class ProfileGoalSection extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s2),
                     Text(
                       l10n.profileGoalFromProfile,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColor.textSecondary,
                       ),
@@ -164,7 +164,7 @@ class _GoalCountBadge extends StatelessWidget {
       ),
       child: Text(
         '$count',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w800,
           color: AppColor.primary,
@@ -194,11 +194,11 @@ class _PrimaryGoalRow extends StatelessWidget {
           Container(
             width: 28,
             height: 28,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColor.primarySoft,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.crosshair_2_line,
               size: 15,
               color: AppColor.primary,
@@ -208,7 +208,7 @@ class _PrimaryGoalRow extends StatelessWidget {
           Expanded(
             child: Text(
               goal,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: AppColor.textPrimary,
@@ -244,7 +244,7 @@ class _SecondaryGoalRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             RemixIcons.checkbox_blank_circle_line,
             size: 14,
             color: AppColor.primary,
@@ -253,7 +253,7 @@ class _SecondaryGoalRow extends StatelessWidget {
           Expanded(
             child: Text(
               goal,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColor.textSecondary,

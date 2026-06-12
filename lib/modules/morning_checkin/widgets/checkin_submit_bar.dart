@@ -33,7 +33,7 @@ class CheckinSubmitBar extends StatelessWidget {
         AppSpacing.s16,
         MediaQuery.of(context).padding.bottom + AppSpacing.s12,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         border: Border(top: BorderSide(color: AppColor.border)),
       ),
@@ -56,7 +56,7 @@ class CheckinSubmitBar extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(

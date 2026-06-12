@@ -275,7 +275,12 @@ void main() {
   late FakeAiApiService fakeAiApiService;
   late HomePageModel homePageModel;
 
-  HomePageModel buildModel({Duration? pollInterval, int maxPolls = 10}) {
+  HomePageModel buildModel({
+    Duration? pollInterval,
+    int maxPolls = 10,
+    Duration? tabRefreshDebounce,
+    Duration? tabRefreshCacheTtl,
+  }) {
     return HomePageModel(
       questService: fakeQuestService,
       progressService: fakeProgressService,
@@ -286,6 +291,9 @@ void main() {
       aiApiService: fakeAiApiService,
       pollInterval: pollInterval ?? const Duration(seconds: 10),
       maxPolls: maxPolls,
+      tabRefreshDebounce:
+          tabRefreshDebounce ?? const Duration(milliseconds: 450),
+      tabRefreshCacheTtl: tabRefreshCacheTtl ?? const Duration(seconds: 20),
     );
   }
 
@@ -607,6 +615,198 @@ void main() {
       expect(fakeQuestService.skippedQuestId, 'q1');
       expect(fakeQuestService.skippedReason, 'Too busy');
     });
+
+    test(
+      'tab visible refresh reuses fresh cache without another API call',
+      () async {
+        homePageModel = buildModel(
+          tabRefreshDebounce: const Duration(milliseconds: 10),
+          tabRefreshCacheTtl: const Duration(seconds: 30),
+        );
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+          ),
+        ];
+
+        await homePageModel.loadHomeData();
+        final callsAfterInitialLoad = fakeQuestService.getTodayQuestsCallCount;
+
+        homePageModel.scheduleTabVisibleRefresh();
+        await Future.delayed(const Duration(milliseconds: 30));
+
+        expect(fakeQuestService.getTodayQuestsCallCount, callsAfterInitialLoad);
+      },
+    );
+
+    test('tab visible refresh debounces stale cache reloads', () async {
+      homePageModel = buildModel(
+        tabRefreshDebounce: const Duration(milliseconds: 10),
+        tabRefreshCacheTtl: Duration.zero,
+      );
+      fakeQuestService.quests = [
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.pending,
+        ),
+      ];
+
+      await homePageModel.loadHomeData();
+      final callsAfterInitialLoad = fakeQuestService.getTodayQuestsCallCount;
+
+      homePageModel.scheduleTabVisibleRefresh();
+      homePageModel.scheduleTabVisibleRefresh();
+      homePageModel.scheduleTabVisibleRefresh();
+      await Future.delayed(const Duration(milliseconds: 40));
+
+      expect(
+        fakeQuestService.getTodayQuestsCallCount,
+        callsAfterInitialLoad + 1,
+      );
+    });
+
+    test('external quest update moves completed quest immediately', () async {
+      fakeQuestService.quests = [
+        const QuestModel(
+          id: 'q1',
+          title: 'Q1',
+          type: QuestType.water,
+          status: QuestStatus.active,
+        ),
+        const QuestModel(
+          id: 'q2',
+          title: 'Q2',
+          type: QuestType.learning,
+          status: QuestStatus.pending,
+        ),
+      ];
+      await homePageModel.loadHomeData();
+
+      homePageModel.applyQuestUpdate(
+        fakeQuestService.quests.first.copyWith(
+          status: QuestStatus.completed,
+          completedAt: DateTime.now(),
+        ),
+        refreshInBackground: false,
+      );
+
+      expect(homePageModel.state.completedQuests.map((q) => q.id), ['q1']);
+      expect(homePageModel.state.activeQuests.map((q) => q.id), ['q2']);
+      expect(homePageModel.state.completedTodayQuestCount, 1);
+    });
+
+    test(
+      'stale read-after-write does not revert an optimistically completed quest',
+      () async {
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.active,
+          ),
+          const QuestModel(
+            id: 'q2',
+            title: 'Q2',
+            type: QuestType.learning,
+            status: QuestStatus.pending,
+          ),
+        ];
+        await homePageModel.loadHomeData();
+
+        // Optimistically mark q1 completed, as the action API response would.
+        homePageModel.applyQuestUpdate(
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.completed,
+          ),
+          refreshInBackground: false,
+        );
+        expect(homePageModel.state.completedQuests.map((q) => q.id), ['q1']);
+
+        // Backend read-after-write is still stale: getTodayQuests returns q1
+        // as active (fakeQuestService.quests was never updated).
+        await homePageModel.loadHomeData(
+          autoGenerateIfEmpty: false,
+          forceRefresh: true,
+          showLoading: false,
+        );
+
+        // Overlay keeps q1 completed; it must not snap back to active.
+        expect(homePageModel.state.completedQuests.map((q) => q.id), ['q1']);
+        expect(
+          homePageModel.state.activeQuests.any((q) => q.id == 'q1'),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'overlay clears once backend reflects the optimistic status',
+      () async {
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.active,
+          ),
+        ];
+        await homePageModel.loadHomeData();
+
+        homePageModel.applyQuestUpdate(
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.completed,
+          ),
+          refreshInBackground: false,
+        );
+
+        // Backend catches up: q1 is now genuinely completed.
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.completed,
+          ),
+        ];
+        await homePageModel.loadHomeData(
+          autoGenerateIfEmpty: false,
+          forceRefresh: true,
+          showLoading: false,
+        );
+        expect(homePageModel.state.completedQuests.map((q) => q.id), ['q1']);
+
+        // Server now legitimately moves q1 back to pending (e.g. another
+        // device). The overlay was already dropped, so the server state wins.
+        fakeQuestService.quests = [
+          const QuestModel(
+            id: 'q1',
+            title: 'Q1',
+            type: QuestType.water,
+            status: QuestStatus.pending,
+          ),
+        ];
+        await homePageModel.loadHomeData(
+          autoGenerateIfEmpty: false,
+          forceRefresh: true,
+          showLoading: false,
+        );
+
+        expect(homePageModel.state.completedQuests, isEmpty);
+        expect(homePageModel.state.activeQuests.map((q) => q.id), ['q1']);
+      },
+    );
   });
 
   group('Duplicate Tap Prevention & Action Loading Map', () {

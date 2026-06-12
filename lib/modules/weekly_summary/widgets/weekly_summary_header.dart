@@ -26,7 +26,7 @@ class WeeklySummaryHeader extends StatelessWidget {
         children: [
           Text(
             l10n.weeklySummaryHeaderLabel,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'JetBrains Mono',
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -37,7 +37,7 @@ class WeeklySummaryHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.s4),
           Text(
             l10n.weeklySummaryHeaderTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -47,7 +47,7 @@ class WeeklySummaryHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.s4),
           Text(
             DateHelper.formatDateRange(summary.weekStart, summary.weekEnd),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,
             ),
@@ -56,7 +56,7 @@ class WeeklySummaryHeader extends StatelessWidget {
           Text(
             l10n.weeklySummaryHeaderDesc,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppColor.fgMuted,
               height: 1.5,

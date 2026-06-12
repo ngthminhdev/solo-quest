@@ -114,7 +114,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
       constraints: BoxConstraints(
         maxHeight: screenHeight * 0.9,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bg,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppRadius.xl),
@@ -146,14 +146,14 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                     gradient: AppColor.secondaryToPrimaryGradient,
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     RemixIcons.sparkling_2_fill,
                     size: 22,
                     color: AppColor.bgDeep,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -186,7 +186,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
             ),
           ),
 
-          const Divider(height: 1, color: AppColor.border),
+          Divider(height: 1, color: AppColor.border),
 
           // Form content
           Flexible(
@@ -207,7 +207,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                     controller: _goalController,
                     decoration: InputDecoration(
                       hintText: 'Ví dụ: State Management, Testing, Performance...',
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontSize: 14,
                         color: AppColor.fgMuted,
                       ),
@@ -215,22 +215,22 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                       fillColor: AppColor.bgRaised,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide: const BorderSide(color: AppColor.border),
+                        borderSide: BorderSide(color: AppColor.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide: const BorderSide(color: AppColor.border),
+                        borderSide: BorderSide(color: AppColor.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        borderSide: const BorderSide(color: AppColor.cyan, width: 2),
+                        borderSide: BorderSide(color: AppColor.cyan, width: 2),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.s16,
                         vertical: AppSpacing.s14,
                       ),
                     ),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       color: AppColor.fg,
                     ),
@@ -306,7 +306,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
           // Action bar
           Container(
             padding: const EdgeInsets.all(AppSpacing.s16),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColor.bg,
               border: Border(
                 top: BorderSide(color: AppColor.border),
@@ -328,7 +328,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             RemixIcons.error_warning_line,
                             size: 18,
                             color: AppColor.danger,
@@ -337,7 +337,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                           Expanded(
                             child: Text(
                               widget.generationError!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 color: AppColor.danger,
                               ),
@@ -372,7 +372,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const SizedBox(
+                                  SizedBox(
                                     width: 16,
                                     height: 16,
                                     child: CircularProgressIndicator(
@@ -502,7 +502,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColor.fg,
@@ -510,7 +510,7 @@ class _RoadmapPreferenceSheetState extends State<RoadmapPreferenceSheet> {
         ),
         if (isRequired) ...[
           const SizedBox(width: AppSpacing.s4),
-          const Text(
+          Text(
             '*',
             style: TextStyle(
               fontSize: 14,
@@ -729,7 +729,7 @@ class _DifficultyOption extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColor.fg,
@@ -738,7 +738,7 @@ class _DifficultyOption extends StatelessWidget {
                   const SizedBox(height: AppSpacing.s2),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
                     ),
@@ -747,7 +747,7 @@ class _DifficultyOption extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              const Icon(
+              Icon(
                 RemixIcons.check_line,
                 size: 20,
                 color: AppColor.cyan,

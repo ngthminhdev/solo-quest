@@ -76,7 +76,7 @@ class _SummaryItem extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             color: AppColor.fgMuted,
             letterSpacing: 0.04,

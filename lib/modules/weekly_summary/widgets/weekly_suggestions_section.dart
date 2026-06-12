@@ -70,7 +70,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '◆ $title',
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'JetBrains Mono',
         fontSize: 11,
         fontWeight: FontWeight.w700,
@@ -117,7 +117,7 @@ class _SuggestionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,
@@ -127,7 +127,7 @@ class _SuggestionCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     reason,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
                       height: 1.4,

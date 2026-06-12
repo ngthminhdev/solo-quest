@@ -72,7 +72,7 @@ class OnboardingScheduleStep extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           l10n.onboardingStep5ScheduleHint,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColor.cyan,
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -116,7 +116,7 @@ class OnboardingScheduleStep extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         Text(
           l10n.onboardingStep5SystemNote,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             color: AppColor.fgMuted,
             height: 1.5,
@@ -167,7 +167,7 @@ class OnboardingScheduleStep extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.time_line,
                   size: 18,
                   color: AppColor.fgMuted,
@@ -177,7 +177,7 @@ class OnboardingScheduleStep extends StatelessWidget {
                   TimeHelper.formatOrFallback(
                     value.isNotEmpty ? value : defaultTime,
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
                     fontWeight: FontWeight.w600,
@@ -265,7 +265,7 @@ class OnboardingScheduleStep extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   RemixIcons.time_line,
                   size: 18,
                   color: AppColor.fgMuted,
@@ -275,7 +275,7 @@ class OnboardingScheduleStep extends StatelessWidget {
                   TimeHelper.formatOrFallback(
                     value.isNotEmpty ? value : defaultTime,
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     color: AppColor.fg,
                     fontWeight: FontWeight.w600,

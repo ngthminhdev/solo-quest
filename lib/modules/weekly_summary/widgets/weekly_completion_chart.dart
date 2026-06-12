@@ -34,7 +34,7 @@ class WeeklyCompletionChart extends StatelessWidget {
             children: [
               Text(
                 l10n.weeklySummaryChartTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColor.fgSecondary,
@@ -74,7 +74,7 @@ class WeeklyCompletionChart extends StatelessWidget {
           children: [
             Text(
               l10n.weeklySummaryChartTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColor.fgSecondary,
@@ -104,7 +104,7 @@ class WeeklyCompletionChart extends StatelessWidget {
                         children: [
                           Text(
                             '${(rate * 100).round()}%',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'JetBrains Mono',
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -137,7 +137,7 @@ class WeeklyCompletionChart extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             dayLabels[labelIndex],
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: AppColor.fgMuted,

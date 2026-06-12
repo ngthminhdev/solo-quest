@@ -49,7 +49,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '◆ $title',
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'JetBrains Mono',
         fontSize: 11,
         fontWeight: FontWeight.w700,
@@ -92,7 +92,7 @@ class _InsightCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgSecondary,
                 height: 1.4,
@@ -122,7 +122,7 @@ class _AiSummaryCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             RemixIcons.robot_2_line,
             size: 18,
             color: AppColor.cyan,
@@ -131,7 +131,7 @@ class _AiSummaryCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColor.fgSecondary,
                 height: 1.4,

@@ -47,7 +47,7 @@ class QuestDifficultySelector extends StatelessWidget {
                 children: [
                   Text(
                     value.getLocalizedLabel(l10n),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColor.fg,
@@ -55,7 +55,7 @@ class QuestDifficultySelector extends StatelessWidget {
                   ),
                   Text(
                     value.getLocalizedDescription(l10n),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgMuted,
                     ),
@@ -63,7 +63,7 @@ class QuestDifficultySelector extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               RemixIcons.arrow_down_s_line,
               size: 18,
               color: AppColor.fgMuted,
@@ -94,7 +94,7 @@ class QuestDifficultySelector extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
                   child: Text(
                     l10n.questRulesGeneralDifficultySelectorTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColor.fg,
@@ -134,7 +134,7 @@ class QuestDifficultySelector extends StatelessWidget {
                                 ),
                                 Text(
                                   difficulty.getLocalizedDescription(l10n),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     color: AppColor.fgMuted,
                                   ),
@@ -143,7 +143,7 @@ class QuestDifficultySelector extends StatelessWidget {
                             ),
                           ),
                           if (selected)
-                            const Icon(
+                            Icon(
                               RemixIcons.check_line,
                               size: 18,
                               color: AppColor.cyan,

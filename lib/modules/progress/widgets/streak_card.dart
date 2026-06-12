@@ -36,7 +36,7 @@ class StreakCard extends StatelessWidget {
               color: AppColor.warnDim,
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.fire_line,
               size: 22,
               color: AppColor.warn,
@@ -49,7 +49,7 @@ class StreakCard extends StatelessWidget {
               children: [
                 Text(
                   context.l10n.progressStreakDaysLabel(streakDays),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColor.fg,
@@ -58,7 +58,7 @@ class StreakCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s2),
                 Text(
                   motivationMessage(streakDays),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppColor.fgSecondary,
                     height: 1.35,
@@ -81,7 +81,7 @@ class StreakCard extends StatelessWidget {
               ),
               child: Text(
                 'x$streakDays',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

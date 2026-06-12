@@ -27,7 +27,7 @@ class ProfileEmptyView extends StatelessWidget {
               color: AppColor.fgMuted,
             ),
             const SizedBox(height: AppSpacing.s16),
-            const Text(
+            Text(
               'Chưa có hồ sơ',
               style: TextStyle(
                 fontSize: 18,

@@ -37,7 +37,7 @@ class AppChecklistItem extends StatelessWidget {
                 ),
               ),
               child: checked
-                  ? const Icon(RemixIcons.check_line, size: 14, color: AppColor.bgDeep)
+                  ? Icon(RemixIcons.check_line, size: 14, color: AppColor.bgDeep)
                   : null,
             ),
             const SizedBox(width: 12),
@@ -58,7 +58,7 @@ class AppChecklistItem extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppColor.fgMuted,
                       ),

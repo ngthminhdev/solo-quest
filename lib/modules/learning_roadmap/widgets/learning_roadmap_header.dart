@@ -24,7 +24,7 @@ class LearningRoadmapHeader extends StatelessWidget {
               color: AppColor.infoDim,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.route_line,
               size: 22,
               color: AppColor.info,
@@ -33,7 +33,7 @@ class LearningRoadmapHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.s12),
           Text(
             l10n.lrPageTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: AppColor.fg,
@@ -42,7 +42,7 @@ class LearningRoadmapHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.s6),
           Text(
             l10n.lrPageSubtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppColor.fgSecondary,
               height: 1.5,

@@ -104,7 +104,7 @@ class AppChoiceBottomSheet extends StatelessWidget {
             width: double.infinity,
             height: 44,
             color: AppColor.transparent,
-            child: const Center(
+            child: Center(
               child: Text(
                 'Huỷ',
                 style: TextStyle(

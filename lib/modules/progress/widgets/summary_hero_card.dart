@@ -39,7 +39,7 @@ class SummaryHeroCard extends StatelessWidget {
                   children: [
                     Text(
                       l10n.progressCurrentLevel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         color: AppColor.fgMuted,
                         letterSpacing: 0.06,
@@ -48,7 +48,7 @@ class SummaryHeroCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.s2),
                     Text(
                       'Level ${progress.level}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -67,7 +67,7 @@ class SummaryHeroCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'EXP',
                 style: TextStyle(
                   fontFamily: 'Roboto',
@@ -77,7 +77,7 @@ class SummaryHeroCard extends StatelessWidget {
               ),
               Text(
                 '${_formatNumber(progress.currentLevelExp)} / ${_formatNumber(progress.nextLevelExp)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -147,7 +147,7 @@ class _LevelRing extends StatelessWidget {
     return Container(
       width: 56,
       height: 56,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: AppColor.levelGradient,
       ),
@@ -155,14 +155,14 @@ class _LevelRing extends StatelessWidget {
         child: Container(
           width: 48,
           height: 48,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColor.bg,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$level',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Roboto',
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
@@ -219,7 +219,7 @@ class _StatCell extends StatelessWidget {
                 if (suffix != null)
                   TextSpan(
                     text: suffix,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Roboto',
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
@@ -232,7 +232,7 @@ class _StatCell extends StatelessWidget {
           const SizedBox(height: AppSpacing.s4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               color: AppColor.fgMuted,
               letterSpacing: 0.04,

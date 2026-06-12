@@ -102,20 +102,16 @@ class _LearningRoadmapPageState
     return AppScaffold(
       showBottomNav: false,
       scroll: false,
-      body: Stack(
+      isLocked: state.isLockedPage,
+      body: Column(
         children: [
-          _buildContent(state),
-          // FAB positioned at bottom right
-          Positioned(
-            right: 16,
-            bottom: 16,
-            child: CreateRoadmapFab(
-              onPressed: () => pageModel.showPreferenceSheet(),
-              isGenerating: state.isGeneratingRoadmap,
-              generationMessage: state.generationStatusMessage,
-            ),
-          ),
+          Expanded(child: _buildContent(state)),
         ],
+      ),
+      floatingActionButton: CreateRoadmapFab(
+        onPressed: () => pageModel.showPreferenceSheet(),
+        isGenerating: state.isGeneratingRoadmap,
+        generationMessage: state.generationStatusMessage,
       ),
     );
   }

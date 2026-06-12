@@ -194,7 +194,7 @@ class OnboardingCompleteStep extends StatelessWidget {
             width: 80,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13, color: AppColor.fgSecondary),
+              style: TextStyle(fontSize: 13, color: AppColor.fgSecondary),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -223,13 +223,13 @@ class OnboardingCompleteStep extends StatelessWidget {
         children: [
           Text(
             time,
-            style: const TextStyle(fontSize: 12, color: AppColor.fgMuted),
+            style: TextStyle(fontSize: 12, color: AppColor.fgMuted),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: AppColor.fg,
@@ -239,7 +239,7 @@ class OnboardingCompleteStep extends StatelessWidget {
           ),
           Text(
             exp,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColor.expGold,

@@ -44,7 +44,7 @@ class OnboardingBottomBar extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.md + MediaQuery.of(context).padding.bottom,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         border: Border(top: BorderSide(color: AppColor.border, width: 0.5)),
       ),
@@ -66,7 +66,7 @@ class OnboardingBottomBar extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       RemixIcons.arrow_left_s_line,
                       size: 16,
                       color: AppColor.fgSecondary,
@@ -96,7 +96,7 @@ class OnboardingBottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(

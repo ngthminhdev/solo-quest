@@ -84,7 +84,7 @@ class _StatItem extends StatelessWidget {
           const SizedBox(height: AppSpacing.s6),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColor.fg,

@@ -17,7 +17,7 @@ class DailyReviewHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(RemixIcons.moon_line, size: 24, color: AppColor.violet),
+              Icon(RemixIcons.moon_line, size: 24, color: AppColor.violet),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

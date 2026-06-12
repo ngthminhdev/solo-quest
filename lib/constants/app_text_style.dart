@@ -6,7 +6,7 @@ class AppTextStyle {
   static const String _font = 'Exo2';
 
   // Display / Hero text
-  static const TextStyle display = TextStyle(
+  static final TextStyle display = TextStyle(
     fontFamily: _font,
     fontSize: 28,
     fontWeight: FontWeight.w800,
@@ -16,7 +16,7 @@ class AppTextStyle {
   );
 
   // Headings
-  static const TextStyle h1 = TextStyle(
+  static final TextStyle h1 = TextStyle(
     fontFamily: _font,
     fontSize: 24,
     fontWeight: FontWeight.w700,
@@ -25,7 +25,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle h2 = TextStyle(
+  static final TextStyle h2 = TextStyle(
     fontFamily: _font,
     fontSize: 20,
     fontWeight: FontWeight.w700,
@@ -33,7 +33,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle h3 = TextStyle(
+  static final TextStyle h3 = TextStyle(
     fontFamily: _font,
     fontSize: 18,
     fontWeight: FontWeight.w600,
@@ -41,10 +41,10 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle heading = h3; // Alias for backward compatibility
+  static TextStyle get heading => h3; // Alias for backward compatibility
 
   // Body text
-  static const TextStyle body = TextStyle(
+  static final TextStyle body = TextStyle(
     fontFamily: _font,
     fontSize: 14,
     fontWeight: FontWeight.w500,
@@ -52,7 +52,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle bodyBold = TextStyle(
+  static final TextStyle bodyBold = TextStyle(
     fontFamily: _font,
     fontSize: 14,
     fontWeight: FontWeight.w600,
@@ -60,7 +60,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle bodySmall = TextStyle(
+  static final TextStyle bodySmall = TextStyle(
     fontFamily: _font,
     fontSize: 13,
     fontWeight: FontWeight.w500,
@@ -69,7 +69,7 @@ class AppTextStyle {
   );
 
   // Caption / Helper text
-  static const TextStyle caption = TextStyle(
+  static final TextStyle caption = TextStyle(
     fontFamily: _font,
     fontSize: 12,
     fontWeight: FontWeight.w400,
@@ -77,7 +77,7 @@ class AppTextStyle {
     color: AppColor.fgSecondary,
   );
 
-  static const TextStyle captionBold = TextStyle(
+  static final TextStyle captionBold = TextStyle(
     fontFamily: _font,
     fontSize: 12,
     fontWeight: FontWeight.w600,
@@ -86,7 +86,7 @@ class AppTextStyle {
   );
 
   // Labels / Tags
-  static const TextStyle label = TextStyle(
+  static final TextStyle label = TextStyle(
     fontFamily: _font,
     fontSize: 11,
     fontWeight: FontWeight.w600,
@@ -95,7 +95,7 @@ class AppTextStyle {
     color: AppColor.fgMuted,
   );
 
-  static const TextStyle labelUppercase = TextStyle(
+  static final TextStyle labelUppercase = TextStyle(
     fontFamily: _font,
     fontSize: 11,
     fontWeight: FontWeight.w700,
@@ -122,7 +122,7 @@ class AppTextStyle {
   );
 
   // Mono / Code style
-  static const TextStyle mono = TextStyle(
+  static final TextStyle mono = TextStyle(
     fontFamily: _font,
     fontSize: 14,
     fontWeight: FontWeight.w700,
@@ -130,7 +130,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle monoLarge = TextStyle(
+  static final TextStyle monoLarge = TextStyle(
     fontFamily: _font,
     fontSize: 18,
     fontWeight: FontWeight.w800,
@@ -138,7 +138,7 @@ class AppTextStyle {
     color: AppColor.fg,
   );
 
-  static const TextStyle monoLabel = TextStyle(
+  static final TextStyle monoLabel = TextStyle(
     fontFamily: _font,
     fontSize: 11,
     fontWeight: FontWeight.w700,
@@ -148,7 +148,7 @@ class AppTextStyle {
   );
 
   // Section headers
-  static const TextStyle sectionLabel = TextStyle(
+  static final TextStyle sectionLabel = TextStyle(
     fontFamily: _font,
     fontSize: 11,
     fontWeight: FontWeight.w700,

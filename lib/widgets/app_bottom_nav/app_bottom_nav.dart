@@ -20,7 +20,7 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColor.bgRaised,
         border: Border(top: BorderSide(color: AppColor.border, width: 1)),
       ),
@@ -197,11 +197,14 @@ class _NavItemState extends State<_NavItem> with TickerProviderStateMixin {
                     if (widget.isActive)
                       _buildSlidingCard(itemWidth),
 
-                    // Icon with slide animation
-                    _buildIcon(),
-
-                    // Label with slide animation
-                    _buildLabel(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildIcon(),
+                        const SizedBox(height: 3),
+                        _buildLabel(),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -240,73 +243,62 @@ class _NavItemState extends State<_NavItem> with TickerProviderStateMixin {
   }
 
   Widget _buildSlidingCard(double itemWidth) {
-    final slideOffset = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: const Offset(0, -0.5),
-    ).animate(CurvedAnimation(
+    final width = itemWidth > 76 ? 76.0 : itemWidth - 10;
+    final opacity = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _slideController,
-      curve: const Interval(0.3, 1.0),
+      curve: Curves.easeOutCubic,
     )).value;
 
-    return ClipRect(
-      child: SlideTransition(
-        position: AlwaysStoppedAnimation(slideOffset),
-        child: Container(
-          width: itemWidth,
-          height: 60,
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        width: width,
+        height: 52,
+        decoration: BoxDecoration(
+          color: AppColor.primarySubtleOverlay,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColor.primaryBorder),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.primarySoftShadow,
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildIcon() {
-    final iconSlide = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1.2),
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: const Interval(0.3, 1.0),
-    )).value;
-
-    return ClipRect(
-      child: SlideTransition(
-        position: AlwaysStoppedAnimation(iconSlide),
-        child: Icon(
-          widget.icon,
-          size: 22,
-          color: widget.isActive ? AppColor.cyan : AppColor.fgMuted,
-        ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      width: 26,
+      height: 24,
+      alignment: Alignment.center,
+      child: Icon(
+        widget.icon,
+        size: widget.isActive ? 22 : 21,
+        color: widget.isActive ? AppColor.cyan : AppColor.fgMuted,
       ),
     );
   }
 
   Widget _buildLabel() {
-    final labelSlide = Tween<Offset>(
-      begin: const Offset(0, 1.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: const Interval(0.3, 1.0),
-    )).value;
-
-    return ClipRect(
-      child: SlideTransition(
-        position: AlwaysStoppedAnimation(labelSlide),
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.only(top: 2),
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
-              color: widget.isActive ? AppColor.cyan : AppColor.fgMuted,
-              height: 1.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+    return SizedBox(
+      width: 70,
+      child: Text(
+        widget.label,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
+          color: widget.isActive ? AppColor.cyan : AppColor.fgMuted,
+          height: 1.1,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -335,4 +327,3 @@ class _RipplePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
-

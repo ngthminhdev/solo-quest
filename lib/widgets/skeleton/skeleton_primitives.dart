@@ -74,7 +74,7 @@ class SkeletonCircle extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColor.surface,
           shape: BoxShape.circle,
         ),
@@ -163,7 +163,7 @@ class SkeletonSectionHeader extends StatelessWidget {
           Container(
             width: 8,
             height: 8,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColor.surface,
               shape: BoxShape.circle,
             ),

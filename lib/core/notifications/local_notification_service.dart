@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -11,6 +12,11 @@ import '../../../core/timer/countdown_session.dart';
 import 'notification_ids.dart';
 
 class LocalNotificationService {
+  static const String attentionChannelId = 'solo_quest_attention_v2';
+  static const String _attentionChannelName = 'Solo Quest Alerts';
+  static const String _attentionChannelDescription =
+      'Important quest, reminder, and timer alerts';
+
   final FlutterLocalNotificationsPlugin _plugin;
   bool _initialized = false;
   final StreamController<String> _tapController = StreamController<String>.broadcast();
@@ -36,6 +42,7 @@ class LocalNotificationService {
       final androidImplementation = _plugin
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       if (androidImplementation != null) {
+        await _createAttentionChannel(androidImplementation);
         await androidImplementation.requestNotificationsPermission();
       }
       _initialized = true;
@@ -44,6 +51,52 @@ class LocalNotificationService {
         developer.log('[LocalNotificationService] Init error: $e');
       }
     }
+  }
+
+  Future<void> _createAttentionChannel(
+    AndroidFlutterLocalNotificationsPlugin androidImplementation,
+  ) async {
+    await androidImplementation.createNotificationChannel(
+      AndroidNotificationChannel(
+        attentionChannelId,
+        _attentionChannelName,
+        description: _attentionChannelDescription,
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern: _attentionVibrationPattern(),
+      ),
+    );
+  }
+
+  static Int64List _attentionVibrationPattern() {
+    return Int64List.fromList(const [0, 450, 120, 450]);
+  }
+
+  static NotificationDetails _attentionNotificationDetails() {
+    return NotificationDetails(
+      android: AndroidNotificationDetails(
+        attentionChannelId,
+        _attentionChannelName,
+        channelDescription: _attentionChannelDescription,
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern: _attentionVibrationPattern(),
+        category: AndroidNotificationCategory.reminder,
+      ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+  }
+
+  static void playAttentionCue() {
+    unawaited(HapticFeedback.vibrate().catchError((_) {}));
+    unawaited(SystemSound.play(SystemSoundType.alert).catchError((_) {}));
   }
 
   void _onNotificationTap(NotificationResponse response) {
@@ -101,18 +154,7 @@ class LocalNotificationService {
         'Đến giờ quay lại nhiệm vụ',
         quest.title,
         tzTime,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'quest_snooze_channel',
-            'Quest Snooze Reminders',
-            channelDescription: 'Notifications for snoozed quest reminders',
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-            enableVibration: true,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
+        _attentionNotificationDetails(),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -189,18 +231,7 @@ class LocalNotificationService {
         'Hết giờ',
         '${session.title} đã kết thúc.',
         tzTime,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'countdown_completion_channel',
-            'Countdown Completion',
-            channelDescription: 'Notifications for completed countdown quests',
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-            enableVibration: true,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
+        _attentionNotificationDetails(),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -243,21 +274,12 @@ class LocalNotificationService {
   }) async {
     if (!_initialized) return;
     try {
+      playAttentionCue();
       await _plugin.show(
         id,
         title,
         body,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'fcm_foreground_channel',
-            'FCM Foreground Notifications',
-            channelDescription: 'Notifications received while the app is in the foreground',
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
+        _attentionNotificationDetails(),
         payload: payload,
       );
     } catch (e) {

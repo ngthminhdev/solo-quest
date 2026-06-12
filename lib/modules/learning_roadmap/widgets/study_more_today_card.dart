@@ -67,7 +67,7 @@ class _StudyMoreTodayCardState extends State<StudyMoreTodayCard> {
           // Header
           Row(
             children: [
-              const Icon(
+              Icon(
                 RemixIcons.add_circle_line,
                 size: 16,
                 color: AppColor.violet,
@@ -75,7 +75,7 @@ class _StudyMoreTodayCardState extends State<StudyMoreTodayCard> {
               const SizedBox(width: AppSpacing.s8),
               Text(
                 l10n.lrStudyMoreTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'JetBrainsMono',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,

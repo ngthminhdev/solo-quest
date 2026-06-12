@@ -78,7 +78,7 @@ class _SnoozedQuestCard extends StatelessWidget {
                   color: AppColor.warnDim,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
-                child: const Icon(
+                child: Icon(
                   RemixIcons.time_line,
                   color: AppColor.warn,
                   size: 16,
@@ -91,7 +91,7 @@ class _SnoozedQuestCard extends StatelessWidget {
                   children: [
                     Text(
                       quest.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColor.fgSecondary,
@@ -100,7 +100,7 @@ class _SnoozedQuestCard extends StatelessWidget {
                     if (quest.description.isNotEmpty)
                       Text(
                         quest.description,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColor.fgMuted,
                         ),

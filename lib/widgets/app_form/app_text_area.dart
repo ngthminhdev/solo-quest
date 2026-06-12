@@ -32,7 +32,7 @@ class AppTextArea extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
               label!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColor.fgSecondary,
@@ -44,23 +44,23 @@ class AppTextArea extends StatelessWidget {
           onChanged: onChanged,
           maxLines: maxLines,
           maxLength: maxLength,
-          style: const TextStyle(fontSize: 14, color: AppColor.fg),
+          style: TextStyle(fontSize: 14, color: AppColor.fg),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColor.fgMuted),
+            hintStyle: TextStyle(color: AppColor.fgMuted),
             filled: true,
             fillColor: AppColor.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColor.border),
+              borderSide: BorderSide(color: AppColor.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColor.border),
+              borderSide: BorderSide(color: AppColor.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColor.cyan),
+              borderSide: BorderSide(color: AppColor.cyan),
             ),
             contentPadding: const EdgeInsets.all(12),
           ),

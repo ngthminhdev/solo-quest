@@ -58,7 +58,7 @@ class ProgressLinkCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColor.fg,
@@ -67,7 +67,7 @@ class ProgressLinkCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     desc,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
                     ),
@@ -75,7 +75,7 @@ class ProgressLinkCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               RemixIcons.arrow_right_s_line,
               size: 16,
               color: AppColor.fgMuted,

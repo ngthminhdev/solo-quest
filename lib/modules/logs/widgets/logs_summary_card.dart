@@ -99,7 +99,7 @@ class LogsSummaryCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.s4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 color: AppColor.fgMuted,
                 letterSpacing: 0.04,

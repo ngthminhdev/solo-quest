@@ -70,7 +70,7 @@ class WelcomeFeatureList extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColor.fg,
@@ -78,7 +78,7 @@ class WelcomeFeatureList extends StatelessWidget {
               ),
               Text(
                 desc,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   color: AppColor.fgMuted,
                 ),

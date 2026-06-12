@@ -32,11 +32,11 @@ class QuestRulesSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(RemixIcons.settings_4_line, size: 18, color: AppColor.cyan),
+              Icon(RemixIcons.settings_4_line, size: 18, color: AppColor.cyan),
               const SizedBox(width: AppSpacing.s8),
               Text(
                 l10n.questRulesSummaryTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: AppColor.fg,
@@ -127,7 +127,7 @@ class _SummaryMetric extends StatelessWidget {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppColor.fg,
@@ -138,7 +138,7 @@ class _SummaryMetric extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fgSecondary,

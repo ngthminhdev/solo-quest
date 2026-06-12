@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:remixicon/remixicon.dart';
 
 import '../../constants/app_color.dart';
 import '../../constants/app_spacing.dart';
+import '../app_state/app_loading.dart';
 
 class AppScaffold extends StatelessWidget {
   final String? title;
@@ -15,6 +17,8 @@ class AppScaffold extends StatelessWidget {
   final bool useGradientBackground;
   final bool showBackButton;
   final VoidCallback? onBack;
+  final Widget? floatingActionButton;
+  final bool isLocked;
 
   const AppScaffold({
     super.key,
@@ -29,6 +33,8 @@ class AppScaffold extends StatelessWidget {
     this.useGradientBackground = true,
     this.showBackButton = false,
     this.onBack,
+    this.floatingActionButton,
+    this.isLocked = false,
   });
 
   @override
@@ -45,30 +51,40 @@ class AppScaffold extends StatelessWidget {
               centerTitle: false,
               leading: showBackButton
                   ? IconButton(
-                      icon: const Icon(Icons.arrow_back),
+                      icon: const Icon(RemixIcons.arrow_left_s_line),
                       onPressed: onBack ?? () => Navigator.of(context).pop(),
                     )
                   : null,
               actions: actions,
             )
           : null,
-      body: Container(
-        decoration: useGradientBackground
-            ? const BoxDecoration(
-                gradient: AppColor.backgroundGradient,
-              )
-            : null,
-        child: SafeArea(
-          child: scroll
-              ? SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: body,
-                )
-              : body,
-        ),
-      ),
+      body: isLocked
+          ? PageLockOverlay(
+              isLocked: true,
+              child: _buildBody(),
+            )
+          : _buildBody(),
       bottomNavigationBar: showBottomNav ? bottomNav : null,
       bottomSheet: bottom,
+      floatingActionButton: floatingActionButton,
+    );
+  }
+
+  Widget _buildBody() {
+    return Container(
+      decoration: useGradientBackground
+          ? BoxDecoration(
+              gradient: AppColor.backgroundGradient,
+            )
+          : null,
+      child: SafeArea(
+        child: scroll
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: body,
+              )
+            : body,
+      ),
     );
   }
 }

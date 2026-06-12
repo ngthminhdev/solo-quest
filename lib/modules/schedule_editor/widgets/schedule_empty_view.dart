@@ -28,7 +28,7 @@ class ScheduleEmptyView extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: AppColor.border),
             ),
-            child: const Icon(
+            child: Icon(
               RemixIcons.calendar_event_line,
               size: 36,
               color: AppColor.fgMuted,
@@ -37,7 +37,7 @@ class ScheduleEmptyView extends StatelessWidget {
           const SizedBox(height: AppSpacing.s16),
           Text(
             l10n.scheduleEditorEmptyTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColor.fg,

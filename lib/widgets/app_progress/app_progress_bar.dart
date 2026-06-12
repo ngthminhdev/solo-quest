@@ -34,7 +34,7 @@ class AppProgressBar extends StatelessWidget {
                 if (label != null)
                   Text(
                     label!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Roboto',
                       fontSize: 11,
                       color: AppColor.fgMuted,
@@ -43,7 +43,7 @@ class AppProgressBar extends StatelessWidget {
                 if (valueText != null)
                   Text(
                     valueText!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Roboto',
                       fontSize: 12,
                       color: AppColor.fgSecondary,

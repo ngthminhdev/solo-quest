@@ -66,7 +66,7 @@ class SkipQuestSheet {
                     color: AppColor.violet,
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Xác nhận bỏ qua',
                       style: TextStyle(
@@ -85,7 +85,7 @@ class SkipQuestSheet {
                   width: double.infinity,
                   height: 44,
                   color: AppColor.transparent,
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Huỷ',
                       style: TextStyle(

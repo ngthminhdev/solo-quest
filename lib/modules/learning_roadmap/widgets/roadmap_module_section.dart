@@ -75,7 +75,7 @@ class RoadmapModuleSection extends StatelessWidget {
                 ),
                 child: Text(
                   module.moduleNumber.toString().padLeft(2, '0'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'JetBrainsMono',
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -87,7 +87,7 @@ class RoadmapModuleSection extends StatelessWidget {
               Expanded(
                 child: Text(
                   module.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColor.textPrimary,

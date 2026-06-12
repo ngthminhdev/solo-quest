@@ -58,7 +58,7 @@ class ReminderSettingCard extends StatelessWidget {
                     children: [
                       Text(
                         setting.type.getLocalizedTitle(context.l10n),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColor.fg,
@@ -67,7 +67,7 @@ class ReminderSettingCard extends StatelessWidget {
                       const SizedBox(height: AppSpacing.s2),
                       Text(
                         setting.type.getLocalizedDescription(context.l10n),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           color: AppColor.fgMuted,
                           height: 1.35,
@@ -133,7 +133,7 @@ class ReminderSettingCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     setting.frequency.getLocalizedDescription(context.l10n),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       color: AppColor.fgSecondary,
                       height: 1.35,
@@ -156,7 +156,7 @@ class ReminderSettingCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           RemixIcons.edit_2_line,
                           size: 14,
                           color: AppColor.cyan,
@@ -164,7 +164,7 @@ class ReminderSettingCard extends StatelessWidget {
                         const SizedBox(width: AppSpacing.s4),
                         Text(
                           context.l10n.reminderCardEditButton,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColor.cyan,
@@ -285,7 +285,7 @@ class _ReminderSwitch extends StatelessWidget {
           child: Container(
             width: 20,
             height: 20,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.fg,
             ),

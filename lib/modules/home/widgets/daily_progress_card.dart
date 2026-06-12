@@ -99,7 +99,7 @@ class DailyProgressCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 color: AppColor.fgMuted,
                 letterSpacing: 0.04,

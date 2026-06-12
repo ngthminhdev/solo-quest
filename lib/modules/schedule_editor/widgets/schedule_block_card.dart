@@ -56,7 +56,7 @@ class ScheduleBlockCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   block.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColor.fg,

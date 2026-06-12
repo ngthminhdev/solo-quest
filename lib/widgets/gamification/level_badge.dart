@@ -29,7 +29,7 @@ class LevelBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             RemixIcons.star_fill,
             size: 12,
             color: AppColor.bgDeep,
